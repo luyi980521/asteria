@@ -16,4 +16,11 @@
 
     <name>asteria-common</name>
     <description>Asteria shared foundational types.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
 </project>
