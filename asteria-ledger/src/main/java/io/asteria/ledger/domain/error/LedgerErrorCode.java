@@ -6,6 +6,11 @@ public enum LedgerErrorCode {
     NULL_ARGUMENT("LEDGER_0003", "Argument must not be null"),
     INSUFFICIENT_POSTINGS("LEDGER_0004", "Journal entry must contain at least two postings"),
     MULTIPLE_CURRENCIES_NOT_SUPPORTED("LEDGER_0005", "Journal entry must contain postings in the same currency"),
+    DEBIT_CREDIT_DIRECTION_ILLEGAL("LEDGER_0006", "DebitCredit direction is illegal"),
+    JOURNAL_ENTRY_NOT_BALANCED("LEDGER_0007", "Journal entry not balanced"),
+    POSTING_AMOUNT_MUST_BE_POSITIVE("LEDGER_0008", "Posting amount must be positive"),
+    JOURNAL_ENTRY_CANNOT_BE_POSTED("LEDGER_0009", "Journal entry cannot be posted"),
+    POSTED_AT_REQUIRED("LEDGER_0010", "Posted at required"),
 
     ;
 
