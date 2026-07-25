@@ -14,6 +14,10 @@ public enum LedgerErrorCode {
     ONLY_POSTED_ENTRY_CAN_BE_REVERSED("LEDGER_0011", "Only posted entry can be reversed"),
     JOURNAL_ENTRY_ALREADY_REVERSED("LEDGER_0012", "Journal entry already reversed"),
     REVERSED_AT_BEFORE_POSTED_AT("LEDGER_0013", "Reversed at before posted at"),
+    SOURCE_TYPE_REQUIRED("LEDGER_0014", "Source type required"),
+    SOURCE_ID_REQUIRED("LEDGER_0015", "Source id required"),
+    EVENT_TYPE_REQUIRED("LEDGER_0016", "Event type required"),
+    EVENT_ID_REQUIRED("LEDGER_0017", "Event id required"),
 
     ;
 

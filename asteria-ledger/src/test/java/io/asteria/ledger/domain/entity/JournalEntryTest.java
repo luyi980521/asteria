@@ -4,8 +4,10 @@ import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.enums.JournalEntryStatus;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
+import io.asteria.ledger.domain.valueobject.EventId;
 import io.asteria.ledger.domain.valueobject.LedgerAccountId;
 import io.asteria.ledger.domain.valueobject.Money;
+import io.asteria.ledger.domain.valueobject.JournalReference;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -27,7 +29,7 @@ class JournalEntryTest {
 
     @Test
     void createsBalancedEntryAsDraft() {
-        JournalEntry entry = new JournalEntry().create(validPostings(), "REF-001");
+        JournalEntry entry = new JournalEntry().create(validPostings(), reference("REF-001"));
 
         assertEquals(JournalEntryStatus.DRAFT, entry.getStatus());
         assertNull(entry.getPostedAt());
@@ -37,7 +39,7 @@ class JournalEntryTest {
     @Test
     void rejectsEntryWithFewerThanTwoPostings() {
         assertError(LedgerErrorCode.INSUFFICIENT_POSTINGS,
-                () -> new JournalEntry().create(List.of(posting("10.00", DebitCredit.DEBIT)), "REF"));
+                () -> new JournalEntry().create(List.of(posting("10.00", DebitCredit.DEBIT)), reference("REF")));
     }
 
     @Test
@@ -47,7 +49,7 @@ class JournalEntryTest {
                 posting("100.00", DebitCredit.CREDIT, EUR));
 
         assertError(LedgerErrorCode.MULTIPLE_CURRENCIES_NOT_SUPPORTED,
-                () -> new JournalEntry().create(postings, "REF"));
+                () -> new JournalEntry().create(postings, reference("REF")));
     }
 
     @Test
@@ -57,7 +59,7 @@ class JournalEntryTest {
                 posting("99.00", DebitCredit.CREDIT));
 
         assertError(LedgerErrorCode.JOURNAL_ENTRY_NOT_BALANCED,
-                () -> new JournalEntry().create(postings, "REF"));
+                () -> new JournalEntry().create(postings, reference("REF")));
     }
 
     @Test
@@ -140,7 +142,7 @@ class JournalEntryTest {
     }
 
     private JournalEntry createDraft() {
-        return new JournalEntry().create(validPostings(), "REF-001");
+        return new JournalEntry().create(validPostings(), reference("REF-001"));
     }
 
     private JournalEntry createPosted() {
@@ -164,6 +166,14 @@ class JournalEntryTest {
                 LedgerAccountId.generate(),
                 Money.of(new BigDecimal(amount), currency),
                 direction);
+    }
+
+    private JournalReference reference(String sourceId) {
+        return new JournalReference(
+                "TEST",
+                sourceId,
+                "TEST_CREATED",
+                EventId.generate().value());
     }
 
     private void assertError(LedgerErrorCode expected, org.junit.jupiter.api.function.Executable executable) {

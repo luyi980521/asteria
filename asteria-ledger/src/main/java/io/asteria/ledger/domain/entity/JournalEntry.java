@@ -2,9 +2,13 @@ package io.asteria.ledger.domain.entity;
 
 import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.enums.JournalEntryStatus;
+import io.asteria.ledger.domain.enums.JournalReferenceEventType;
+import io.asteria.ledger.domain.enums.JournalReferenceSourceType;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
+import io.asteria.ledger.domain.valueobject.EventId;
 import io.asteria.ledger.domain.valueobject.JournalEntryId;
+import io.asteria.ledger.domain.valueobject.JournalReference;
 import io.asteria.ledger.domain.valueobject.Money;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +43,7 @@ public class JournalEntry {
     private JournalEntryStatus status;
 
     /** 外部业务编号 */
-    private String reference;
+    private JournalReference reference;
 
     /** 被冲正凭证ID：当前凭证是冲正凭证时使用 */
     private JournalEntryId originalJournalEntryId;
@@ -59,7 +63,7 @@ public class JournalEntry {
     /**
      * 创建记账凭证
      * */
-    public JournalEntry create(List<Posting> postings, String reference) {
+    public JournalEntry create(List<Posting> postings, JournalReference reference) {
 
         validatePostingCount(postings);
         validateSameCurrency(postings);
@@ -123,11 +127,18 @@ public class JournalEntry {
         validateBalanced(postings);
         validatePositiveAmounts(postings);
 
+        JournalReference journalReference = new JournalReference(
+                JournalReferenceSourceType.JOURNAL_ENTRY.name(),
+                originalJournalEntryId.value().toString(),
+                JournalReferenceEventType.JOURNAL_ENTRY_REVERSED.name(),
+                EventId.generate().value()
+        );
+
         return JournalEntry.builder()
                 .journalEntryId(JournalEntryId.generate())
                 .postings(reversedPostings)
                 .status(JournalEntryStatus.DRAFT)
-                .reference("REVERSAL:" + originalJournalEntryId)
+                .reference(journalReference)
                 .originalJournalEntryId(originalJournalEntryId)
                 .reversalReason(reason)
                 .build();
