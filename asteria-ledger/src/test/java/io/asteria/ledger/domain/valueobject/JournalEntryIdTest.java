@@ -4,45 +4,39 @@ import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JournalEntryIdTest {
 
     @Test
-    void generateReturnsNonNullUuid() {
-        assertTrue(JournalEntryId.generate().value() != null);
+    void ofPreservesLongValue() {
+        assertEquals(1001L, JournalEntryId.of(1001L).value());
     }
 
     @Test
-    void fromPreservesUuid() {
-        UUID uuid = UUID.randomUUID();
-
-        assertEquals(uuid, JournalEntryId.from(uuid).value());
-    }
-
-    @Test
-    void nullUuidReturnsNullArgument() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> JournalEntryId.from(null));
+    void nullValueReturnsNullArgument() {
+        LedgerDomainException exception = assertThrows(
+                LedgerDomainException.class,
+                () -> JournalEntryId.of(null));
 
         assertEquals(LedgerErrorCode.NULL_ARGUMENT, exception.errorCode());
     }
 
     @Test
-    void sameUuidIdsAreEqual() {
-        UUID uuid = UUID.randomUUID();
+    void nonPositiveValueIsRejected() {
+        assertThrows(LedgerDomainException.class, () -> JournalEntryId.of(0L));
+        assertThrows(LedgerDomainException.class, () -> JournalEntryId.of(-1L));
+    }
 
-        assertEquals(JournalEntryId.from(uuid), JournalEntryId.from(uuid));
+    @Test
+    void sameValuesAreEqual() {
+        assertEquals(JournalEntryId.of(1001L), JournalEntryId.of(1001L));
     }
 
     @Test
     void differentIdTypesAreNotEqual() {
-        UUID uuid = UUID.randomUUID();
-
-        assertNotEquals(JournalEntryId.from(uuid), PostingId.from(uuid));
+        assertNotEquals(JournalEntryId.of(1001L), PostingId.of(1001L));
     }
 }

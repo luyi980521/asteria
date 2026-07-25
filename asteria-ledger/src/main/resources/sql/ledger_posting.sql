@@ -1,19 +1,34 @@
+DROP TABLE IF EXISTS ledger_posting;
 CREATE TABLE ledger_posting (
-    id                  VARCHAR(64) PRIMARY KEY,
-    journal_entry_id    VARCHAR(64) NOT NULL,
-    ledger_account_id   VARCHAR(64) NOT NULL,
+    id                  BIGINT PRIMARY KEY,
+    journal_entry_id    BIGINT NOT NULL,
+    ledger_account_id   BIGINT NOT NULL,
     amount              NUMERIC(38, 18) NOT NULL,
     currency            VARCHAR(16) NOT NULL,
     direction           VARCHAR(16) NOT NULL,
     sequence_no         INTEGER NOT NULL,
     created_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_posting_journal_entry
-        FOREIGN KEY (journal_entry_id)
-        REFERENCES ledger_journal_entry(id),
+    CONSTRAINT ck_posting_id_positive
+        CHECK (id > 0),
+
+    CONSTRAINT ck_posting_journal_entry_id_positive
+        CHECK (journal_entry_id > 0),
+
+    CONSTRAINT ck_posting_ledger_account_id_positive
+        CHECK (ledger_account_id > 0),
 
     CONSTRAINT ck_posting_amount_positive
         CHECK (amount > 0),
+
+    CONSTRAINT ck_posting_currency_not_blank
+        CHECK (length(trim(currency)) > 0),
+
+    CONSTRAINT ck_posting_direction
+        CHECK (direction IN ('DEBIT', 'CREDIT')),
+
+    CONSTRAINT ck_posting_sequence_positive
+        CHECK (sequence_no > 0),
 
     CONSTRAINT uk_posting_sequence
         UNIQUE (journal_entry_id, sequence_no)

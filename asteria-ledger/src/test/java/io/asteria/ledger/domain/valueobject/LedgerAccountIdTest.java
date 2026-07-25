@@ -4,45 +4,39 @@ import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LedgerAccountIdTest {
 
     @Test
-    void generateReturnsNonNullUuid() {
-        assertTrue(LedgerAccountId.generate().value() != null);
+    void ofPreservesLongValue() {
+        assertEquals(3001L, LedgerAccountId.of(3001L).value());
     }
 
     @Test
-    void fromPreservesUuid() {
-        UUID uuid = UUID.randomUUID();
-
-        assertEquals(uuid, LedgerAccountId.from(uuid).value());
-    }
-
-    @Test
-    void nullUuidReturnsNullArgument() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> LedgerAccountId.from(null));
+    void nullValueReturnsNullArgument() {
+        LedgerDomainException exception = assertThrows(
+                LedgerDomainException.class,
+                () -> LedgerAccountId.of(null));
 
         assertEquals(LedgerErrorCode.NULL_ARGUMENT, exception.errorCode());
     }
 
     @Test
-    void sameUuidIdsAreEqual() {
-        UUID uuid = UUID.randomUUID();
+    void nonPositiveValueIsRejected() {
+        assertThrows(LedgerDomainException.class, () -> LedgerAccountId.of(0L));
+        assertThrows(LedgerDomainException.class, () -> LedgerAccountId.of(-1L));
+    }
 
-        assertEquals(LedgerAccountId.from(uuid), LedgerAccountId.from(uuid));
+    @Test
+    void sameValuesAreEqual() {
+        assertEquals(LedgerAccountId.of(3001L), LedgerAccountId.of(3001L));
     }
 
     @Test
     void differentIdTypesAreNotEqual() {
-        UUID uuid = UUID.randomUUID();
-
-        assertNotEquals(LedgerAccountId.from(uuid), JournalEntryId.from(uuid));
+        assertNotEquals(LedgerAccountId.of(3001L), JournalEntryId.of(3001L));
     }
 }

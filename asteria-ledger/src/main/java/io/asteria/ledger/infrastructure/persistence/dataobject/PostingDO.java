@@ -1,5 +1,6 @@
 package io.asteria.ledger.infrastructure.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -17,18 +18,18 @@ public class PostingDO {
     /**
      * 分录ID
      */
-    @TableId
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     /**
      * 所属记账凭证ID
      */
-    private String journalEntryId;
+    private Long journalEntryId;
 
     /**
      * 账本账户ID
      */
-    private String ledgerAccountId;
+    private Long ledgerAccountId;
 
     /**
      * 分录金额，必须大于0；借贷方向由direction字段表达

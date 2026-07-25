@@ -3,21 +3,18 @@ package io.asteria.ledger.domain.valueobject;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 
-import java.util.UUID;
-
-public record JournalEntryId(UUID value) {
+public record JournalEntryId(Long value) {
 
     public JournalEntryId {
         if (value == null) {
             throw new LedgerDomainException(LedgerErrorCode.NULL_ARGUMENT);
         }
+        if (value <= 0) {
+            throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
+        }
     }
 
-    public static JournalEntryId generate() {
-        return new JournalEntryId(UUID.randomUUID());
-    }
-
-    public static JournalEntryId from(UUID value) {
+    public static JournalEntryId of(Long value) {
         return new JournalEntryId(value);
     }
 }

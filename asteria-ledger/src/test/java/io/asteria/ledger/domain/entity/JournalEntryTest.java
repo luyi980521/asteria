@@ -5,9 +5,11 @@ import io.asteria.ledger.domain.enums.JournalEntryStatus;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import io.asteria.ledger.domain.valueobject.EventId;
+import io.asteria.ledger.domain.valueobject.JournalEntryId;
+import io.asteria.ledger.domain.valueobject.JournalReference;
 import io.asteria.ledger.domain.valueobject.LedgerAccountId;
 import io.asteria.ledger.domain.valueobject.Money;
-import io.asteria.ledger.domain.valueobject.JournalReference;
+import io.asteria.ledger.domain.valueobject.PostingId;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -29,37 +31,48 @@ class JournalEntryTest {
 
     @Test
     void createsBalancedEntryAsDraft() {
-        JournalEntry entry = new JournalEntry().create(validPostings(), reference("REF-001"));
+        JournalEntry entry = JournalEntry.create(
+                JournalEntryId.of(1001L), validPostings(), reference("REF-001"));
 
         assertEquals(JournalEntryStatus.DRAFT, entry.getStatus());
         assertNull(entry.getPostedAt());
+        assertEquals(1001L, entry.getJournalEntryId().value());
         assertEquals(2, entry.getPostings().size());
+    }
+
+    @Test
+    void rejectsEntryWithNullId() {
+        assertError(LedgerErrorCode.NULL_ARGUMENT,
+                () -> JournalEntry.create(null, validPostings(), reference("REF")));
     }
 
     @Test
     void rejectsEntryWithFewerThanTwoPostings() {
         assertError(LedgerErrorCode.INSUFFICIENT_POSTINGS,
-                () -> new JournalEntry().create(List.of(posting("10.00", DebitCredit.DEBIT)), reference("REF")));
+                () -> JournalEntry.create(
+                        JournalEntryId.of(1001L),
+                        List.of(posting(2001L, 3001L, "10.00", DebitCredit.DEBIT)),
+                        reference("REF")));
     }
 
     @Test
     void rejectsEntryWithMultipleCurrencies() {
         List<Posting> postings = List.of(
-                posting("100.00", DebitCredit.DEBIT, USD),
-                posting("100.00", DebitCredit.CREDIT, EUR));
+                posting(2001L, 3001L, "100.00", DebitCredit.DEBIT, USD),
+                posting(2002L, 3002L, "100.00", DebitCredit.CREDIT, EUR));
 
         assertError(LedgerErrorCode.MULTIPLE_CURRENCIES_NOT_SUPPORTED,
-                () -> new JournalEntry().create(postings, reference("REF")));
+                () -> JournalEntry.create(JournalEntryId.of(1001L), postings, reference("REF")));
     }
 
     @Test
     void rejectsUnbalancedEntry() {
         List<Posting> postings = List.of(
-                posting("100.00", DebitCredit.DEBIT),
-                posting("99.00", DebitCredit.CREDIT));
+                posting(2001L, 3001L, "100.00", DebitCredit.DEBIT),
+                posting(2002L, 3002L, "99.00", DebitCredit.CREDIT));
 
         assertError(LedgerErrorCode.JOURNAL_ENTRY_NOT_BALANCED,
-                () -> new JournalEntry().create(postings, reference("REF")));
+                () -> JournalEntry.create(JournalEntryId.of(1001L), postings, reference("REF")));
     }
 
     @Test
@@ -87,20 +100,23 @@ class JournalEntryTest {
     }
 
     @Test
-    void reversalSwapsDirectionsAndPreservesPostingValues() {
+    void reversalUsesApplicationGeneratedIds() {
         JournalEntry original = createPosted();
         Posting originalDebit = original.getPostings().get(0);
         Posting originalCredit = original.getPostings().get(1);
 
-        JournalEntry reversal = original.reverse(REVERSED_AT, "业务冲正");
+        JournalEntry reversal = original.reverse(
+                JournalEntryId.of(1002L),
+                List.of(PostingId.of(2003L), PostingId.of(2004L)),
+                REVERSED_AT,
+                "reversal");
 
         assertEquals(JournalEntryStatus.POSTED, reversal.getStatus());
-        assertEquals(REVERSED_AT, reversal.getPostedAt());
+        assertEquals(1002L, reversal.getJournalEntryId().value());
         assertEquals(original.getJournalEntryId(), reversal.getOriginalJournalEntryId());
         assertEquals(reversal.getJournalEntryId(), original.getReversingJournalEntryId());
         assertEquals(REVERSED_AT, original.getReversedAt());
         assertNotEquals(original.getJournalEntryId(), reversal.getJournalEntryId());
-        assertEquals(2, reversal.getPostings().size());
 
         Posting reversedDebit = reversal.getPostings().get(0);
         Posting reversedCredit = reversal.getPostings().get(1);
@@ -117,32 +133,38 @@ class JournalEntryTest {
     @Test
     void cannotReverseDraftEntry() {
         assertError(LedgerErrorCode.ONLY_POSTED_ENTRY_CAN_BE_REVERSED,
-                () -> createDraft().reverse(REVERSED_AT, "业务冲正"));
+                () -> createDraft().reverse(
+                        JournalEntryId.of(1002L), reversalPostingIds(), REVERSED_AT, "reversal"));
     }
 
     @Test
     void cannotReverseTwice() {
         JournalEntry entry = createPosted();
-        entry.reverse(REVERSED_AT, "第一次冲正");
+        entry.reverse(JournalEntryId.of(1002L), reversalPostingIds(), REVERSED_AT, "first");
 
         assertError(LedgerErrorCode.JOURNAL_ENTRY_ALREADY_REVERSED,
-                () -> entry.reverse(REVERSED_AT, "第二次冲正"));
+                () -> entry.reverse(JournalEntryId.of(1003L),
+                        List.of(PostingId.of(2005L), PostingId.of(2006L)),
+                        REVERSED_AT, "second"));
     }
 
     @Test
     void cannotReverseBeforePostedAt() {
         assertError(LedgerErrorCode.REVERSED_AT_BEFORE_POSTED_AT,
-                () -> createPosted().reverse(POSTED_AT.minusSeconds(1), "业务冲正"));
+                () -> createPosted().reverse(
+                        JournalEntryId.of(1002L), reversalPostingIds(),
+                        POSTED_AT.minusSeconds(1), "reversal"));
     }
 
     @Test
     void reversalReasonCannotBeBlank() {
         assertError(LedgerErrorCode.INVALID_PARAMS,
-                () -> createPosted().reverse(REVERSED_AT, "  "));
+                () -> createPosted().reverse(
+                        JournalEntryId.of(1002L), reversalPostingIds(), REVERSED_AT, "  "));
     }
 
     private JournalEntry createDraft() {
-        return new JournalEntry().create(validPostings(), reference("REF-001"));
+        return JournalEntry.create(JournalEntryId.of(1001L), validPostings(), reference("REF-001"));
     }
 
     private JournalEntry createPosted() {
@@ -153,30 +175,34 @@ class JournalEntryTest {
 
     private List<Posting> validPostings() {
         return List.of(
-                posting("100.00", DebitCredit.DEBIT),
-                posting("100.00", DebitCredit.CREDIT));
+                posting(2001L, 3001L, "100.00", DebitCredit.DEBIT),
+                posting(2002L, 3002L, "100.00", DebitCredit.CREDIT));
     }
 
-    private Posting posting(String amount, DebitCredit direction) {
-        return posting(amount, direction, USD);
+    private List<PostingId> reversalPostingIds() {
+        return List.of(PostingId.of(2003L), PostingId.of(2004L));
     }
 
-    private Posting posting(String amount, DebitCredit direction, Currency currency) {
-        return new Posting().create(
-                LedgerAccountId.generate(),
+    private Posting posting(Long postingId, Long ledgerAccountId,
+                            String amount, DebitCredit direction) {
+        return posting(postingId, ledgerAccountId, amount, direction, USD);
+    }
+
+    private Posting posting(Long postingId, Long ledgerAccountId,
+                            String amount, DebitCredit direction, Currency currency) {
+        return Posting.create(
+                PostingId.of(postingId),
+                LedgerAccountId.of(ledgerAccountId),
                 Money.of(new BigDecimal(amount), currency),
                 direction);
     }
 
     private JournalReference reference(String sourceId) {
-        return new JournalReference(
-                "TEST",
-                sourceId,
-                "TEST_CREATED",
-                EventId.generate().value());
+        return new JournalReference("TEST", sourceId, "TEST_CREATED", EventId.generate().value());
     }
 
-    private void assertError(LedgerErrorCode expected, org.junit.jupiter.api.function.Executable executable) {
+    private void assertError(LedgerErrorCode expected,
+                             org.junit.jupiter.api.function.Executable executable) {
         LedgerDomainException exception = assertThrows(LedgerDomainException.class, executable);
         assertEquals(expected, exception.errorCode());
     }

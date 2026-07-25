@@ -1,28 +1,62 @@
+DROP TABLE IF EXISTS ledger_journal_entry;
 CREATE TABLE ledger_journal_entry (
-    id                          VARCHAR(64) PRIMARY KEY,
+    id                          BIGINT PRIMARY KEY,
     source_type                 VARCHAR(64) NOT NULL,
     source_id                   VARCHAR(128) NOT NULL,
     event_type                  VARCHAR(64) NOT NULL,
-    event_id                    VARCHAR(64) NOT NULL,
+    event_id                    VARCHAR(128) NOT NULL,
     status                      VARCHAR(32) NOT NULL,
     posted_at                   TIMESTAMPTZ NULL,
-    original_journal_entry_id   VARCHAR(64) NULL,
-    reversing_journal_entry_id  VARCHAR(64) NULL,
+    original_journal_entry_id   BIGINT NULL,
+    reversing_journal_entry_id  BIGINT NULL,
     reversal_reason             VARCHAR(512) NULL,
     reversed_at                 TIMESTAMPTZ NULL,
     created_at                  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at                  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     version                     BIGINT NOT NULL DEFAULT 0,
 
+    CONSTRAINT ck_journal_entry_id_positive
+        CHECK (id > 0),
+
     CONSTRAINT uk_journal_entry_event_id
         UNIQUE (event_id),
+
+    CONSTRAINT ck_journal_entry_status
+        CHECK (status IN ('DRAFT', 'POSTED')),
 
     CONSTRAINT ck_journal_entry_posted_at
         CHECK (
             (status = 'DRAFT' AND posted_at IS NULL)
             OR
             (status = 'POSTED' AND posted_at IS NOT NULL)
-        )
+        ),
+
+    CONSTRAINT ck_journal_entry_original_not_self
+        CHECK (
+            original_journal_entry_id IS NULL
+            OR original_journal_entry_id <> id
+        ),
+
+    CONSTRAINT ck_journal_entry_reversing_not_self
+        CHECK (
+            reversing_journal_entry_id IS NULL
+            OR reversing_journal_entry_id <> id
+        ),
+
+    CONSTRAINT ck_journal_entry_original_id_positive
+        CHECK (
+            original_journal_entry_id IS NULL
+            OR original_journal_entry_id > 0
+        ),
+
+    CONSTRAINT ck_journal_entry_reversing_id_positive
+        CHECK (
+            reversing_journal_entry_id IS NULL
+            OR reversing_journal_entry_id > 0
+        ),
+
+    CONSTRAINT ck_journal_entry_version_non_negative
+        CHECK (version >= 0)
 );
 
 COMMENT ON TABLE ledger_journal_entry IS '记账凭证表';

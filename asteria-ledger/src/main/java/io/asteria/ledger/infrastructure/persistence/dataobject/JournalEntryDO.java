@@ -1,9 +1,11 @@
 package io.asteria.ledger.infrastructure.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
 
 import java.util.Date;
@@ -18,8 +20,8 @@ public class JournalEntryDO {
     /**
      * 记账凭证ID
      */
-    @TableId
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     /**
      * 来源业务对象类型，例如 PAYMENT、REFUND、SETTLEMENT
@@ -54,12 +56,12 @@ public class JournalEntryDO {
     /**
      * 原记账凭证ID；当前凭证为冲正凭证时，指向被冲正的原凭证
      */
-    private String originalJournalEntryId;
+    private Long originalJournalEntryId;
 
     /**
      * 冲正凭证ID；当前凭证已被冲正时，指向对应的冲正凭证
      */
-    private String reversingJournalEntryId;
+    private Long reversingJournalEntryId;
 
     /**
      * 冲正原因
@@ -86,5 +88,6 @@ public class JournalEntryDO {
     /**
      * 乐观锁版本号
      */
+    @Version
     private Long version;
 }

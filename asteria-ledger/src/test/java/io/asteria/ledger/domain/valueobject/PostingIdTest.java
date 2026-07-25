@@ -4,45 +4,39 @@ import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PostingIdTest {
 
     @Test
-    void generateReturnsNonNullUuid() {
-        assertTrue(PostingId.generate().value() != null);
+    void ofPreservesLongValue() {
+        assertEquals(2001L, PostingId.of(2001L).value());
     }
 
     @Test
-    void fromPreservesUuid() {
-        UUID uuid = UUID.randomUUID();
-
-        assertEquals(uuid, PostingId.from(uuid).value());
-    }
-
-    @Test
-    void nullUuidReturnsNullArgument() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> PostingId.from(null));
+    void nullValueReturnsNullArgument() {
+        LedgerDomainException exception = assertThrows(
+                LedgerDomainException.class,
+                () -> PostingId.of(null));
 
         assertEquals(LedgerErrorCode.NULL_ARGUMENT, exception.errorCode());
     }
 
     @Test
-    void sameUuidIdsAreEqual() {
-        UUID uuid = UUID.randomUUID();
+    void nonPositiveValueIsRejected() {
+        assertThrows(LedgerDomainException.class, () -> PostingId.of(0L));
+        assertThrows(LedgerDomainException.class, () -> PostingId.of(-1L));
+    }
 
-        assertEquals(PostingId.from(uuid), PostingId.from(uuid));
+    @Test
+    void sameValuesAreEqual() {
+        assertEquals(PostingId.of(2001L), PostingId.of(2001L));
     }
 
     @Test
     void differentIdTypesAreNotEqual() {
-        UUID uuid = UUID.randomUUID();
-
-        assertNotEquals(PostingId.from(uuid), LedgerAccountId.from(uuid));
+        assertNotEquals(PostingId.of(2001L), LedgerAccountId.of(2001L));
     }
 }
