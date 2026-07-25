@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.ledger.infrastructure.persistence.mapper.JournalEntryMapper">
+
+    <resultMap id="BaseResultMap" type="io.asteria.ledger.infrastructure.persistence.dataobject.JournalEntryDO">
+            <id property="id" column="id" />
+            <result property="sourceType" column="source_type" />
+            <result property="sourceId" column="source_id" />
+            <result property="eventType" column="event_type" />
+            <result property="eventId" column="event_id" />
+            <result property="status" column="status" />
+            <result property="postedAt" column="posted_at" />
+            <result property="originalJournalEntryId" column="original_journal_entry_id" />
+            <result property="reversingJournalEntryId" column="reversing_journal_entry_id" />
+            <result property="reversalReason" column="reversal_reason" />
+            <result property="reversedAt" column="reversed_at" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+            <result property="version" column="version" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,source_type,source_id,event_type,event_id,status,
+        posted_at,original_journal_entry_id,reversing_journal_entry_id,reversal_reason,reversed_at,
+        created_at,updated_at,version
+    </sql>
+</mapper>

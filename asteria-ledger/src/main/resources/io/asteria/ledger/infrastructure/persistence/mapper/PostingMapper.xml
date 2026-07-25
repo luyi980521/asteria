@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.ledger.infrastructure.persistence.mapper.PostingMapper">
+
+    <resultMap id="BaseResultMap" type="io.asteria.ledger.infrastructure.persistence.dataobject.PostingDO">
+            <id property="id" column="id" />
+            <result property="journalEntryId" column="journal_entry_id" />
+            <result property="ledgerAccountId" column="ledger_account_id" />
+            <result property="amount" column="amount" />
+            <result property="currency" column="currency" />
+            <result property="direction" column="direction" />
+            <result property="sequenceNo" column="sequence_no" />
+            <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,journal_entry_id,ledger_account_id,amount,currency,direction,
+        sequence_no,created_at
+    </sql>
+</mapper>
