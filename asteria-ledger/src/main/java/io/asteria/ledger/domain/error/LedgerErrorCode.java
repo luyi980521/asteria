@@ -10,7 +10,10 @@ public enum LedgerErrorCode {
     JOURNAL_ENTRY_NOT_BALANCED("LEDGER_0007", "Journal entry not balanced"),
     POSTING_AMOUNT_MUST_BE_POSITIVE("LEDGER_0008", "Posting amount must be positive"),
     JOURNAL_ENTRY_CANNOT_BE_POSTED("LEDGER_0009", "Journal entry cannot be posted"),
-    POSTED_AT_REQUIRED("LEDGER_0010", "Posted at required"),
+    INVALID_PARAMS("LEDGER_0010", "Invalid params"),
+    ONLY_POSTED_ENTRY_CAN_BE_REVERSED("LEDGER_0011", "Only posted entry can be reversed"),
+    JOURNAL_ENTRY_ALREADY_REVERSED("LEDGER_0012", "Journal entry already reversed"),
+    REVERSED_AT_BEFORE_POSTED_AT("LEDGER_0013", "Reversed at before posted at"),
 
     ;
 

@@ -27,14 +27,23 @@ public class Posting {
     /** 方向 */
     private DebitCredit direction;
 
-    public static Posting create(LedgerAccountId ledgerAccountId,
-                                 Money money, DebitCredit direction) {
+    public Posting create(LedgerAccountId ledgerAccountId,
+                          Money money, DebitCredit direction) {
 
         return Posting.builder()
                 .postingId(PostingId.generate())
                 .ledgerAccountId(ledgerAccountId)
                 .money(money)
                 .direction(direction)
+                .build();
+    }
+
+    public Posting reverse() {
+        return Posting.builder()
+                .postingId(PostingId.generate())
+                .ledgerAccountId(this.ledgerAccountId)
+                .money(this.money)
+                .direction(this.direction.reverse())
                 .build();
     }
 }

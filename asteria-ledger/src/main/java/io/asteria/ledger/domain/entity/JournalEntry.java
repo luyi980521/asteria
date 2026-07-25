@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -40,8 +41,20 @@ public class JournalEntry {
     /** 外部业务编号 */
     private String reference;
 
+    /** 被冲正凭证ID：当前凭证是冲正凭证时使用 */
+    private JournalEntryId originalJournalEntryId;
+
+    /** 冲正凭证ID：当前凭证已被冲正时使用 */
+    private JournalEntryId reversingJournalEntryId;
+
+    /** 冲正原因 */
+    private String reversalReason;
+
     /** 入账时间 */
     private Instant postedAt;
+
+    /** 被冲正时间 */
+    private Instant reversedAt;
 
     /**
      * 创建记账凭证
@@ -72,7 +85,7 @@ public class JournalEntry {
         }
 
         if (postedAt == null) {
-            throw new LedgerDomainException(LedgerErrorCode.POSTED_AT_REQUIRED);
+            throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
         }
 
         validatePostingCount(postings);
@@ -82,6 +95,42 @@ public class JournalEntry {
 
         this.status = JournalEntryStatus.POSTED;
         this.postedAt = postedAt;
+    }
+
+    /**
+     * 冲正
+     * */
+    public JournalEntry reverse(Instant reversedAt, String reason) {
+
+        validateReversible(reversedAt, reason);
+
+        // 生成冲正分录数据
+        List<Posting> reversedPostings = this.postings.stream().map(Posting::reverse).toList();
+        JournalEntry reversalEntry = createReversal(reversedPostings, journalEntryId, reason);
+        reversalEntry.post(reversedAt);
+
+        this.reversingJournalEntryId = reversalEntry.getJournalEntryId();
+        this.reversedAt = reversedAt;
+
+        return reversalEntry;
+    }
+
+    private JournalEntry createReversal(List<Posting> reversedPostings,
+                                        JournalEntryId originalJournalEntryId, String reason) {
+
+        validatePostingCount(postings);
+        validateSameCurrency(postings);
+        validateBalanced(postings);
+        validatePositiveAmounts(postings);
+
+        return JournalEntry.builder()
+                .journalEntryId(JournalEntryId.generate())
+                .postings(reversedPostings)
+                .status(JournalEntryStatus.DRAFT)
+                .reference("REVERSAL:" + originalJournalEntryId)
+                .originalJournalEntryId(originalJournalEntryId)
+                .reversalReason(reason)
+                .build();
     }
 
     /**
@@ -142,6 +191,37 @@ public class JournalEntry {
 
         if (hasIllegalAmount) {
             throw new LedgerDomainException(LedgerErrorCode.POSTING_AMOUNT_MUST_BE_POSITIVE);
+        }
+    }
+
+    /**
+     * 校验是否可冲正
+     *
+     * 冲正规则:
+     * 1. DRAFT 不能冲正
+     * 2. 只有 POSTED 可以冲正
+     * 3. 原凭证不能重复冲正
+     * 4. 冲正时间不能早于原入账时间
+     * 5. 原因不能为空
+     * 6. 反向凭证必须自动正式入账
+     * 7. 原凭证历史分录不能被修改
+     * */
+    private void validateReversible(Instant reversedAt, String reason) {
+
+        if (reversedAt == null || StringUtils.isBlank(reason)) {
+            throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
+        }
+
+        if (this.status != JournalEntryStatus.POSTED) {
+            throw new LedgerDomainException(LedgerErrorCode.ONLY_POSTED_ENTRY_CAN_BE_REVERSED);
+        }
+
+        if (this.reversingJournalEntryId != null) {
+            throw new LedgerDomainException(LedgerErrorCode.JOURNAL_ENTRY_ALREADY_REVERSED);
+        }
+
+        if (reversedAt.isBefore(this.postedAt)) {
+            throw new LedgerDomainException(LedgerErrorCode.REVERSED_AT_BEFORE_POSTED_AT);
         }
     }
 }

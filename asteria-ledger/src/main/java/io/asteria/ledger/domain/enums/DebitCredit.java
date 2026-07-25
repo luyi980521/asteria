@@ -6,5 +6,11 @@ public enum DebitCredit {
     DEBIT,
 
     /** 贷 */
-    CREDIT
+    CREDIT,
+
+    ;
+
+    public DebitCredit reverse() {
+        return this == DEBIT ? CREDIT : DEBIT;
+    }
 }
