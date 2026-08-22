@@ -7,7 +7,7 @@ import io.asteria.ledger.domain.exception.LedgerDomainException;
 import io.asteria.ledger.domain.valueobject.EventId;
 import io.asteria.ledger.domain.valueobject.JournalEntryId;
 import io.asteria.ledger.domain.valueobject.JournalReference;
-import io.asteria.ledger.domain.valueobject.AccountId;
+import io.asteria.ledger.domain.valueobject.LedgerAccountId;
 import io.asteria.ledger.domain.valueobject.Money;
 import io.asteria.ledger.domain.valueobject.PostingId;
 import org.junit.jupiter.api.Test;
@@ -124,8 +124,8 @@ class JournalEntryTest {
         assertEquals(originalCredit.getDirection().reverse(), reversedCredit.getDirection());
         assertEquals(originalDebit.getMoney(), reversedDebit.getMoney());
         assertEquals(originalCredit.getMoney(), reversedCredit.getMoney());
-        assertEquals(originalDebit.getAccountId(), reversedDebit.getAccountId());
-        assertEquals(originalCredit.getAccountId(), reversedCredit.getAccountId());
+        assertEquals(originalDebit.getLedgerAccountId(), reversedDebit.getLedgerAccountId());
+        assertEquals(originalCredit.getLedgerAccountId(), reversedCredit.getLedgerAccountId());
         assertNotEquals(originalDebit.getPostingId(), reversedDebit.getPostingId());
         assertNotEquals(originalCredit.getPostingId(), reversedCredit.getPostingId());
     }
@@ -192,7 +192,7 @@ class JournalEntryTest {
                             String amount, DebitCredit direction, Currency currency) {
         return Posting.create(
                 PostingId.of(postingId),
-                AccountId.of(ledgerAccountId),
+                LedgerAccountId.of(ledgerAccountId),
                 Money.of(new BigDecimal(amount), currency),
                 direction);
     }

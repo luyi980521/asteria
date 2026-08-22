@@ -3,9 +3,9 @@ package io.asteria.ledger.domain.valueobject;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 
-public record AccountId(Long value) {
+public record LedgerAccountId(Long value) {
 
-    public AccountId {
+    public LedgerAccountId {
         if (value == null) {
             throw new LedgerDomainException(LedgerErrorCode.NULL_ARGUMENT);
         }
@@ -14,7 +14,7 @@ public record AccountId(Long value) {
         }
     }
 
-    public static AccountId of(Long value) {
-        return new AccountId(value);
+    public static LedgerAccountId of(Long value) {
+        return new LedgerAccountId(value);
     }
 }

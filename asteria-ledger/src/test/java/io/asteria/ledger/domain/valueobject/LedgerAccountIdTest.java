@@ -8,35 +8,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class AccountIdTest {
+class LedgerAccountIdTest {
 
     @Test
     void ofPreservesLongValue() {
-        assertEquals(3001L, AccountId.of(3001L).value());
+        assertEquals(3001L, LedgerAccountId.of(3001L).value());
     }
 
     @Test
     void nullValueReturnsNullArgument() {
         LedgerDomainException exception = assertThrows(
                 LedgerDomainException.class,
-                () -> AccountId.of(null));
+                () -> LedgerAccountId.of(null));
 
         assertEquals(LedgerErrorCode.NULL_ARGUMENT, exception.errorCode());
     }
 
     @Test
     void nonPositiveValueIsRejected() {
-        assertThrows(LedgerDomainException.class, () -> AccountId.of(0L));
-        assertThrows(LedgerDomainException.class, () -> AccountId.of(-1L));
+        assertThrows(LedgerDomainException.class, () -> LedgerAccountId.of(0L));
+        assertThrows(LedgerDomainException.class, () -> LedgerAccountId.of(-1L));
     }
 
     @Test
     void sameValuesAreEqual() {
-        assertEquals(AccountId.of(3001L), AccountId.of(3001L));
+        assertEquals(LedgerAccountId.of(3001L), LedgerAccountId.of(3001L));
     }
 
     @Test
     void differentIdTypesAreNotEqual() {
-        assertNotEquals(AccountId.of(3001L), JournalEntryId.of(3001L));
+        assertNotEquals(LedgerAccountId.of(3001L), JournalEntryId.of(3001L));
     }
 }

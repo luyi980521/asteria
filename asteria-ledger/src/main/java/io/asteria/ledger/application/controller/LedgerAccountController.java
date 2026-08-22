@@ -1,9 +1,9 @@
 package io.asteria.ledger.application.controller;
 
-import io.asteria.ledger.application.command.CreateAccountCommand;
-import io.asteria.ledger.application.request.CreateAccountRequest;
-import io.asteria.ledger.application.service.AccountApplicationService;
-import io.asteria.ledger.domain.valueobject.AccountId;
+import io.asteria.ledger.application.command.CreateLedgerAccountCommand;
+import io.asteria.ledger.application.request.CreateLedgerAccountRequest;
+import io.asteria.ledger.application.service.LedgerAccountApplicationService;
+import io.asteria.ledger.domain.valueobject.LedgerAccountId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,17 +20,17 @@ import java.util.Currency;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ledger/accounts")
-public class AccountController {
+public class LedgerAccountController {
 
-    private final AccountApplicationService accountApplicationService;
+    private final LedgerAccountApplicationService ledgerAccountApplicationService;
 
     /**
      * 创建账本账户
      * */
     @PostMapping
-    public AccountId create(@RequestBody CreateAccountRequest request) {
+    public LedgerAccountId create(@RequestBody CreateLedgerAccountRequest request) {
         log.info("Received create ledger account request, accountCode: {}", request.accountCode());
-        CreateAccountCommand command = new CreateAccountCommand(
+        CreateLedgerAccountCommand command = new CreateLedgerAccountCommand(
                 request.accountCode(),
                 request.ownerType(),
                 request.ownerId(),
@@ -39,6 +39,6 @@ public class AccountController {
                 request.allowNegativeBalance()
         );
 
-        return accountApplicationService.create(command);
+        return ledgerAccountApplicationService.createLedgerAccount(command);
     }
 }

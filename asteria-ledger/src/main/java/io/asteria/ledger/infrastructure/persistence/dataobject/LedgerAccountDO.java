@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @TableName(value ="ledger_account")
 @Data
-public class AccountDO {
+public class LedgerAccountDO {
     /**
      * 账本账户ID，由应用层雪花算法生成
      */

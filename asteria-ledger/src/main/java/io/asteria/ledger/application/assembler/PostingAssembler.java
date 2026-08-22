@@ -23,7 +23,7 @@ public class PostingAssembler {
 
         return Posting.create(
                 postingId,
-                command.accountId(),
+                command.ledgerAccountId(),
                 command.money(),
                 command.direction()
         );

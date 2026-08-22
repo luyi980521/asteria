@@ -8,7 +8,7 @@ import lombok.Getter;
  * */
 @Getter
 @AllArgsConstructor
-public enum AccountCategory {
+public enum LedgerAccountCategory {
 
     /** 资产 */
     ASSET(NormalBalance.DEBIT),

@@ -7,7 +7,7 @@
     <resultMap id="BaseResultMap" type="io.asteria.ledger.infrastructure.persistence.dataobject.PostingDO">
             <id property="id" column="id" />
             <result property="journalEntryId" column="journal_entry_id" />
-            <result property="accountId" column="ledger_account_id" />
+            <result property="ledgerAccountId" column="ledger_account_id" />
             <result property="amount" column="amount" />
             <result property="currency" column="currency" />
             <result property="direction" column="direction" />

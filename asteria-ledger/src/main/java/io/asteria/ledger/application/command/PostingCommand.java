@@ -1,11 +1,11 @@
 package io.asteria.ledger.application.command;
 
 import io.asteria.ledger.domain.enums.DebitCredit;
-import io.asteria.ledger.domain.valueobject.AccountId;
+import io.asteria.ledger.domain.valueobject.LedgerAccountId;
 import io.asteria.ledger.domain.valueobject.Money;
 
 public record PostingCommand(
-        AccountId accountId,
+        LedgerAccountId ledgerAccountId,
         Money money,
         DebitCredit direction
 ) {

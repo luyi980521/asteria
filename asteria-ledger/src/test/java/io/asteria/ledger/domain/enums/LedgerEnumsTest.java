@@ -13,7 +13,7 @@ class LedgerEnumsTest {
 
     @Test
     void ledgerAccountStatusHasExpectedValues() {
-        assertArrayEquals(new AccountStatus[]{AccountStatus.ACTIVE, AccountStatus.CLOSED}, AccountStatus.values());
+        assertArrayEquals(new LedgerAccountStatus[]{LedgerAccountStatus.ACTIVE, LedgerAccountStatus.CLOSED}, LedgerAccountStatus.values());
     }
 
     @Test

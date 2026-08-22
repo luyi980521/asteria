@@ -37,6 +37,6 @@ class PostingIdTest {
 
     @Test
     void differentIdTypesAreNotEqual() {
-        assertNotEquals(PostingId.of(2001L), AccountId.of(2001L));
+        assertNotEquals(PostingId.of(2001L), LedgerAccountId.of(2001L));
     }
 }

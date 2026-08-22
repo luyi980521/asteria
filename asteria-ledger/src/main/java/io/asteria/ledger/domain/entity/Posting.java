@@ -3,7 +3,7 @@ package io.asteria.ledger.domain.entity;
 import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
-import io.asteria.ledger.domain.valueobject.AccountId;
+import io.asteria.ledger.domain.valueobject.LedgerAccountId;
 import io.asteria.ledger.domain.valueobject.Money;
 import io.asteria.ledger.domain.valueobject.PostingId;
 import lombok.AllArgsConstructor;
@@ -24,7 +24,7 @@ public class Posting {
     private PostingId postingId;
 
     /** 账本id */
-    private AccountId accountId;
+    private LedgerAccountId ledgerAccountId;
 
     /** 货币 */
     private Money money;
@@ -33,7 +33,7 @@ public class Posting {
     private DebitCredit direction;
 
     public static Posting create(PostingId postingId,
-                                 AccountId accountId,
+                                 LedgerAccountId ledgerAccountId,
                                  Money money,
                                  DebitCredit direction) {
 
@@ -42,7 +42,7 @@ public class Posting {
         }
         return Posting.builder()
                 .postingId(postingId)
-                .accountId(accountId)
+                .ledgerAccountId(ledgerAccountId)
                 .money(money)
                 .direction(direction)
                 .build();
@@ -52,17 +52,17 @@ public class Posting {
      * 从持久化数据恢复分录。
      */
     public static Posting reconstitute(PostingId postingId,
-                                       AccountId accountId,
+                                       LedgerAccountId ledgerAccountId,
                                        Money money,
                                        DebitCredit direction) {
 
-        if (postingId == null || accountId == null || money == null || direction == null) {
+        if (postingId == null || ledgerAccountId == null || money == null || direction == null) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
         }
 
         return Posting.builder()
                 .postingId(postingId)
-                .accountId(accountId)
+                .ledgerAccountId(ledgerAccountId)
                 .money(money)
                 .direction(direction)
                 .build();
@@ -74,7 +74,7 @@ public class Posting {
         }
         return Posting.builder()
                 .postingId(postingId)
-                .accountId(this.accountId)
+                .ledgerAccountId(this.ledgerAccountId)
                 .money(this.money)
                 .direction(this.direction.reverse())
                 .build();

@@ -92,13 +92,13 @@ public class JournalEntryPersistenceConverter {
 
         return Posting.reconstitute(
                 toPostingId(postingDO.getId()),
-                toAccountId(postingDO.getLedgerAccountId()),
+                toLedgerAccountId(postingDO.getLedgerAccountId()),
                 toMoney(postingDO.getAmount(), postingDO.getCurrency()),
                 valueOfDirection(postingDO.getDirection()));
     }
 
     private PostingDO toPostingDO(Posting posting, Long journalEntryId, int sequenceNo) {
-        if (posting == null || posting.getPostingId() == null || posting.getAccountId() == null
+        if (posting == null || posting.getPostingId() == null || posting.getLedgerAccountId() == null
                 || posting.getMoney() == null || posting.getDirection() == null) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
         }
@@ -106,7 +106,7 @@ public class JournalEntryPersistenceConverter {
         PostingDO postingDO = new PostingDO();
         postingDO.setId(posting.getPostingId().value());
         postingDO.setJournalEntryId(journalEntryId);
-        postingDO.setLedgerAccountId(posting.getAccountId().value());
+        postingDO.setLedgerAccountId(posting.getLedgerAccountId().value());
         postingDO.setAmount(posting.getMoney().amount());
         postingDO.setCurrency(posting.getMoney().currency().getCurrencyCode());
         postingDO.setDirection(posting.getDirection().name());
@@ -168,11 +168,11 @@ public class JournalEntryPersistenceConverter {
         return PostingId.of(value);
     }
 
-    private AccountId toAccountId(Long value) {
+    private LedgerAccountId toLedgerAccountId(Long value) {
         if (value == null) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
         }
-        return AccountId.of(value);
+        return LedgerAccountId.of(value);
     }
 
     private Long toValue(JournalEntryId value) {

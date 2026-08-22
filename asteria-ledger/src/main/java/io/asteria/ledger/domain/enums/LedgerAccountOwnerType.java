@@ -3,7 +3,7 @@ package io.asteria.ledger.domain.enums;
 /**
  * 账本账户所属主体类型
  * */
-public enum AccountOwnerType {
+public enum LedgerAccountOwnerType {
 
     /** 用户 */
     USER,
