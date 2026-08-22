@@ -6,11 +6,7 @@ import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.enums.JournalEntryStatus;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
-import io.asteria.ledger.domain.valueobject.JournalEntryId;
-import io.asteria.ledger.domain.valueobject.JournalReference;
-import io.asteria.ledger.domain.valueobject.LedgerAccountId;
-import io.asteria.ledger.domain.valueobject.Money;
-import io.asteria.ledger.domain.valueobject.PostingId;
+import io.asteria.ledger.domain.valueobject.*;
 import io.asteria.ledger.infrastructure.persistence.dataobject.JournalEntryDO;
 import io.asteria.ledger.infrastructure.persistence.dataobject.PostingDO;
 import org.apache.commons.collections4.CollectionUtils;
@@ -96,13 +92,13 @@ public class JournalEntryPersistenceConverter {
 
         return Posting.reconstitute(
                 toPostingId(postingDO.getId()),
-                toLedgerAccountId(postingDO.getLedgerAccountId()),
+                toAccountId(postingDO.getLedgerAccountId()),
                 toMoney(postingDO.getAmount(), postingDO.getCurrency()),
                 valueOfDirection(postingDO.getDirection()));
     }
 
     private PostingDO toPostingDO(Posting posting, Long journalEntryId, int sequenceNo) {
-        if (posting == null || posting.getPostingId() == null || posting.getLedgerAccountId() == null
+        if (posting == null || posting.getPostingId() == null || posting.getAccountId() == null
                 || posting.getMoney() == null || posting.getDirection() == null) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
         }
@@ -110,7 +106,7 @@ public class JournalEntryPersistenceConverter {
         PostingDO postingDO = new PostingDO();
         postingDO.setId(posting.getPostingId().value());
         postingDO.setJournalEntryId(journalEntryId);
-        postingDO.setLedgerAccountId(posting.getLedgerAccountId().value());
+        postingDO.setLedgerAccountId(posting.getAccountId().value());
         postingDO.setAmount(posting.getMoney().amount());
         postingDO.setCurrency(posting.getMoney().currency().getCurrencyCode());
         postingDO.setDirection(posting.getDirection().name());
@@ -172,11 +168,11 @@ public class JournalEntryPersistenceConverter {
         return PostingId.of(value);
     }
 
-    private LedgerAccountId toLedgerAccountId(Long value) {
+    private AccountId toAccountId(Long value) {
         if (value == null) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
         }
-        return LedgerAccountId.of(value);
+        return AccountId.of(value);
     }
 
     private Long toValue(JournalEntryId value) {

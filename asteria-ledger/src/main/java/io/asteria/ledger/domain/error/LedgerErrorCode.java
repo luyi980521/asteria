@@ -22,7 +22,20 @@ public enum LedgerErrorCode {
     EVENT_TYPE_REQUIRED("LEDGER_0014", "Event type required"),
     EVENT_ID_REQUIRED("LEDGER_0015", "Event id required"),
     DUPLICATE_LEDGER_EVENT("LEDGER_0016", "Duplicate ledger event"),
-
+    LEDGER_ACCOUNT_ID_REQUIRED("LEDGER_0017", "Ledger account id required"),
+    LEDGER_ACCOUNT_CODE_REQUIRED("LEDGER_0018", "Ledger account code required"),
+    LEDGER_ACCOUNT_OWNER_TYPE_REQUIRED("LEDGER_0019", "Ledger account owner type required"),
+    LEDGER_ACCOUNT_OWNER_ID_ILLEGAL("LEDGER_0020", "Ledger account owner id must be greater than zero"),
+    LEDGER_ACCOUNT_CATEGORY_REQUIRED("LEDGER_0021", "Ledger account category required"),
+    LEDGER_ACCOUNT_CURRENCY_REQUIRED("LEDGER_0022", "Ledger account currency required"),
+    LEDGER_ACCOUNT_STATUS_REQUIRED("LEDGER_0023", "Ledger account status required"),
+    LEDGER_ACCOUNT_NOT_ACTIVE("LEDGER_0024", "Ledger account is not active"),
+    LEDGER_ACCOUNT_CURRENCY_MISMATCH("LEDGER_0025", "Ledger account currency does not match posting currency"),
+    POSTING_MONEY_REQUIRED("LEDGER_0026", "Posting money required"),
+    CLOSED_LEDGER_ACCOUNT_CANNOT_BE_FROZEN("LEDGER_0027", "Closed ledger account cannot be frozen"),
+    CLOSED_LEDGER_ACCOUNT_CANNOT_BE_ACTIVATED("LEDGER_0028", "Closed ledger account cannot be activated"),
+    LEDGER_ACCOUNT_ALREADY_CLOSED("LEDGER_0029", "Ledger account is already closed"),
+    LEDGER_ACCOUNT_ALREADY_EXISTS("LEDGER_0030", "Ledger account is already exists"),
 
     ;
 
