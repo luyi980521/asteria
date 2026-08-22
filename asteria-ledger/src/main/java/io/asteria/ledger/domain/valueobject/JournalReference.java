@@ -4,6 +4,9 @@ import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * 用于确认记账凭证是由哪一个业务事件触发产生
+ * */
 public record JournalReference(
 
         /* 业务对象类型，例如 PAYMENT */
