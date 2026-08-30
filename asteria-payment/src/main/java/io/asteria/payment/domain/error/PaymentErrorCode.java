@@ -21,6 +21,10 @@ public enum PaymentErrorCode {
     PAYMENT_NOT_FOUND("PAYMENT_0017", "Payment does not exist"),
     PAYMENT_REFERENCE_ALREADY_EXISTS("PAYMENT_0018", "Payment reference already exists"),
     PAYMENT_CHANNEL_NOT_FOUND("PAYMENT_0019", "Payment channel not found"),
+    PAYMENT_CAPTURE_FAIL_TO_AUTHORIZED("PAYMENT_0020", "Payment capture fail to authorized"),
+    INVALID_PAYMENT_STATUS("PAYMENT_0021", "Invalid payment status"),
+    AUTHORIZATION_TRANSACTION_ID_REQUIRED("PAYMENT_0022", "Authorization transaction id required"),
+    AUTHORIZED_AT_REQUIRED("PAYMENT_0023", "Authorized at required"),
 
     ;
 

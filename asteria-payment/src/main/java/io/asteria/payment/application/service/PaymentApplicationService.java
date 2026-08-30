@@ -22,4 +22,11 @@ public interface PaymentApplicationService {
      * @param paymentId {@link PaymentId}
      * */
     void authorize(PaymentId paymentId);
+
+    /**
+     * 捕获支付
+     *
+     * @param paymentId {@link PaymentId}
+     * */
+    void capture(PaymentId paymentId);
 }

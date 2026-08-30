@@ -1,17 +1,18 @@
 CREATE TABLE payment (
-    id                  BIGINT PRIMARY KEY,
-    merchant_id         BIGINT NOT NULL,
-    amount              NUMERIC(38, 18) NOT NULL,
-    currency            VARCHAR(16) NOT NULL,
-    payment_method      VARCHAR(32) NOT NULL,
-    reference_type      VARCHAR(64) NOT NULL,
-    reference_id        VARCHAR(128) NOT NULL,
-    status              VARCHAR(32) NOT NULL,
-    created_at          TIMESTAMPTZ NOT NULL,
-    authorized_at       TIMESTAMPTZ NULL,
-    captured_at         TIMESTAMPTZ NULL,
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    version             BIGINT NOT NULL DEFAULT 0,
+    id                           BIGINT PRIMARY KEY,
+    merchant_id                  BIGINT          NOT NULL,
+    amount                       NUMERIC(38, 18) NOT NULL,
+    currency                     VARCHAR(16)     NOT NULL,
+    payment_method               VARCHAR(32)     NOT NULL,
+    reference_type               VARCHAR(64)     NOT NULL,
+    reference_id                 VARCHAR(128)    NOT NULL,
+    status                       VARCHAR(32)     NOT NULL,
+    authorization_transaction_id VARCHAR(128)    NULL,
+    created_at                   TIMESTAMPTZ     NOT NULL,
+    authorized_at                TIMESTAMPTZ     NULL,
+    captured_at                  TIMESTAMPTZ     NULL,
+    updated_at                   TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    version                      BIGINT          NOT NULL DEFAULT 0,
 
     CONSTRAINT ck_payment_id_positive
         CHECK (id > 0),
@@ -105,6 +106,9 @@ COMMENT ON COLUMN payment.reference_id
 
 COMMENT ON COLUMN payment.status
     IS '支付状态：CREATED、AUTHORIZING、AUTHORIZED、CAPTURING、CAPTURED、FAILED、CANCELLED';
+
+COMMENT ON COLUMN payment.authorization_transaction_id
+    IS '支付渠道授权交易ID';
 
 COMMENT ON COLUMN payment.created_at
     IS '支付创建时间';

@@ -1,18 +1,21 @@
 package io.asteria.payment.domain.entity;
 
 import io.asteria.common.domain.valueobject.Money;
-import io.asteria.payment.domain.error.PaymentErrorCode;
-import io.asteria.payment.domain.exception.PaymentDomainException;
 import io.asteria.payment.domain.enums.PaymentMethod;
 import io.asteria.payment.domain.enums.PaymentStatus;
+import io.asteria.payment.domain.error.PaymentErrorCode;
+import io.asteria.payment.domain.exception.PaymentDomainException;
 import io.asteria.payment.domain.valueobject.PaymentId;
 import io.asteria.payment.domain.valueobject.PaymentReference;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 
 /**
  * 支付值对象定义
  * */
+@Getter
 public class Payment {
 
     /** 支付ID */
@@ -32,6 +35,9 @@ public class Payment {
 
     /** 支付状态 */
     private PaymentStatus status;
+
+    /** 渠道授权交易ID */
+    private String authorizationTransactionId;
 
     /** 创建时间 */
     private final Instant createdAt;
@@ -99,17 +105,23 @@ public class Payment {
 
     /**
      * 标记支付授权成功
-     * */
-    public void authorize(Instant authorizedAt) {
+     */
+    public void authorize(String authorizationTransactionId, Instant authorizedAt) {
         if (status != PaymentStatus.AUTHORIZING) {
-            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_AUTHORIZING_TO_AUTHORIZE);
-        }
-        if (authorizedAt == null) {
-            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_AUTHORIZED_AT_REQUIRED);
+            throw new PaymentDomainException(PaymentErrorCode.INVALID_PAYMENT_STATUS);
         }
 
-        status = PaymentStatus.AUTHORIZED;
+        if (StringUtils.isBlank(authorizationTransactionId)) {
+            throw new PaymentDomainException(PaymentErrorCode.AUTHORIZATION_TRANSACTION_ID_REQUIRED);
+        }
+
+        if (authorizedAt == null) {
+            throw new PaymentDomainException(PaymentErrorCode.AUTHORIZED_AT_REQUIRED);
+        }
+
+        this.authorizationTransactionId = authorizationTransactionId;
         this.authorizedAt = authorizedAt;
+        this.status = PaymentStatus.AUTHORIZED;
     }
 
     /**
@@ -118,6 +130,10 @@ public class Payment {
     public void startCapture() {
         if (status != PaymentStatus.AUTHORIZED) {
             throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_AUTHORIZED_TO_CAPTURE);
+        }
+
+        if (StringUtils.isBlank(authorizationTransactionId)) {
+            throw new PaymentDomainException(PaymentErrorCode.AUTHORIZATION_TRANSACTION_ID_REQUIRED);
         }
 
         status = PaymentStatus.CAPTURING;
@@ -136,6 +152,17 @@ public class Payment {
 
         status = PaymentStatus.CAPTURED;
         this.capturedAt = capturedAt;
+    }
+
+    /**
+     * 标记捕获失败
+     */
+    public void captureFailed() {
+        if (status != PaymentStatus.CAPTURING) {
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_CAPTURE_FAIL_TO_AUTHORIZED);
+        }
+
+        status = PaymentStatus.AUTHORIZED;
     }
 
     /**
@@ -171,48 +198,4 @@ public class Payment {
                 status, createdAt, authorizedAt, capturedAt);
     }
 
-    /** 获取支付ID */
-    public PaymentId getPaymentId() {
-        return paymentId;
-    }
-
-    /** 获取商户ID */
-    public Long getMerchantId() {
-        return merchantId;
-    }
-
-    /** 获取支付金额 */
-    public Money getAmount() {
-        return amount;
-    }
-
-    /** 获取支付方式 */
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    /** 获取支付业务关联信息 */
-    public PaymentReference getReference() {
-        return reference;
-    }
-
-    /** 获取支付状态 */
-    public PaymentStatus getStatus() {
-        return status;
-    }
-
-    /** 获取创建时间 */
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    /** 获取授权成功时间 */
-    public Instant getAuthorizedAt() {
-        return authorizedAt;
-    }
-
-    /** 获取捕获成功时间 */
-    public Instant getCapturedAt() {
-        return capturedAt;
-    }
 }

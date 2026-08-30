@@ -3,9 +3,7 @@ package io.asteria.payment.application.service.impl;
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
 import io.asteria.payment.application.command.CreatePaymentCommand;
-import io.asteria.payment.application.port.channel.AuthorizationRequest;
-import io.asteria.payment.application.port.channel.AuthorizationResult;
-import io.asteria.payment.application.port.channel.PaymentChannel;
+import io.asteria.payment.application.port.channel.*;
 import io.asteria.payment.application.port.router.PaymentChannelRouter;
 import io.asteria.payment.application.service.PaymentApplicationService;
 import io.asteria.payment.domain.entity.Payment;
@@ -16,7 +14,6 @@ import io.asteria.payment.domain.valueobject.PaymentId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -73,7 +70,6 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
      * @param paymentId {@link PaymentId}
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void authorize(PaymentId paymentId) {
 
         // 将支付流程推进为授权中并更新状态
@@ -89,11 +85,41 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
         PaymentChannel paymentChannel = paymentChannelRouter.route(payment);
         AuthorizationResult authorizationResult = paymentChannel.authorize(authorizationRequest);
         if (authorizationResult.success()) {
-            payment.authorize(Instant.now());
+            payment.authorize(authorizationResult.channelTransactionId(), Instant.now());
         } else {
             payment.fail();
         }
         paymentRepository.update(payment);
         log.info("Payment authorized successfully: {}", paymentId);
+    }
+
+    /**
+     * 捕获支付
+     *
+     * @param paymentId {@link PaymentId}
+     */
+    @Override
+    public void capture(PaymentId paymentId) {
+
+        // 将支付流程推进为捕获中并更新状态
+        Payment payment = paymentRepository.findById(paymentId);
+        payment.startCapture();
+        paymentRepository.update(payment);
+
+        CaptureRequest captureRequest = CaptureRequest.builder()
+                .paymentId(paymentId)
+                .amount(payment.getAmount())
+                .authorizationTransactionId(payment.getAuthorizationTransactionId())
+                .build();
+        PaymentChannel paymentChannel = paymentChannelRouter.route(payment);
+        CaptureResult captureResult = paymentChannel.capture(captureRequest);
+        if (captureResult.success()) {
+            payment.capture(Instant.now());
+        } else {
+            // 暂时先将捕获失败的支付单状态更改回 authorized，未来增加捕获失败的处理
+            payment.captureFailed();
+        }
+        paymentRepository.update(payment);
+        log.info("Payment capture successfully: {}", paymentId);
     }
 }

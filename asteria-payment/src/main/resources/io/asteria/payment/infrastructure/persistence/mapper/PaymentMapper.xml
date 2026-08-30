@@ -13,6 +13,7 @@
         <result property="referenceType" column="reference_type" />
         <result property="referenceId" column="reference_id" />
         <result property="status" column="status" />
+        <result property="authorizationTransactionId" column="authorization_transaction_id" />
         <result property="createdAt" column="created_at" />
         <result property="authorizedAt" column="authorized_at" />
         <result property="capturedAt" column="captured_at" />
@@ -22,6 +23,6 @@
 
     <sql id="Base_Column_List">
         id,merchant_id,amount,currency,payment_method,reference_type,reference_id,status,
-        created_at,authorized_at,captured_at,updated_at,version
+        authorization_transaction_id,created_at,authorized_at,captured_at,updated_at,version
     </sql>
 </mapper>

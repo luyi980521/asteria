@@ -16,4 +16,9 @@ public interface PaymentChannel {
      * 发起支付授权
      * */
     AuthorizationResult authorize(AuthorizationRequest request);
+
+    /**
+     * 发起支付捕获
+     */
+    CaptureResult capture(CaptureRequest request);
 }

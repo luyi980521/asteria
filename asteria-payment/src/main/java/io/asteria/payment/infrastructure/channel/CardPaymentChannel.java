@@ -1,8 +1,6 @@
 package io.asteria.payment.infrastructure.channel;
 
-import io.asteria.payment.application.port.channel.AuthorizationRequest;
-import io.asteria.payment.application.port.channel.AuthorizationResult;
-import io.asteria.payment.application.port.channel.PaymentChannel;
+import io.asteria.payment.application.port.channel.*;
 import io.asteria.payment.domain.enums.PaymentMethod;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +23,14 @@ public class CardPaymentChannel implements PaymentChannel {
      */
     @Override
     public AuthorizationResult authorize(AuthorizationRequest request) {
-        return AuthorizationResult.success("mock_" + request.paymentId().value());
+        return AuthorizationResult.success("auth_" + request.paymentId().value());
+    }
+
+    /**
+     * 发起支付捕获
+     */
+    @Override
+    public CaptureResult capture(CaptureRequest request) {
+        return CaptureResult.success("capture_" + request.paymentId().value());
     }
 }

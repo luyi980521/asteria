@@ -24,6 +24,7 @@ public class PaymentDO {
     private String referenceType;
     private String referenceId;
     private String status;
+    private String authorizationTransactionId;
     private Date createdAt;
     private Date authorizedAt;
     private Date capturedAt;
