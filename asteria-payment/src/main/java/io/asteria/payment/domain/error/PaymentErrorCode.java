@@ -20,6 +20,7 @@ public enum PaymentErrorCode {
     PAYMENT_CANNOT_CANCEL_IN_CURRENT_STATUS("PAYMENT_0016", "Current payment cannot be cancelled"),
     PAYMENT_NOT_FOUND("PAYMENT_0017", "Payment does not exist"),
     PAYMENT_REFERENCE_ALREADY_EXISTS("PAYMENT_0018", "Payment reference already exists"),
+    PAYMENT_CHANNEL_NOT_FOUND("PAYMENT_0019", "Payment channel not found"),
 
     ;
 

@@ -12,6 +12,14 @@ public interface PaymentApplicationService {
      * 创建支付
      *
      * @param command {@link CreatePaymentCommand}
+     * @return {@link PaymentId}
      * */
     PaymentId create(CreatePaymentCommand command);
+
+    /**
+     * 授权支付
+     *
+     * @param paymentId {@link PaymentId}
+     * */
+    void authorize(PaymentId paymentId);
 }
