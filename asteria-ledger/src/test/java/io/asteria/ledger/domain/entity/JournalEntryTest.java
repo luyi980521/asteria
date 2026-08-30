@@ -8,7 +8,7 @@ import io.asteria.ledger.domain.valueobject.EventId;
 import io.asteria.ledger.domain.valueobject.JournalEntryId;
 import io.asteria.ledger.domain.valueobject.JournalReference;
 import io.asteria.ledger.domain.valueobject.LedgerAccountId;
-import io.asteria.ledger.domain.valueobject.Money;
+import io.asteria.common.domain.valueobject.Money;
 import io.asteria.ledger.domain.valueobject.PostingId;
 import org.junit.jupiter.api.Test;
 

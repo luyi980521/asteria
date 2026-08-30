@@ -1,5 +1,6 @@
 package io.asteria.ledger.infrastructure.persistence.converter;
 
+import io.asteria.common.domain.valueobject.Money;
 import io.asteria.ledger.domain.entity.JournalEntry;
 import io.asteria.ledger.domain.entity.Posting;
 import io.asteria.ledger.domain.enums.DebitCredit;

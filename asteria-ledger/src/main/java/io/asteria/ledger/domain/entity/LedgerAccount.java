@@ -7,7 +7,7 @@ import io.asteria.ledger.domain.enums.NormalBalance;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import io.asteria.ledger.domain.valueobject.LedgerAccountId;
-import io.asteria.ledger.domain.valueobject.Money;
+import io.asteria.common.domain.valueobject.Money;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

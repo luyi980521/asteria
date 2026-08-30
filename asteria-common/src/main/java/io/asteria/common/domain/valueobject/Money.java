@@ -1,7 +1,7 @@
-package io.asteria.ledger.domain.valueobject;
+package io.asteria.common.domain.valueobject;
 
-import io.asteria.ledger.domain.error.LedgerErrorCode;
-import io.asteria.ledger.domain.exception.LedgerDomainException;
+import io.asteria.common.domain.error.CommonErrorCode;
+import io.asteria.common.domain.exception.CommonDomainException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -33,44 +33,44 @@ public final class Money {
     public Money add(Money other) {
         requireOther(other);
         if (!currency.equals(other.currency)) {
-            throw new LedgerDomainException(LedgerErrorCode.CURRENCY_MISMATCH);
+            throw new CommonDomainException(CommonErrorCode.MONEY_CURRENCY_MISMATCH);
         }
         return new Money(amount.add(other.amount), currency);
     }
 
     private static BigDecimal requirePositiveAmount(BigDecimal amount) {
         if (amount == null) {
-            throw new LedgerDomainException(LedgerErrorCode.NULL_ARGUMENT);
+            throw new CommonDomainException(CommonErrorCode.MONEY_AMOUNT_REQUIRED);
         }
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new LedgerDomainException(LedgerErrorCode.INVALID_MONEY_AMOUNT);
+            throw new CommonDomainException(CommonErrorCode.MONEY_AMOUNT_MUST_BE_POSITIVE);
         }
         return amount;
     }
 
     private static Currency requireCurrency(Currency currency) {
         if (currency == null) {
-            throw new LedgerDomainException(LedgerErrorCode.NULL_ARGUMENT);
+            throw new CommonDomainException(CommonErrorCode.MONEY_CURRENCY_REQUIRED);
         }
         return currency;
     }
 
     private static void requireOther(Money other) {
         if (other == null) {
-            throw new LedgerDomainException(LedgerErrorCode.NULL_ARGUMENT);
+            throw new CommonDomainException(CommonErrorCode.MONEY_OTHER_REQUIRED);
         }
     }
 
     private static BigDecimal normalize(BigDecimal amount, Currency currency) {
         int fractionDigits = currency.getDefaultFractionDigits();
         if (fractionDigits < 0) {
-            throw new LedgerDomainException(LedgerErrorCode.INVALID_MONEY_AMOUNT);
+            throw new CommonDomainException(CommonErrorCode.MONEY_AMOUNT_SCALE_INVALID);
         }
 
         try {
             return amount.setScale(fractionDigits, RoundingMode.UNNECESSARY);
         } catch (ArithmeticException ex) {
-            throw new LedgerDomainException(LedgerErrorCode.INVALID_MONEY_AMOUNT, ex);
+            throw new CommonDomainException(CommonErrorCode.MONEY_AMOUNT_SCALE_INVALID, ex);
         }
     }
 

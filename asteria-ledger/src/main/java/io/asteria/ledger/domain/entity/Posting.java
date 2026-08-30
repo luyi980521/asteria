@@ -4,7 +4,7 @@ import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import io.asteria.ledger.domain.valueobject.LedgerAccountId;
-import io.asteria.ledger.domain.valueobject.Money;
+import io.asteria.common.domain.valueobject.Money;
 import io.asteria.ledger.domain.valueobject.PostingId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

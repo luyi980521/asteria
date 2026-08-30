@@ -10,7 +10,7 @@ import io.asteria.ledger.domain.valueobject.EventId;
 import io.asteria.ledger.domain.valueobject.JournalEntryId;
 import io.asteria.ledger.domain.valueobject.JournalReference;
 import io.asteria.ledger.domain.valueobject.PostingId;
-import io.asteria.ledger.domain.valueobject.Money;
+import io.asteria.common.domain.valueobject.Money;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

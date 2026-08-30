@@ -1,7 +1,8 @@
 package io.asteria.ledger.domain.valueobject;
 
-import io.asteria.ledger.domain.error.LedgerErrorCode;
-import io.asteria.ledger.domain.exception.LedgerDomainException;
+import io.asteria.common.domain.error.CommonErrorCode;
+import io.asteria.common.domain.exception.CommonDomainException;
+import io.asteria.common.domain.valueobject.Money;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -35,37 +36,37 @@ class MoneyTest {
 
     @Test
     void amountNullReturnsNullArgument() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> Money.of(null, USD));
+        CommonDomainException exception = assertThrows(CommonDomainException.class, () -> Money.of(null, USD));
 
-        assertEquals(LedgerErrorCode.NULL_ARGUMENT, exception.errorCode());
+        assertEquals(CommonErrorCode.MONEY_AMOUNT_REQUIRED, exception.errorCode());
     }
 
     @Test
     void currencyNullReturnsNullArgument() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> Money.of(new BigDecimal("1.00"), null));
+        CommonDomainException exception = assertThrows(CommonDomainException.class, () -> Money.of(new BigDecimal("1.00"), null));
 
-        assertEquals(LedgerErrorCode.NULL_ARGUMENT, exception.errorCode());
+        assertEquals(CommonErrorCode.MONEY_CURRENCY_REQUIRED, exception.errorCode());
     }
 
     @Test
     void zeroAmountReturnsInvalidMoneyAmount() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> Money.of(BigDecimal.ZERO, USD));
+        CommonDomainException exception = assertThrows(CommonDomainException.class, () -> Money.of(BigDecimal.ZERO, USD));
 
-        assertEquals(LedgerErrorCode.INVALID_MONEY_AMOUNT, exception.errorCode());
+        assertEquals(CommonErrorCode.MONEY_AMOUNT_MUST_BE_POSITIVE, exception.errorCode());
     }
 
     @Test
     void negativeAmountReturnsInvalidMoneyAmount() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> Money.of(new BigDecimal("-1"), USD));
+        CommonDomainException exception = assertThrows(CommonDomainException.class, () -> Money.of(new BigDecimal("-1"), USD));
 
-        assertEquals(LedgerErrorCode.INVALID_MONEY_AMOUNT, exception.errorCode());
+        assertEquals(CommonErrorCode.MONEY_AMOUNT_MUST_BE_POSITIVE, exception.errorCode());
     }
 
     @Test
     void excessivePrecisionReturnsInvalidMoneyAmount() {
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> Money.of(new BigDecimal("10.257"), USD));
+        CommonDomainException exception = assertThrows(CommonDomainException.class, () -> Money.of(new BigDecimal("10.257"), USD));
 
-        assertEquals(LedgerErrorCode.INVALID_MONEY_AMOUNT, exception.errorCode());
+        assertEquals(CommonErrorCode.MONEY_AMOUNT_SCALE_INVALID, exception.errorCode());
     }
 
     @Test
@@ -90,18 +91,18 @@ class MoneyTest {
         Money usd = Money.of(new BigDecimal("10.25"), USD);
         Money eur = Money.of(new BigDecimal("2.75"), EUR);
 
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> usd.add(eur));
+        CommonDomainException exception = assertThrows(CommonDomainException.class, () -> usd.add(eur));
 
-        assertEquals(LedgerErrorCode.CURRENCY_MISMATCH, exception.errorCode());
+        assertEquals(CommonErrorCode.MONEY_CURRENCY_MISMATCH, exception.errorCode());
     }
 
     @Test
     void addNullReturnsNullArgument() {
         Money money = Money.of(new BigDecimal("10.25"), USD);
 
-        LedgerDomainException exception = assertThrows(LedgerDomainException.class, () -> money.add(null));
+        CommonDomainException exception = assertThrows(CommonDomainException.class, () -> money.add(null));
 
-        assertEquals(LedgerErrorCode.NULL_ARGUMENT, exception.errorCode());
+        assertEquals(CommonErrorCode.MONEY_OTHER_REQUIRED, exception.errorCode());
     }
 
     @Test
