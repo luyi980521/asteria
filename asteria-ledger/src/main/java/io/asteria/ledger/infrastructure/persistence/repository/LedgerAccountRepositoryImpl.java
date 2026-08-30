@@ -1,7 +1,9 @@
 package io.asteria.ledger.infrastructure.persistence.repository;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.asteria.ledger.domain.entity.LedgerAccount;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
@@ -13,6 +15,9 @@ import io.asteria.ledger.infrastructure.persistence.mapper.LedgerAccountMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -81,5 +86,15 @@ public class LedgerAccountRepositoryImpl implements LedgerAccountRepository {
         queryWrapper.eq("account_code", accountCode);
         LedgerAccountDO oldLedgerAccountDO = ledgerAccountMapper.selectOne(queryWrapper);
         return oldLedgerAccountDO != null;
+    }
+
+    @Override
+    public List<LedgerAccount> findByLedgerAccountIds(List<LedgerAccountId> ledgerAccountIds) {
+
+        LambdaQueryWrapper<LedgerAccountDO> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.in(LedgerAccountDO::getId, ledgerAccountIds.stream()
+                .map(LedgerAccountId::value).collect(Collectors.toSet()));
+        List<LedgerAccountDO> ledgerAccountDOS = ledgerAccountMapper.selectList(queryWrapper);
+        return ledgerAccountDOS.stream().map(converter::toDomain).toList();
     }
 }

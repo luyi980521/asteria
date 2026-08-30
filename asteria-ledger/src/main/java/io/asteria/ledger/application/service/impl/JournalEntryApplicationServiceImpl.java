@@ -5,6 +5,7 @@ import io.asteria.common.util.JsonUtils;
 import io.asteria.ledger.application.assembler.PostingAssembler;
 import io.asteria.ledger.application.command.CreateAndPostJournalEntryCommand;
 import io.asteria.ledger.application.service.JournalEntryApplicationService;
+import io.asteria.ledger.application.service.LedgerAccountApplicationService;
 import io.asteria.ledger.domain.entity.JournalEntry;
 import io.asteria.ledger.domain.entity.Posting;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
@@ -35,6 +36,9 @@ public class JournalEntryApplicationServiceImpl implements JournalEntryApplicati
     @Autowired
     private DistributedIdGenerator distributedIdGenerator;
 
+    @Autowired
+    private LedgerAccountApplicationService ledgerAccountApplicationService;
+
     /**
      * 创建并入账
      *
@@ -60,6 +64,7 @@ public class JournalEntryApplicationServiceImpl implements JournalEntryApplicati
             log.warn("Journal entry already exists: {}", JsonUtils.toJson(command.reference()));
             throw new LedgerDomainException(LedgerErrorCode.DUPLICATE_LEDGER_EVENT);
         }
+        ledgerAccountApplicationService.validatePostable(command.postings());
 
         List<Posting> postings = command.postings().stream()
                 .map(pc -> postingAssembler.toEntity(pc))

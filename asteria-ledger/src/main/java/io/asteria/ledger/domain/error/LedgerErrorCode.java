@@ -36,6 +36,7 @@ public enum LedgerErrorCode {
     CLOSED_LEDGER_ACCOUNT_CANNOT_BE_ACTIVATED("LEDGER_0028", "Closed ledger account cannot be activated"),
     LEDGER_ACCOUNT_ALREADY_CLOSED("LEDGER_0029", "Ledger account is already closed"),
     LEDGER_ACCOUNT_ALREADY_EXISTS("LEDGER_0030", "Ledger account is already exists"),
+    LEDGER_ACCOUNT_NOT_EXIST("LEDGER_0031", "Ledger account doesn't exist"),
 
     ;
 
