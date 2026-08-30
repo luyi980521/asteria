@@ -198,4 +198,17 @@ public class Payment {
                 status, createdAt, authorizedAt, capturedAt);
     }
 
+    /**
+     * 从持久化数据恢复包含授权交易号的 Payment
+     * */
+    public static Payment reconstitute(PaymentId paymentId, Long merchantId, Money amount,
+                                       PaymentMethod paymentMethod, PaymentReference reference,
+                                       String authorizationTransactionId, PaymentStatus status,
+                                       Instant createdAt, Instant authorizedAt, Instant capturedAt) {
+        Payment payment = new Payment(paymentId, merchantId, amount, paymentMethod, reference,
+                status, createdAt, authorizedAt, capturedAt);
+        payment.authorizationTransactionId = authorizationTransactionId;
+        return payment;
+    }
+
 }

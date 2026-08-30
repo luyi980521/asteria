@@ -26,6 +26,7 @@ public class PaymentPersistenceConverter {
         dataObject.setReferenceType(payment.getReference().referenceType());
         dataObject.setReferenceId(payment.getReference().referenceId());
         dataObject.setStatus(payment.getStatus().name());
+        dataObject.setAuthorizationTransactionId(payment.getAuthorizationTransactionId());
         dataObject.setCreatedAt(Date.from(payment.getCreatedAt()));
         dataObject.setAuthorizedAt(toDate(payment.getAuthorizedAt()));
         dataObject.setCapturedAt(toDate(payment.getCapturedAt()));
@@ -39,6 +40,7 @@ public class PaymentPersistenceConverter {
                 Money.of(dataObject.getAmount(), Currency.getInstance(dataObject.getCurrency())),
                 PaymentMethod.valueOf(dataObject.getPaymentMethod()),
                 new PaymentReference(dataObject.getReferenceType(), dataObject.getReferenceId()),
+                dataObject.getAuthorizationTransactionId(),
                 PaymentStatus.valueOf(dataObject.getStatus()),
                 dataObject.getCreatedAt().toInstant(),
                 toInstant(dataObject.getAuthorizedAt()),

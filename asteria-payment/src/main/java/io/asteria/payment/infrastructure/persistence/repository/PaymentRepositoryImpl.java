@@ -49,6 +49,8 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                 .eq(PaymentDO::getId, paymentId)
                 .eq(PaymentDO::getVersion, existing.getVersion())
                 .set(PaymentDO::getStatus, dataObject.getStatus())
+                .set(PaymentDO::getAuthorizationTransactionId,
+                        dataObject.getAuthorizationTransactionId())
                 .set(PaymentDO::getAuthorizedAt, dataObject.getAuthorizedAt())
                 .set(PaymentDO::getCapturedAt, dataObject.getCapturedAt())
                 .set(PaymentDO::getUpdatedAt, new Date())

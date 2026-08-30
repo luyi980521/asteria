@@ -43,7 +43,7 @@ class PaymentTest {
 
         payment.startAuthorization();
         assertEquals(PaymentStatus.AUTHORIZING, payment.getStatus());
-        payment.authorize(AUTHORIZED_AT);
+        payment.authorize("auth-1001", AUTHORIZED_AT);
         assertEquals(PaymentStatus.AUTHORIZED, payment.getStatus());
         assertEquals(AUTHORIZED_AT, payment.getAuthorizedAt());
         payment.startCapture();
@@ -61,7 +61,7 @@ class PaymentTest {
 
         Payment authorized = payment();
         authorized.startAuthorization();
-        authorized.authorize(AUTHORIZED_AT);
+        authorized.authorize("auth-1001", AUTHORIZED_AT);
         authorized.cancel();
         assertEquals(PaymentStatus.CANCELLED, authorized.getStatus());
     }
@@ -82,8 +82,8 @@ class PaymentTest {
     void rejectsIllegalStateTransitions() {
         Payment payment = payment();
 
-        assertError(PaymentErrorCode.PAYMENT_MUST_BE_AUTHORIZING_TO_AUTHORIZE,
-                () -> payment.authorize(AUTHORIZED_AT));
+        assertError(PaymentErrorCode.INVALID_PAYMENT_STATUS,
+                () -> payment.authorize("auth-1001", AUTHORIZED_AT));
         assertError(PaymentErrorCode.PAYMENT_MUST_BE_AUTHORIZED_TO_CAPTURE,
                 payment::startCapture);
         assertError(PaymentErrorCode.PAYMENT_MUST_BE_CAPTURING_TO_CAPTURE,
@@ -92,7 +92,7 @@ class PaymentTest {
         payment.startAuthorization();
         assertError(PaymentErrorCode.PAYMENT_MUST_BE_CREATED_TO_AUTHORIZE,
                 payment::startAuthorization);
-        payment.authorize(AUTHORIZED_AT);
+        payment.authorize("auth-1001", AUTHORIZED_AT);
         payment.startCapture();
         assertError(PaymentErrorCode.PAYMENT_CANNOT_CANCEL_IN_CURRENT_STATUS, payment::cancel);
         payment.capture(CAPTURED_AT);
@@ -129,8 +129,9 @@ class PaymentTest {
 
         Payment payment = payment();
         payment.startAuthorization();
-        assertError(PaymentErrorCode.PAYMENT_AUTHORIZED_AT_REQUIRED, () -> payment.authorize(null));
-        payment.authorize(AUTHORIZED_AT);
+        assertError(PaymentErrorCode.AUTHORIZED_AT_REQUIRED,
+                () -> payment.authorize("auth-1001", null));
+        payment.authorize("auth-1001", AUTHORIZED_AT);
         payment.startCapture();
         assertError(PaymentErrorCode.PAYMENT_CAPTURED_AT_REQUIRED, () -> payment.capture(null));
     }
