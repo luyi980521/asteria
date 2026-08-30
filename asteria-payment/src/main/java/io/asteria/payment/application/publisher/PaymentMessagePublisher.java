@@ -57,9 +57,14 @@ public class PaymentMessagePublisher {
                 return;
             }
 
-            outboxTransactionService.markPublished(event.getId(), Instant.now());
-            log.info("Outbox event published, eventId: {}, eventType: {}",
-                    event.getEventId(), event.getEventType());
+            try {
+                outboxTransactionService.markPublished(event.getId(), Instant.now());
+                log.info("Outbox event marked published, eventId: {}, eventType: {}",
+                        event.getEventId(), event.getEventType());
+            } catch (Exception ex) {
+                log.error("Failed to mark outbox event published, eventId: {}",
+                        event.getEventId(), ex);
+            }
         });
     }
 }

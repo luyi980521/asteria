@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -35,10 +34,8 @@ public class OutboxPublisher {
 
         try {
             paymentMessagePublisher.publish(event);
-            outboxEventRepository.markPublished(event.getId(), Instant.now());
-            log.info("Outbox event marked published, eventId: {}", event.getEventId());
         } catch (Exception ex) {
-            log.error("Failed to publish outbox event, eventId: {}, eventType: {}",
+            log.error("Failed to submit outbox event, eventId: {}, eventType: {}",
                     event.getEventId(), event.getEventType(), ex);
         }
     }
