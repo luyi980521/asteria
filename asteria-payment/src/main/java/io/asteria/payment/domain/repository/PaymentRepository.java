@@ -1,8 +1,8 @@
 package io.asteria.payment.domain.repository;
 
-import io.asteria.payment.entity.Payment;
-import io.asteria.payment.valueobject.PaymentId;
-import io.asteria.payment.valueobject.PaymentReference;
+import io.asteria.payment.domain.entity.Payment;
+import io.asteria.payment.domain.valueobject.PaymentId;
+import io.asteria.payment.domain.valueobject.PaymentReference;
 
 public interface PaymentRepository {
 

@@ -1,12 +1,12 @@
 package io.asteria.payment.infrastructure.persistence.converter;
 
 import io.asteria.common.domain.valueobject.Money;
-import io.asteria.payment.entity.Payment;
-import io.asteria.payment.enums.PaymentMethod;
-import io.asteria.payment.enums.PaymentStatus;
+import io.asteria.payment.domain.entity.Payment;
+import io.asteria.payment.domain.enums.PaymentMethod;
+import io.asteria.payment.domain.enums.PaymentStatus;
 import io.asteria.payment.infrastructure.persistence.dataobject.PaymentDO;
-import io.asteria.payment.valueobject.PaymentId;
-import io.asteria.payment.valueobject.PaymentReference;
+import io.asteria.payment.domain.valueobject.PaymentId;
+import io.asteria.payment.domain.valueobject.PaymentReference;
 import org.springframework.stereotype.Component;
 
 import java.util.Currency;

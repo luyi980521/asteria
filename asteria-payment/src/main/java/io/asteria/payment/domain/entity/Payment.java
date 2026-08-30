@@ -1,12 +1,12 @@
-package io.asteria.payment.entity;
+package io.asteria.payment.domain.entity;
 
 import io.asteria.common.domain.valueobject.Money;
 import io.asteria.payment.domain.error.PaymentErrorCode;
 import io.asteria.payment.domain.exception.PaymentDomainException;
-import io.asteria.payment.enums.PaymentMethod;
-import io.asteria.payment.enums.PaymentStatus;
-import io.asteria.payment.valueobject.PaymentId;
-import io.asteria.payment.valueobject.PaymentReference;
+import io.asteria.payment.domain.enums.PaymentMethod;
+import io.asteria.payment.domain.enums.PaymentStatus;
+import io.asteria.payment.domain.valueobject.PaymentId;
+import io.asteria.payment.domain.valueobject.PaymentReference;
 
 import java.time.Instant;
 

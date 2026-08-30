@@ -1,4 +1,4 @@
-package io.asteria.payment.valueobject;
+package io.asteria.payment.domain.valueobject;
 
 import io.asteria.payment.domain.error.PaymentErrorCode;
 import io.asteria.payment.domain.exception.PaymentDomainException;

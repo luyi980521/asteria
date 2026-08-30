@@ -1,4 +1,4 @@
-package io.asteria.payment.enums;
+package io.asteria.payment.domain.enums;
 
 /**
  * 支付状态枚举定义
