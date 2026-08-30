@@ -1,87 +1,32 @@
 package io.asteria.payment.application.service;
 
-import io.asteria.payment.application.assembler.PaymentOutboxEventAssembler;
 import io.asteria.payment.application.port.channel.AuthorizationResult;
 import io.asteria.payment.application.port.channel.CaptureResult;
 import io.asteria.payment.domain.entity.Payment;
-import io.asteria.payment.domain.repository.OutboxEventRepository;
-import io.asteria.payment.domain.repository.PaymentRepository;
-import io.asteria.payment.domain.valueobject.OutboxEvent;
 import io.asteria.payment.domain.valueobject.PaymentId;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
 
 /**
- * Payment 本地状态事务服务
+ * Payment 本地状态事务服务功能接口定义
  * */
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class PaymentTransactionService {
-
-    private final PaymentRepository paymentRepository;
-
-    private final PaymentOutboxEventAssembler paymentOutboxEventAssembler;
-
-    private final OutboxEventRepository outboxEventRepository;
+public interface PaymentTransactionService {
 
     /**
      * 开始授权并提交本地状态
      * */
-    @Transactional(rollbackFor = Exception.class)
-    public Payment startAuthorization(PaymentId paymentId) {
-        Payment payment = paymentRepository.findById(paymentId);
-        payment.startAuthorization();
-        paymentRepository.update(payment);
-        return payment;
-    }
+    Payment startAuthorization(PaymentId paymentId);
 
     /**
      * 根据渠道结果完成授权并提交本地状态
      * */
-    @Transactional(rollbackFor = Exception.class)
-    public void completeAuthorization(PaymentId paymentId, AuthorizationResult result) {
-        Payment payment = paymentRepository.findById(paymentId);
-        if (result.success()) {
-            payment.authorize(result.channelTransactionId(), Instant.now());
-        } else {
-            payment.fail();
-        }
-        paymentRepository.update(payment);
-    }
+    void completeAuthorization(PaymentId paymentId, AuthorizationResult result);
 
     /**
      * 开始捕获并提交本地状态
      * */
-    @Transactional(rollbackFor = Exception.class)
-    public Payment startCapture(PaymentId paymentId) {
-        Payment payment = paymentRepository.findById(paymentId);
-        payment.startCapture();
-        paymentRepository.update(payment);
-        return payment;
-    }
+    Payment startCapture(PaymentId paymentId);
 
     /**
      * 根据渠道结果完成捕获并提交本地状态
      * */
-    @Transactional(rollbackFor = Exception.class)
-    public void completeCapture(PaymentId paymentId, CaptureResult result) {
-        Payment payment = paymentRepository.findById(paymentId);
-        if (result.success()) {
-            payment.capture(Instant.now());
-        } else {
-            // 暂时先将捕获失败的支付单状态更改回 authorized，未来增加捕获失败的处理
-            payment.captureFailed();
-        }
-
-        OutboxEvent outboxEvent = paymentOutboxEventAssembler.toPaymentCapturedOutboxEvent(payment);
-        outboxEventRepository.insert(outboxEvent);
-        paymentRepository.update(payment);
-        log.info("Payment capture completed, paymentId: {}, outboxEventId: {}",
-                paymentId.value(), outboxEvent.getEventId());
-    }
+    void completeCapture(PaymentId paymentId, CaptureResult result);
 }

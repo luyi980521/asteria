@@ -25,6 +25,7 @@ public enum PaymentErrorCode {
     INVALID_PAYMENT_STATUS("PAYMENT_0021", "Invalid payment status"),
     AUTHORIZATION_TRANSACTION_ID_REQUIRED("PAYMENT_0022", "Authorization transaction id required"),
     AUTHORIZED_AT_REQUIRED("PAYMENT_0023", "Authorized at required"),
+    UNSUPPORTED_OUTBOX_EVENT_TYPE("PAYMENT_0024", "Unsupported outbox event type"),
 
     ;
 
