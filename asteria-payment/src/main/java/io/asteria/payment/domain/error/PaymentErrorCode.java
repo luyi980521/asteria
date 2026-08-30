@@ -18,7 +18,10 @@ public enum PaymentErrorCode {
     PAYMENT_MUST_BE_CAPTURING_TO_CAPTURE("PAYMENT_0014", "Only capturing payment can be captured"),
     PAYMENT_CANNOT_FAIL_IN_CURRENT_STATUS("PAYMENT_0015", "Current payment cannot be marked as failed"),
     PAYMENT_CANNOT_CANCEL_IN_CURRENT_STATUS("PAYMENT_0016", "Current payment cannot be cancelled"),
-    PAYMENT_NOT_FOUND("PAYMENT_0017", "Payment does not exist");
+    PAYMENT_NOT_FOUND("PAYMENT_0017", "Payment does not exist"),
+    PAYMENT_REFERENCE_ALREADY_EXISTS("PAYMENT_0018", "Payment reference already exists"),
+
+    ;
 
     private final String code;
     private final String defaultMessage;
