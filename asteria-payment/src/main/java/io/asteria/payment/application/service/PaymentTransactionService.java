@@ -1,11 +1,15 @@
 package io.asteria.payment.application.service;
 
+import io.asteria.payment.application.assembler.PaymentOutboxEventAssembler;
 import io.asteria.payment.application.port.channel.AuthorizationResult;
 import io.asteria.payment.application.port.channel.CaptureResult;
 import io.asteria.payment.domain.entity.Payment;
+import io.asteria.payment.domain.repository.OutboxEventRepository;
 import io.asteria.payment.domain.repository.PaymentRepository;
+import io.asteria.payment.domain.valueobject.OutboxEvent;
 import io.asteria.payment.domain.valueobject.PaymentId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +18,16 @@ import java.time.Instant;
 /**
  * Payment 本地状态事务服务
  * */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentTransactionService {
 
     private final PaymentRepository paymentRepository;
+
+    private final PaymentOutboxEventAssembler paymentOutboxEventAssembler;
+
+    private final OutboxEventRepository outboxEventRepository;
 
     /**
      * 开始授权并提交本地状态
@@ -68,6 +77,11 @@ public class PaymentTransactionService {
             // 暂时先将捕获失败的支付单状态更改回 authorized，未来增加捕获失败的处理
             payment.captureFailed();
         }
+
+        OutboxEvent outboxEvent = paymentOutboxEventAssembler.toPaymentCapturedOutboxEvent(payment);
+        outboxEventRepository.insert(outboxEvent);
         paymentRepository.update(payment);
+        log.info("Payment capture completed, paymentId: {}, outboxEventId: {}",
+                paymentId.value(), outboxEvent.getEventId());
     }
 }

@@ -2,6 +2,7 @@ package io.asteria.payment.domain.valueobject;
 
 import io.asteria.payment.domain.enums.OutboxEventStatus;
 import io.asteria.payment.domain.enums.OutboxEventType;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.time.Instant;
  * Outbox 事件
  */
 @Getter
+@Builder
 public class OutboxEvent {
 
     /** Outbox 记录 ID */
