@@ -1,5 +1,7 @@
 package io.asteria.payment.valueobject;
 
+import io.asteria.payment.domain.error.PaymentErrorCode;
+import io.asteria.payment.domain.exception.PaymentDomainException;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -12,11 +14,11 @@ public record PaymentReference(String referenceType, String referenceId) {
      * */
     public PaymentReference {
         if (StringUtils.isBlank(referenceType)) {
-            throw new IllegalArgumentException("Payment reference type must not be blank");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_REFERENCE_TYPE_REQUIRED);
         }
 
         if (StringUtils.isBlank(referenceId)) {
-            throw new IllegalArgumentException("Payment reference id must not be blank");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_REFERENCE_ID_REQUIRED);
         }
     }
 }

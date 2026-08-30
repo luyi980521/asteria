@@ -1,6 +1,8 @@
 package io.asteria.payment.entity;
 
 import io.asteria.common.domain.valueobject.Money;
+import io.asteria.payment.domain.error.PaymentErrorCode;
+import io.asteria.payment.domain.exception.PaymentDomainException;
 import io.asteria.payment.enums.PaymentMethod;
 import io.asteria.payment.enums.PaymentStatus;
 import io.asteria.payment.valueobject.PaymentId;
@@ -62,22 +64,22 @@ public class Payment {
                                  PaymentMethod paymentMethod, PaymentReference reference,
                                  Instant createdAt) {
         if (paymentId == null) {
-            throw new IllegalArgumentException("Payment id must not be null");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_ID_MUST_BE_POSITIVE);
         }
         if (merchantId == null || merchantId <= 0) {
-            throw new IllegalArgumentException("Merchant id must be positive");
+            throw new PaymentDomainException(PaymentErrorCode.MERCHANT_ID_MUST_BE_POSITIVE);
         }
         if (amount == null) {
-            throw new IllegalArgumentException("Payment amount must not be null");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_AMOUNT_REQUIRED);
         }
         if (paymentMethod == null) {
-            throw new IllegalArgumentException("Payment method must not be null");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_METHOD_REQUIRED);
         }
         if (reference == null) {
-            throw new IllegalArgumentException("Payment reference must not be null");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_REFERENCE_REQUIRED);
         }
         if (createdAt == null) {
-            throw new IllegalArgumentException("Created time must not be null");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_CREATED_AT_REQUIRED);
         }
 
         return new Payment(paymentId, merchantId, amount, paymentMethod, reference,
@@ -89,7 +91,7 @@ public class Payment {
      * */
     public void startAuthorization() {
         if (status != PaymentStatus.CREATED) {
-            throw new IllegalStateException("Only created payment can start authorization");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_CREATED_TO_AUTHORIZE);
         }
 
         status = PaymentStatus.AUTHORIZING;
@@ -100,10 +102,10 @@ public class Payment {
      * */
     public void authorize(Instant authorizedAt) {
         if (status != PaymentStatus.AUTHORIZING) {
-            throw new IllegalStateException("Only authorizing payment can be authorized");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_AUTHORIZING_TO_AUTHORIZE);
         }
         if (authorizedAt == null) {
-            throw new IllegalArgumentException("Authorized time must not be null");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_AUTHORIZED_AT_REQUIRED);
         }
 
         status = PaymentStatus.AUTHORIZED;
@@ -115,7 +117,7 @@ public class Payment {
      * */
     public void startCapture() {
         if (status != PaymentStatus.AUTHORIZED) {
-            throw new IllegalStateException("Only authorized payment can start capture");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_AUTHORIZED_TO_CAPTURE);
         }
 
         status = PaymentStatus.CAPTURING;
@@ -126,10 +128,10 @@ public class Payment {
      * */
     public void capture(Instant capturedAt) {
         if (status != PaymentStatus.CAPTURING) {
-            throw new IllegalStateException("Only capturing payment can be captured");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_CAPTURING_TO_CAPTURE);
         }
         if (capturedAt == null) {
-            throw new IllegalArgumentException("Captured time must not be null");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_CAPTURED_AT_REQUIRED);
         }
 
         status = PaymentStatus.CAPTURED;
@@ -141,7 +143,7 @@ public class Payment {
      * */
     public void fail() {
         if (status == PaymentStatus.CAPTURED || status == PaymentStatus.CANCELLED) {
-            throw new IllegalStateException("Current payment cannot be marked as failed");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_CANNOT_FAIL_IN_CURRENT_STATUS);
         }
 
         status = PaymentStatus.FAILED;
@@ -152,7 +154,7 @@ public class Payment {
      * */
     public void cancel() {
         if (status != PaymentStatus.CREATED && status != PaymentStatus.AUTHORIZED) {
-            throw new IllegalStateException("Current payment cannot be cancelled");
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_CANNOT_CANCEL_IN_CURRENT_STATUS);
         }
 
         status = PaymentStatus.CANCELLED;
