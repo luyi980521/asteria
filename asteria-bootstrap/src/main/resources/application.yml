@@ -19,3 +19,7 @@ asteria:
   id-generator:
     worker-id: 1
     datacenter-id: 1
+  payment:
+    outbox:
+      publish-task-enabled: false
+      publish-interval-ms: 1000
