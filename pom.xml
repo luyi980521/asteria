@@ -18,6 +18,7 @@
         <module>asteria-account</module>
         <module>asteria-ledger</module>
         <module>asteria-payment</module>
+        <module>asteria-settlement</module>
         <module>asteria-infrastructure</module>
     </modules>
 

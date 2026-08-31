@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.settlement.infrastructure.persistence.mapper.SettlementBatchMapper">
+
+    <resultMap id="BaseResultMap" type="io.asteria.settlement.infrastructure.persistence.dataobject.SettlementBatchDO">
+            <id property="id" column="id" />
+            <result property="settlementReference" column="settlement_reference" />
+            <result property="currency" column="currency" />
+            <result property="grossAmount" column="gross_amount" />
+            <result property="feeAmount" column="fee_amount" />
+            <result property="netAmount" column="net_amount" />
+            <result property="status" column="status" />
+            <result property="channelSettlementBatchId" column="channel_settlement_batch_id" />
+            <result property="createdAt" column="created_at" />
+            <result property="processingAt" column="processing_at" />
+            <result property="acceptedAt" column="accepted_at" />
+            <result property="settledAt" column="settled_at" />
+            <result property="failedAt" column="failed_at" />
+            <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,settlement_reference,currency,gross_amount,fee_amount,net_amount,
+        status,channel_settlement_batch_id,created_at,processing_at,accepted_at,
+        settled_at,failed_at,updated_at
+    </sql>
+</mapper>
