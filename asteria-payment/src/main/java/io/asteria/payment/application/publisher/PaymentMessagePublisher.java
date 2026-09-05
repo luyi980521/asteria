@@ -1,7 +1,7 @@
 package io.asteria.payment.application.publisher;
 
 import io.asteria.common.constants.PaymentTopics;
-import io.asteria.payment.application.service.OutboxTransactionService;
+import io.asteria.payment.application.service.PaymentOutboxTransactionService;
 import io.asteria.payment.domain.enums.OutboxEventType;
 import io.asteria.payment.domain.error.PaymentErrorCode;
 import io.asteria.payment.domain.exception.PaymentDomainException;
@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 public class PaymentMessagePublisher {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final OutboxTransactionService outboxTransactionService;
+    private final PaymentOutboxTransactionService paymentOutboxTransactionService;
 
     /**
      * 发布 Outbox 事件
@@ -58,7 +58,7 @@ public class PaymentMessagePublisher {
             }
 
             try {
-                outboxTransactionService.markPublished(event.getId(), Instant.now());
+                paymentOutboxTransactionService.markPublished(event.getId(), Instant.now());
                 log.info("Outbox event marked published, eventId: {}, eventType: {}",
                         event.getEventId(), event.getEventType());
             } catch (Exception ex) {

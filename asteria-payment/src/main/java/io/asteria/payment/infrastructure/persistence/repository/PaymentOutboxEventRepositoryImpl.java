@@ -3,7 +3,7 @@ package io.asteria.payment.infrastructure.persistence.repository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import io.asteria.payment.domain.enums.OutboxEventStatus;
-import io.asteria.payment.domain.repository.OutboxEventRepository;
+import io.asteria.payment.domain.repository.PaymentOutboxEventRepository;
 import io.asteria.payment.domain.valueobject.OutboxEvent;
 import io.asteria.payment.infrastructure.persistence.converter.PaymentOutboxEventPersistenceConverter;
 import io.asteria.payment.infrastructure.persistence.dataobject.PaymentOutboxEventDO;
@@ -16,12 +16,12 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Outbox 事件仓储实现
+ * 支付 Outbox 事件仓储实现
  */
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class OutboxEventRepositoryImpl implements OutboxEventRepository {
+public class PaymentOutboxEventRepositoryImpl implements PaymentOutboxEventRepository {
 
     private final PaymentOutboxEventMapper paymentOutboxEventMapper;
     private final PaymentOutboxEventPersistenceConverter converter;

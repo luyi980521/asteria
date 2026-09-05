@@ -1,6 +1,6 @@
 package io.asteria.payment.application.publisher;
 
-import io.asteria.payment.domain.repository.OutboxEventRepository;
+import io.asteria.payment.domain.repository.PaymentOutboxEventRepository;
 import io.asteria.payment.domain.valueobject.OutboxEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,16 +14,16 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OutboxPublisher {
+public class PaymentOutboxPublisher {
 
-    private final OutboxEventRepository outboxEventRepository;
+    private final PaymentOutboxEventRepository paymentOutboxEventRepository;
     private final PaymentMessagePublisher paymentMessagePublisher;
 
     /**
      * 发布待发送 Outbox 事件
      */
     public void publishPendingEvents() {
-        List<OutboxEvent> events = outboxEventRepository.findPending(100);
+        List<OutboxEvent> events = paymentOutboxEventRepository.findPending(100);
 
         for (OutboxEvent event : events) {
             publish(event);

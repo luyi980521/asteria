@@ -6,9 +6,9 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Outbox 事件仓储
+ * 支付 Outbox 事件仓储
  */
-public interface OutboxEventRepository {
+public interface PaymentOutboxEventRepository {
 
     /**
      * 插入 Outbox 事件

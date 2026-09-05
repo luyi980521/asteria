@@ -1,7 +1,7 @@
 package io.asteria.payment.application.service.impl;
 
-import io.asteria.payment.application.service.OutboxTransactionService;
-import io.asteria.payment.domain.repository.OutboxEventRepository;
+import io.asteria.payment.application.service.PaymentOutboxTransactionService;
+import io.asteria.payment.domain.repository.PaymentOutboxEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,9 +15,9 @@ import java.time.Instant;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OutboxTransactionServiceImpl implements OutboxTransactionService {
+public class PaymentOutboxTransactionServiceImpl implements PaymentOutboxTransactionService {
 
-    private final OutboxEventRepository outboxEventRepository;
+    private final PaymentOutboxEventRepository paymentOutboxEventRepository;
 
     /**
      * 标记 Outbox 事件已发布
@@ -25,6 +25,6 @@ public class OutboxTransactionServiceImpl implements OutboxTransactionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void markPublished(Long id, Instant publishedAt) {
-        outboxEventRepository.markPublished(id, publishedAt);
+        paymentOutboxEventRepository.markPublished(id, publishedAt);
     }
 }

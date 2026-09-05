@@ -5,7 +5,7 @@ import io.asteria.payment.application.port.channel.AuthorizationResult;
 import io.asteria.payment.application.port.channel.CaptureResult;
 import io.asteria.payment.application.service.PaymentTransactionService;
 import io.asteria.payment.domain.entity.Payment;
-import io.asteria.payment.domain.repository.OutboxEventRepository;
+import io.asteria.payment.domain.repository.PaymentOutboxEventRepository;
 import io.asteria.payment.domain.repository.PaymentRepository;
 import io.asteria.payment.domain.valueobject.OutboxEvent;
 import io.asteria.payment.domain.valueobject.PaymentId;
@@ -28,7 +28,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     private final PaymentOutboxEventAssembler paymentOutboxEventAssembler;
 
-    private final OutboxEventRepository outboxEventRepository;
+    private final PaymentOutboxEventRepository paymentOutboxEventRepository;
 
     /**
      * 开始授权并提交本地状态
@@ -84,7 +84,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         }
 
         OutboxEvent outboxEvent = paymentOutboxEventAssembler.toPaymentCapturedOutboxEvent(payment);
-        outboxEventRepository.insert(outboxEvent);
+        paymentOutboxEventRepository.insert(outboxEvent);
         paymentRepository.update(payment);
         log.info("Payment capture completed, paymentId: {}, outboxEventId: {}",
                 paymentId.value(), outboxEvent.getEventId());
