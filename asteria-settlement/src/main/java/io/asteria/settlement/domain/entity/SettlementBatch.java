@@ -121,8 +121,7 @@ public class SettlementBatch {
      */
     public void startProcessing(Instant processingAt) {
         if (status != SettlementBatchStatus.CREATED) {
-            throw new SettlementDomainException(
-                    SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
+            throw new SettlementDomainException(SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
         }
 
         this.status = SettlementBatchStatus.PROCESSING;
@@ -134,8 +133,7 @@ public class SettlementBatch {
      */
     public void accept(String channelSettlementBatchId, Instant acceptedAt) {
         if (status != SettlementBatchStatus.PROCESSING) {
-            throw new SettlementDomainException(
-                    SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
+            throw new SettlementDomainException(SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
         }
 
         this.status = SettlementBatchStatus.ACCEPTED;
@@ -144,12 +142,22 @@ public class SettlementBatch {
     }
 
     /**
+     * 标记提交结果未知。
+     */
+    public void markSubmitUnknown() {
+        if (status != SettlementBatchStatus.PROCESSING) {
+            throw new SettlementDomainException(SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
+        }
+
+        this.status = SettlementBatchStatus.SUBMIT_UNKNOWN;
+    }
+
+    /**
      * 标记结算完成。
      */
     public void settle(Instant settledAt) {
         if (status != SettlementBatchStatus.ACCEPTED) {
-            throw new SettlementDomainException(
-                    SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
+            throw new SettlementDomainException(SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
         }
 
         this.status = SettlementBatchStatus.SETTLED;
@@ -162,8 +170,7 @@ public class SettlementBatch {
     public void fail(Instant failedAt) {
         if (status != SettlementBatchStatus.PROCESSING
                 && status != SettlementBatchStatus.ACCEPTED) {
-            throw new SettlementDomainException(
-                    SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
+            throw new SettlementDomainException(SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
         }
 
         this.status = SettlementBatchStatus.FAILED;
@@ -207,8 +214,7 @@ public class SettlementBatch {
 
     private static void validateItems(List<SettlementItem> items) {
         if (CollectionUtils.isEmpty(items)) {
-            throw new SettlementDomainException(
-                    SettlementErrorCode.SETTLEMENT_ITEMS_REQUIRED);
+            throw new SettlementDomainException(SettlementErrorCode.SETTLEMENT_ITEMS_REQUIRED);
         }
     }
 
@@ -221,8 +227,7 @@ public class SettlementBatch {
 
     private void validateStatus(SettlementBatchStatus expectedStatus) {
         if (status != expectedStatus) {
-            throw new SettlementDomainException(
-                    SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
+            throw new SettlementDomainException(SettlementErrorCode.INVALID_SETTLEMENT_BATCH_STATUS);
         }
     }
 }

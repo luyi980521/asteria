@@ -17,6 +17,8 @@ public enum SettlementErrorCode {
     SETTLEMENT_ITEMS_REQUIRED("SETTLEMENT_0005", "Settlement items required"),
     SETTLEMENT_BATCH_ALREADY_EXISTS("SETTLEMENT_0006", "Settlement batch already exists"),
     SETTLEMENT_CHANNEL_NOT_FOUND("SETTLEMENT_0007", "Settlement channel not found"),
+    SETTLEMENT_BATCH_NOT_FOUND("SETTLEMENT_0008", "Settlement batch not found"),
+    SETTLEMENT_CHANNEL_UNKNOW("SETTLEMENT_0009", "Settlement channel unknow"),
 
     ;
 

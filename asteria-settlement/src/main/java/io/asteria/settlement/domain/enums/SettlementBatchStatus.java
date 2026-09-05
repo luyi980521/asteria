@@ -14,6 +14,9 @@ public enum SettlementBatchStatus {
     /** 渠道已受理 */
     ACCEPTED,
 
+    /** 提交结果未知 */
+    SUBMIT_UNKNOWN,
+
     /** 已结算 */
     SETTLED,
 

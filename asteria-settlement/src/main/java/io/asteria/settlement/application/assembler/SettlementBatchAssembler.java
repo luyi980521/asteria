@@ -3,6 +3,8 @@ package io.asteria.settlement.application.assembler;
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.settlement.application.command.CreateSettlementBatchCommand;
 import io.asteria.settlement.application.command.CreateSettlementItemCommand;
+import io.asteria.settlement.application.port.channel.SettlementBatchRequest;
+import io.asteria.settlement.application.port.channel.SettlementItemRequest;
 import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.entity.SettlementItem;
 import io.asteria.settlement.domain.valueobject.SettlementBatchId;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,6 +49,27 @@ public class SettlementBatchAssembler {
                 items,
                 Instant.now()
         );
+    }
+
+    public SettlementBatchRequest toSettlementBatchRequest(SettlementBatch settlementBatch) {
+        List<SettlementItemRequest> items = new ArrayList<>();
+        for (SettlementItem item : settlementBatch.getItems()) {
+            SettlementItemRequest newItem = SettlementItemRequest.builder()
+                    .paymentId(item.getPaymentId())
+                    .paymentReference(item.getPaymentReference())
+                    .amount(item.getAmount())
+                    .build();
+            items.add(newItem);
+        }
+
+        return SettlementBatchRequest.builder()
+                .settlementBatchId(settlementBatch.getSettlementBatchId().value())
+                .currency(settlementBatch.getCurrency())
+                .grossAmount(settlementBatch.getGrossAmount())
+                .feeAmount(settlementBatch.getFeeAmount())
+                .netAmount(settlementBatch.getNetAmount())
+                .items(items)
+                .build();
     }
 
     /**
