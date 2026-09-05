@@ -81,4 +81,18 @@ public class SettlementBatchTransactionServiceImpl implements SettlementBatchTra
                     return new SettlementDomainException(SettlementErrorCode.SETTLEMENT_BATCH_NOT_FOUND);
                 });
     }
+
+    /**
+     * 标记结算完成，ACCEPTED -> SETTLED
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void settle(SettlementBatchId settlementBatchId, Instant settledAt) {
+        SettlementBatch settlementBatch = settlementBatchRepository.findById(settlementBatchId)
+                .orElseThrow(() -> new SettlementDomainException(
+                        SettlementErrorCode.SETTLEMENT_BATCH_NOT_FOUND));
+
+        settlementBatch.settle(settledAt);
+        settlementBatchRepository.update(settlementBatch);
+    }
 }

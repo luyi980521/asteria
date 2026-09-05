@@ -30,4 +30,9 @@ public interface SettlementBatchRepository {
      * 根据业务引用查询结算批次。
      */
     Optional<SettlementBatch> findByReference(SettlementBatchReference reference);
+
+    /**
+     * 根据渠道结算批次 ID 查询。
+     */
+    Optional<SettlementBatch> findByChannelSettlementBatchId(String channelSettlementBatchId);
 }

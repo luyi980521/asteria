@@ -101,4 +101,26 @@ public class SettlementBatchRepositoryImpl implements SettlementBatchRepository 
 
         return Optional.of(converter.toDomain(batchDO, itemDOList));
     }
+
+    /**
+     * 根据渠道结算批次 ID 查询。
+     */
+    @Override
+    public Optional<SettlementBatch> findByChannelSettlementBatchId(String channelSettlementBatchId) {
+        SettlementBatchDO batchDO = settlementBatchMapper.selectOne(
+                new LambdaQueryWrapper<SettlementBatchDO>()
+                        .eq(SettlementBatchDO::getChannelSettlementBatchId, channelSettlementBatchId)
+        );
+
+        if (batchDO == null) {
+            return Optional.empty();
+        }
+
+        List<SettlementItemDO> itemDOList = settlementItemMapper.selectList(
+                new LambdaQueryWrapper<SettlementItemDO>()
+                        .eq(SettlementItemDO::getSettlementBatchId, batchDO.getId())
+        );
+
+        return Optional.of(converter.toDomain(batchDO, itemDOList));
+    }
 }

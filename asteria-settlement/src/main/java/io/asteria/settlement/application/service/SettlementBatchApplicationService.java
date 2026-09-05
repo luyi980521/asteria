@@ -1,5 +1,6 @@
 package io.asteria.settlement.application.service;
 
+import io.asteria.settlement.application.command.CompleteSettlementBatchCommand;
 import io.asteria.settlement.application.command.CreateSettlementBatchCommand;
 import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.valueobject.SettlementBatchId;
@@ -18,4 +19,9 @@ public interface SettlementBatchApplicationService {
      * 提交结算批次。
      */
     void submit(SettlementBatchId settlementBatchId);
+
+    /**
+     * 完成结算批次。
+     */
+    void complete(CompleteSettlementBatchCommand command);
 }

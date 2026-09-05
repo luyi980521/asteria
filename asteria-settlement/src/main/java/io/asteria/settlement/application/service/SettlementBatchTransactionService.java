@@ -4,6 +4,8 @@ import io.asteria.settlement.application.port.channel.SettlementBatchResult;
 import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.valueobject.SettlementBatchId;
 
+import java.time.Instant;
+
 /**
  * 结算批次事务操作功能接口定义
  * */
@@ -28,4 +30,9 @@ public interface SettlementBatchTransactionService {
      * 结果未知继续等待，状态不推进
      */
     void markSubmitUnknown(SettlementBatchId settlementBatchId);
+
+    /**
+     * 标记结算完成，ACCEPTED -> SETTLED
+     */
+    void settle(SettlementBatchId settlementBatchId, Instant settledAt);
 }

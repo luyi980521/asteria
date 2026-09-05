@@ -2,6 +2,7 @@ package io.asteria.settlement.application.service.impl;
 
 import io.asteria.common.util.JsonUtils;
 import io.asteria.settlement.application.assembler.SettlementBatchAssembler;
+import io.asteria.settlement.application.command.CompleteSettlementBatchCommand;
 import io.asteria.settlement.application.command.CreateSettlementBatchCommand;
 import io.asteria.settlement.application.port.channel.SettlementBatchRequest;
 import io.asteria.settlement.application.port.channel.SettlementBatchResult;
@@ -93,5 +94,18 @@ public class SettlementBatchApplicationServiceImpl implements SettlementBatchApp
                     settlementBatchId.value(), ex.getMessage(), ex);
             throw ex;
         }
+    }
+
+    /**
+     * 完成结算批次。
+     */
+    @Override
+    public void complete(CompleteSettlementBatchCommand command) {
+
+        SettlementBatch settlementBatch = settlementBatchRepository.findByChannelSettlementBatchId(
+                command.channelSettlementBatchId())
+                .orElseThrow(() -> new SettlementDomainException(SettlementErrorCode.SETTLEMENT_BATCH_NOT_FOUND));
+
+        settlementBatchTransactionService.settle(settlementBatch.getSettlementBatchId(), command.settledAt());
     }
 }
