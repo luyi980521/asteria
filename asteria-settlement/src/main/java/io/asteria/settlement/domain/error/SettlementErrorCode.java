@@ -19,6 +19,7 @@ public enum SettlementErrorCode {
     SETTLEMENT_CHANNEL_NOT_FOUND("SETTLEMENT_0007", "Settlement channel not found"),
     SETTLEMENT_BATCH_NOT_FOUND("SETTLEMENT_0008", "Settlement batch not found"),
     SETTLEMENT_CHANNEL_UNKNOW("SETTLEMENT_0009", "Settlement channel unknow"),
+    UNSUPPORTED_OUTBOX_EVENT_TYPE("SETTLEMENT_0010", "Unsupported outbox event type"),
 
     ;
 

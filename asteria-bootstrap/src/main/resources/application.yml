@@ -23,3 +23,7 @@ asteria:
     outbox:
       publish-task-enabled: false
       publish-interval-ms: 1000
+  settlement:
+    outbox:
+      publish-task-enabled: false
+      publish-interval-ms: 1000

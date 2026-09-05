@@ -34,8 +34,8 @@ public class SettlementOutboxRepositoryImpl implements SettlementOutboxRepositor
         SettlementOutboxEventDO eventDO = converter.toDO(event);
         settlementOutboxEventMapper.insert(eventDO);
 
-        log.info("Outbox event inserted, eventId={}, eventType={}",
-                event.getEventId(), event.getEventType());
+        log.info("Outbox event inserted, eventId: {}, settlementBatchId: {}, eventType: {}",
+                event.getEventId(), event.getAggregateId(), event.getEventType());
     }
 
     /**
@@ -70,7 +70,7 @@ public class SettlementOutboxRepositoryImpl implements SettlementOutboxRepositor
         );
 
         if (updated > 0) {
-            log.info("Outbox event marked as published, id={}", id);
+            log.info("Outbox event marked as published, id: {}", id);
         }
     }
 }
