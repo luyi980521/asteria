@@ -3,10 +3,10 @@ package io.asteria.payment.application.assembler;
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
 import io.asteria.payment.domain.entity.Payment;
-import io.asteria.payment.domain.enums.OutboxEventStatus;
-import io.asteria.payment.domain.enums.OutboxEventType;
+import io.asteria.payment.domain.enums.PaymentOutboxEventStatus;
+import io.asteria.payment.domain.enums.PaymentOutboxEventType;
 import io.asteria.payment.domain.event.PaymentCapturedEvent;
-import io.asteria.payment.domain.valueobject.OutboxEvent;
+import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ public class PaymentOutboxEventAssembler {
     /**
      * 组装支付捕获成功 Outbox 事件
      */
-    public OutboxEvent toPaymentCapturedOutboxEvent(Payment payment) {
+    public PaymentOutboxEvent toPaymentCapturedOutboxEvent(Payment payment) {
 
         PaymentCapturedEvent event = PaymentCapturedEvent.builder()
                 .eventId(String.valueOf(distributedIdGenerator.nextId()))
@@ -34,14 +34,14 @@ public class PaymentOutboxEventAssembler {
                 .capturedAt(payment.getCapturedAt())
                 .build();
 
-        return OutboxEvent.builder()
+        return PaymentOutboxEvent.builder()
                 .id(distributedIdGenerator.nextId())
                 .eventId(event.eventId())
                 .aggregateType("PAYMENT")
                 .aggregateId(String.valueOf(payment.getPaymentId()))
-                .eventType(OutboxEventType.PAYMENT_CAPTURED)
+                .eventType(PaymentOutboxEventType.PAYMENT_CAPTURED)
                 .payload(JsonUtils.toJson(event))
-                .status(OutboxEventStatus.PENDING)
+                .status(PaymentOutboxEventStatus.PENDING)
                 .createdAt(Instant.now())
                 .build();
     }

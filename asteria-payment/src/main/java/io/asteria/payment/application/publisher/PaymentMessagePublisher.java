@@ -2,10 +2,10 @@ package io.asteria.payment.application.publisher;
 
 import io.asteria.common.constants.PaymentTopics;
 import io.asteria.payment.application.service.PaymentOutboxTransactionService;
-import io.asteria.payment.domain.enums.OutboxEventType;
+import io.asteria.payment.domain.enums.PaymentOutboxEventType;
 import io.asteria.payment.domain.error.PaymentErrorCode;
 import io.asteria.payment.domain.exception.PaymentDomainException;
-import io.asteria.payment.domain.valueobject.OutboxEvent;
+import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -29,8 +29,8 @@ public class PaymentMessagePublisher {
     /**
      * 发布 Outbox 事件
      */
-    public void publish(OutboxEvent event) {
-        if (event.getEventType() == OutboxEventType.PAYMENT_CAPTURED) {
+    public void publish(PaymentOutboxEvent event) {
+        if (event.getEventType() == PaymentOutboxEventType.PAYMENT_CAPTURED) {
             publishPaymentCaptured(event);
             return;
         }
@@ -42,7 +42,7 @@ public class PaymentMessagePublisher {
     /**
      * 发布支付捕获成功事件
      */
-    private void publishPaymentCaptured(OutboxEvent event) {
+    private void publishPaymentCaptured(PaymentOutboxEvent event) {
 
         CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(
                 PaymentTopics.PAYMENT_CAPTURED,

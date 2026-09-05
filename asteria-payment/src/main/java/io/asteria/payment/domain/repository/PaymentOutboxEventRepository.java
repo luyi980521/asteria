@@ -1,6 +1,6 @@
 package io.asteria.payment.domain.repository;
 
-import io.asteria.payment.domain.valueobject.OutboxEvent;
+import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,12 +13,12 @@ public interface PaymentOutboxEventRepository {
     /**
      * 插入 Outbox 事件
      */
-    void insert(OutboxEvent event);
+    void insert(PaymentOutboxEvent event);
 
     /**
      * 查询待发布事件
      */
-    List<OutboxEvent> findPending(int limit);
+    List<PaymentOutboxEvent> findPending(int limit);
 
     /**
      * 标记为已发布

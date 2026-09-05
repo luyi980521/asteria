@@ -1,8 +1,8 @@
 package io.asteria.payment.infrastructure.persistence.converter;
 
-import io.asteria.payment.domain.enums.OutboxEventStatus;
-import io.asteria.payment.domain.enums.OutboxEventType;
-import io.asteria.payment.domain.valueobject.OutboxEvent;
+import io.asteria.payment.domain.enums.PaymentOutboxEventStatus;
+import io.asteria.payment.domain.enums.PaymentOutboxEventType;
+import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
 import io.asteria.payment.infrastructure.persistence.dataobject.PaymentOutboxEventDO;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class PaymentOutboxEventPersistenceConverter {
     /**
      * 转换为持久化对象
      */
-    public PaymentOutboxEventDO toDO(OutboxEvent event) {
+    public PaymentOutboxEventDO toDO(PaymentOutboxEvent event) {
         PaymentOutboxEventDO eventDO = new PaymentOutboxEventDO();
 
         eventDO.setId(event.getId());
@@ -34,15 +34,15 @@ public class PaymentOutboxEventPersistenceConverter {
     /**
      * 转换为领域对象
      */
-    public OutboxEvent toDomain(PaymentOutboxEventDO eventDO) {
-        return new OutboxEvent(
+    public PaymentOutboxEvent toDomain(PaymentOutboxEventDO eventDO) {
+        return new PaymentOutboxEvent(
                 eventDO.getId(),
                 eventDO.getEventId(),
                 eventDO.getAggregateType(),
                 eventDO.getAggregateId(),
-                OutboxEventType.valueOf(eventDO.getEventType()),
+                PaymentOutboxEventType.valueOf(eventDO.getEventType()),
                 eventDO.getPayload(),
-                OutboxEventStatus.valueOf(eventDO.getStatus()),
+                PaymentOutboxEventStatus.valueOf(eventDO.getStatus()),
                 eventDO.getCreatedAt(),
                 eventDO.getPublishedAt()
         );

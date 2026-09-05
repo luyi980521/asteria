@@ -1,18 +1,18 @@
 package io.asteria.payment.domain.valueobject;
 
-import io.asteria.payment.domain.enums.OutboxEventStatus;
-import io.asteria.payment.domain.enums.OutboxEventType;
+import io.asteria.payment.domain.enums.PaymentOutboxEventStatus;
+import io.asteria.payment.domain.enums.PaymentOutboxEventType;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.Instant;
 
 /**
- * Outbox 事件
+ * 支付 Outbox 事件
  */
 @Getter
 @Builder
-public class OutboxEvent {
+public class PaymentOutboxEvent {
 
     /** Outbox 记录 ID */
     private final Long id;
@@ -27,13 +27,13 @@ public class OutboxEvent {
     private final String aggregateId;
 
     /** 事件类型 */
-    private final OutboxEventType eventType;
+    private final PaymentOutboxEventType eventType;
 
     /** 消息内容 */
     private final String payload;
 
     /** 发布状态 */
-    private OutboxEventStatus status;
+    private PaymentOutboxEventStatus status;
 
     /** 创建时间 */
     private final Instant createdAt;
@@ -41,9 +41,9 @@ public class OutboxEvent {
     /** 发布时间 */
     private Instant publishedAt;
 
-    public OutboxEvent(Long id, String eventId, String aggregateType, String aggregateId,
-                       OutboxEventType eventType, String payload, OutboxEventStatus status,
-                       Instant createdAt, Instant publishedAt) {
+    public PaymentOutboxEvent(Long id, String eventId, String aggregateType, String aggregateId,
+                              PaymentOutboxEventType eventType, String payload, PaymentOutboxEventStatus status,
+                              Instant createdAt, Instant publishedAt) {
         this.id = id;
         this.eventId = eventId;
         this.aggregateType = aggregateType;

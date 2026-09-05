@@ -7,7 +7,7 @@ import io.asteria.payment.application.service.PaymentTransactionService;
 import io.asteria.payment.domain.entity.Payment;
 import io.asteria.payment.domain.repository.PaymentOutboxEventRepository;
 import io.asteria.payment.domain.repository.PaymentRepository;
-import io.asteria.payment.domain.valueobject.OutboxEvent;
+import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
 import io.asteria.payment.domain.valueobject.PaymentId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,10 +83,10 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             payment.captureFailed();
         }
 
-        OutboxEvent outboxEvent = paymentOutboxEventAssembler.toPaymentCapturedOutboxEvent(payment);
-        paymentOutboxEventRepository.insert(outboxEvent);
+        PaymentOutboxEvent paymentOutboxEvent = paymentOutboxEventAssembler.toPaymentCapturedOutboxEvent(payment);
+        paymentOutboxEventRepository.insert(paymentOutboxEvent);
         paymentRepository.update(payment);
         log.info("Payment capture completed, paymentId: {}, outboxEventId: {}",
-                paymentId.value(), outboxEvent.getEventId());
+                paymentId.value(), paymentOutboxEvent.getEventId());
     }
 }

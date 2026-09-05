@@ -2,9 +2,9 @@ package io.asteria.payment.infrastructure.persistence.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import io.asteria.payment.domain.enums.OutboxEventStatus;
+import io.asteria.payment.domain.enums.PaymentOutboxEventStatus;
 import io.asteria.payment.domain.repository.PaymentOutboxEventRepository;
-import io.asteria.payment.domain.valueobject.OutboxEvent;
+import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
 import io.asteria.payment.infrastructure.persistence.converter.PaymentOutboxEventPersistenceConverter;
 import io.asteria.payment.infrastructure.persistence.dataobject.PaymentOutboxEventDO;
 import io.asteria.payment.infrastructure.persistence.mapper.PaymentOutboxEventMapper;
@@ -30,7 +30,7 @@ public class PaymentOutboxEventRepositoryImpl implements PaymentOutboxEventRepos
      * 插入 Outbox 事件
      */
     @Override
-    public void insert(OutboxEvent event) {
+    public void insert(PaymentOutboxEvent event) {
         PaymentOutboxEventDO eventDO = converter.toDO(event);
         paymentOutboxEventMapper.insert(eventDO);
 
@@ -42,10 +42,10 @@ public class PaymentOutboxEventRepositoryImpl implements PaymentOutboxEventRepos
      * 查询待发布事件
      */
     @Override
-    public List<OutboxEvent> findPending(int limit) {
+    public List<PaymentOutboxEvent> findPending(int limit) {
         List<PaymentOutboxEventDO> eventDOList = paymentOutboxEventMapper.selectList(
                 new LambdaQueryWrapper<PaymentOutboxEventDO>()
-                        .eq(PaymentOutboxEventDO::getStatus, OutboxEventStatus.PENDING.name())
+                        .eq(PaymentOutboxEventDO::getStatus, PaymentOutboxEventStatus.PENDING.name())
                         .orderByAsc(PaymentOutboxEventDO::getCreatedAt)
                         .last("LIMIT " + limit)
         );
@@ -64,8 +64,8 @@ public class PaymentOutboxEventRepositoryImpl implements PaymentOutboxEventRepos
                 null,
                 new LambdaUpdateWrapper<PaymentOutboxEventDO>()
                         .eq(PaymentOutboxEventDO::getId, id)
-                        .eq(PaymentOutboxEventDO::getStatus, OutboxEventStatus.PENDING.name())
-                        .set(PaymentOutboxEventDO::getStatus, OutboxEventStatus.PUBLISHED.name())
+                        .eq(PaymentOutboxEventDO::getStatus, PaymentOutboxEventStatus.PENDING.name())
+                        .set(PaymentOutboxEventDO::getStatus, PaymentOutboxEventStatus.PUBLISHED.name())
                         .set(PaymentOutboxEventDO::getPublishedAt, publishedAt)
         );
 
