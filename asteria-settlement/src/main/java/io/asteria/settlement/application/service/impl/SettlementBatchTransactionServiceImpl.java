@@ -1,12 +1,15 @@
 package io.asteria.settlement.application.service.impl;
 
+import io.asteria.settlement.application.assembler.SettlementOutboxEventAssembler;
 import io.asteria.settlement.application.port.channel.SettlementBatchResult;
 import io.asteria.settlement.application.service.SettlementBatchTransactionService;
 import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.error.SettlementErrorCode;
 import io.asteria.settlement.domain.exception.SettlementDomainException;
 import io.asteria.settlement.domain.repository.SettlementBatchRepository;
+import io.asteria.settlement.domain.repository.SettlementOutboxRepository;
 import io.asteria.settlement.domain.valueobject.SettlementBatchId;
+import io.asteria.settlement.domain.valueobject.SettlementOutboxEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ import java.time.Instant;
 public class SettlementBatchTransactionServiceImpl implements SettlementBatchTransactionService {
 
     private final SettlementBatchRepository settlementBatchRepository;
+    private final SettlementOutboxRepository settlementOutboxRepository;
+    private final SettlementOutboxEventAssembler settlementOutboxEventAssembler;
 
     /**
      * 开始处理结算批次，CREATED -> PROCESSING
@@ -94,5 +99,9 @@ public class SettlementBatchTransactionServiceImpl implements SettlementBatchTra
 
         settlementBatch.settle(settledAt);
         settlementBatchRepository.update(settlementBatch);
+
+        SettlementOutboxEvent settlementOutboxEvent = settlementOutboxEventAssembler
+                .toSettlementCompletedOutboxEvent(settlementBatch);
+        settlementOutboxRepository.insert(settlementOutboxEvent);
     }
 }
