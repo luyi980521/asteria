@@ -2,7 +2,7 @@ package io.asteria.settlement.infrastructure.persistence.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import io.asteria.settlement.domain.enums.SettlmementOutboxEventStatus;
+import io.asteria.settlement.domain.enums.SettlementOutboxEventStatus;
 import io.asteria.settlement.domain.repository.SettlementOutboxRepository;
 import io.asteria.settlement.domain.valueobject.SettlementOutboxEvent;
 import io.asteria.settlement.infrastructure.persistence.converter.SettlementOutboxEventPersistenceConverter;
@@ -45,7 +45,7 @@ public class SettlementOutboxRepositoryImpl implements SettlementOutboxRepositor
     public List<SettlementOutboxEvent> findPending(int limit) {
         List<SettlementOutboxEventDO> eventDOList = settlementOutboxEventMapper.selectList(
                 new LambdaQueryWrapper<SettlementOutboxEventDO>()
-                        .eq(SettlementOutboxEventDO::getStatus, SettlmementOutboxEventStatus.PENDING.name())
+                        .eq(SettlementOutboxEventDO::getStatus, SettlementOutboxEventStatus.PENDING.name())
                         .orderByAsc(SettlementOutboxEventDO::getCreatedAt)
                         .last("LIMIT " + limit)
         );
@@ -64,8 +64,8 @@ public class SettlementOutboxRepositoryImpl implements SettlementOutboxRepositor
                 null,
                 new LambdaUpdateWrapper<SettlementOutboxEventDO>()
                         .eq(SettlementOutboxEventDO::getId, id)
-                        .eq(SettlementOutboxEventDO::getStatus, SettlmementOutboxEventStatus.PENDING.name())
-                        .set(SettlementOutboxEventDO::getStatus, SettlmementOutboxEventStatus.PUBLISHED.name())
+                        .eq(SettlementOutboxEventDO::getStatus, SettlementOutboxEventStatus.PENDING.name())
+                        .set(SettlementOutboxEventDO::getStatus, SettlementOutboxEventStatus.PUBLISHED.name())
                         .set(SettlementOutboxEventDO::getPublishedAt, publishedAt)
         );
 

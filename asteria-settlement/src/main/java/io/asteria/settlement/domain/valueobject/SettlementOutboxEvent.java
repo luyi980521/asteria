@@ -1,6 +1,6 @@
 package io.asteria.settlement.domain.valueobject;
 
-import io.asteria.settlement.domain.enums.SettlmementOutboxEventStatus;
+import io.asteria.settlement.domain.enums.SettlementOutboxEventStatus;
 import io.asteria.settlement.domain.enums.SettlementOutboxEventType;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class SettlementOutboxEvent {
     private final String payload;
 
     /** 发布状态 */
-    private SettlmementOutboxEventStatus status;
+    private SettlementOutboxEventStatus status;
 
     /** 创建时间 */
     private final Instant createdAt;
@@ -42,7 +42,7 @@ public class SettlementOutboxEvent {
     private Instant publishedAt;
 
     public SettlementOutboxEvent(Long id, String eventId, String aggregateType, String aggregateId,
-                                 SettlementOutboxEventType eventType, String payload, SettlmementOutboxEventStatus status,
+                                 SettlementOutboxEventType eventType, String payload, SettlementOutboxEventStatus status,
                                  Instant createdAt, Instant publishedAt) {
         this.id = id;
         this.eventId = eventId;

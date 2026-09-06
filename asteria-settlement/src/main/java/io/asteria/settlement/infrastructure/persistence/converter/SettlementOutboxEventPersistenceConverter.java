@@ -1,6 +1,6 @@
 package io.asteria.settlement.infrastructure.persistence.converter;
 
-import io.asteria.settlement.domain.enums.SettlmementOutboxEventStatus;
+import io.asteria.settlement.domain.enums.SettlementOutboxEventStatus;
 import io.asteria.settlement.domain.enums.SettlementOutboxEventType;
 import io.asteria.settlement.domain.valueobject.SettlementOutboxEvent;
 import io.asteria.settlement.infrastructure.persistence.dataobject.SettlementOutboxEventDO;
@@ -42,7 +42,7 @@ public class SettlementOutboxEventPersistenceConverter {
                 eventDO.getAggregateId(),
                 SettlementOutboxEventType.valueOf(eventDO.getEventType()),
                 eventDO.getPayload(),
-                SettlmementOutboxEventStatus.valueOf(eventDO.getStatus()),
+                SettlementOutboxEventStatus.valueOf(eventDO.getStatus()),
                 eventDO.getCreatedAt(),
                 eventDO.getPublishedAt()
         );

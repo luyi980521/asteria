@@ -4,7 +4,7 @@ import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
 import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.enums.SettlementOutboxEventType;
-import io.asteria.settlement.domain.enums.SettlmementOutboxEventStatus;
+import io.asteria.settlement.domain.enums.SettlementOutboxEventStatus;
 import io.asteria.settlement.domain.event.SettlementCompletedEvent;
 import io.asteria.settlement.domain.valueobject.SettlementOutboxEvent;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class SettlementOutboxEventAssembler {
                 .aggregateId(String.valueOf(settlementBatch.getSettlementBatchId().value()))
                 .eventType(SettlementOutboxEventType.SETTLEMENT_COMPLETED)
                 .payload(JsonUtils.toJson(event))
-                .status(SettlmementOutboxEventStatus.PENDING)
+                .status(SettlementOutboxEventStatus.PENDING)
                 .createdAt(Instant.now())
                 .build();
     }
