@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CommonDomainException.class)
     public ApiResponse<Void> handleCommonDomainException(CommonDomainException exception) {
         log.warn("Common domain exception, code: {}, message: {}",
-                exception.errorCode().code(), exception.getMessage());
+                exception.errorCode().code(), exception.getMessage(), exception);
         return ApiResponse.failure(exception.errorCode().code(), exception.getMessage());
     }
 
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CurrencyDomainException.class)
     public ApiResponse<Void> handleCurrencyDomainException(CurrencyDomainException exception) {
         log.warn("Currency domain exception, code: {}, message: {}",
-                exception.errorCode().code(), exception.getMessage());
+                exception.errorCode().code(), exception.getMessage(), exception);
         return ApiResponse.failure(exception.errorCode().code(), exception.getMessage());
     }
 
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LedgerDomainException.class)
     public ApiResponse<Void> handleLedgerDomainException(LedgerDomainException exception) {
         log.warn("Ledger domain exception, code: {}, message: {}",
-                exception.errorCode().code(), exception.getMessage());
+                exception.errorCode().code(), exception.getMessage(), exception);
         return ApiResponse.failure(exception.errorCode().code(), exception.getMessage());
     }
 
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PaymentDomainException.class)
     public ApiResponse<Void> handlePaymentDomainException(PaymentDomainException exception) {
         log.warn("Payment domain exception, code: {}, message: {}",
-                exception.errorCode().code(), exception.getMessage());
+                exception.errorCode().code(), exception.getMessage(), exception);
         return ApiResponse.failure(exception.errorCode().code(), exception.getMessage());
     }
 
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SettlementDomainException.class)
     public ApiResponse<Void> handleSettlementDomainException(SettlementDomainException exception) {
         log.warn("Settlement domain exception, code: {}, message: {}",
-                exception.getErrorCode().getCode(), exception.getMessage());
+                exception.getErrorCode().getCode(), exception.getMessage(), exception);
         return ApiResponse.failure(exception.getErrorCode().getCode(), exception.getMessage());
     }
 
