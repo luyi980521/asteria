@@ -5,7 +5,10 @@ import io.asteria.ledger.application.command.PostingCommand;
 import io.asteria.ledger.application.message.PaymentCapturedMessage;
 import io.asteria.ledger.application.model.PaymentCapturedLedgerAccounts;
 import io.asteria.ledger.application.resolver.PaymentLedgerAccountResolver;
+import io.asteria.ledger.domain.constants.LedgerSourceIds;
 import io.asteria.ledger.domain.enums.DebitCredit;
+import io.asteria.ledger.domain.enums.LedgerEventType;
+import io.asteria.ledger.domain.enums.LedgerSourceType;
 import io.asteria.ledger.domain.valueobject.JournalReference;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,9 +30,9 @@ public class PaymentCapturedLedgerAssembler {
     public CreateAndPostJournalEntryCommand toCreateAndPostCommand(PaymentCapturedMessage message) {
 
         JournalReference reference = JournalReference.builder()
-                .sourceType("PAYMENT")
-                .sourceId("PAYMENT" + message.paymentId())
-                .eventType("PAYMENT_CAPTURED")
+                .sourceType(LedgerSourceType.PAYMENT.name())
+                .sourceId(LedgerSourceIds.payment(message.paymentId()))
+                .eventType(LedgerEventType.PAYMENT_CAPTURED.name())
                 .eventId(message.eventId())
                 .build();
 

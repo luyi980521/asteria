@@ -76,6 +76,10 @@ public class LedgerAccountRepositoryImpl implements LedgerAccountRepository {
         QueryWrapper<LedgerAccountDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("account_code", accountCode);
         LedgerAccountDO oldLedgerAccountDO = ledgerAccountMapper.selectOne(queryWrapper);
+        if (oldLedgerAccountDO == null) {
+            log.warn("Ledger account doesn't exist: {}", accountCode);;
+            throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
+        }
         return converter.toDomain(oldLedgerAccountDO);
     }
 
