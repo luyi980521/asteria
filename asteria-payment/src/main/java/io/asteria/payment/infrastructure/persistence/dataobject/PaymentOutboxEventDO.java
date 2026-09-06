@@ -44,6 +44,9 @@ public class PaymentOutboxEventDO {
      */
     private String payload;
 
+    /** Persisted correlation ID; nullable for historical events. */
+    private String traceId;
+
     /**
      * 消息发布状态：PENDING-待发布，PUBLISHED-已发布
      */

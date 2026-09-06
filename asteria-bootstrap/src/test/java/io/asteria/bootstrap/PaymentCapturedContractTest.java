@@ -12,6 +12,7 @@ import io.asteria.payment.domain.event.PaymentCapturedEvent;
 import io.asteria.payment.domain.valueobject.PaymentId;
 import io.asteria.payment.domain.valueobject.PaymentReference;
 import org.junit.jupiter.api.Test;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -56,7 +57,7 @@ class PaymentCapturedContractTest {
         AtomicReference<PaymentCapturedMessage> delivered = new AtomicReference<>();
         var consumer = new PaymentCapturedConsumer(delivered::set);
 
-        consumer.consume(outbox.getPayload());
+        consumer.consume(new ConsumerRecord<>("payment-captured", 0, 0L, "1001", outbox.getPayload()));
 
         assertContract(outbox.getPayload(), outbox.getEventId(), delivered.get());
         assertEquals("2001", outbox.getEventId());

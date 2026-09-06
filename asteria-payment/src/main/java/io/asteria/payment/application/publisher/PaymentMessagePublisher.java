@@ -6,6 +6,12 @@ import io.asteria.payment.domain.enums.PaymentOutboxEventType;
 import io.asteria.payment.domain.error.PaymentErrorCode;
 import io.asteria.payment.domain.exception.PaymentDomainException;
 import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
+import io.asteria.common.trace.TraceConstants;
+import io.asteria.common.trace.TraceIdGenerator;
+import io.asteria.common.trace.TraceScope;
+import org.slf4j.MDC;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -30,13 +36,15 @@ public class PaymentMessagePublisher {
      * 发布 Outbox 事件
      */
     public void publish(PaymentOutboxEvent event) {
-        if (event.getEventType() == PaymentOutboxEventType.PAYMENT_CAPTURED) {
-            publishPaymentCaptured(event);
-            return;
-        }
+        try (TraceScope scope = TraceScope.open(TraceIdGenerator.resolve(event.getTraceId()))) {
+            if (event.getEventType() == PaymentOutboxEventType.PAYMENT_CAPTURED) {
+                publishPaymentCaptured(event);
+                return;
+            }
 
-        log.error("Unsupported outbox event type: {}", event.getEventType());
-        throw new PaymentDomainException(PaymentErrorCode.UNSUPPORTED_OUTBOX_EVENT_TYPE);
+            log.error("Unsupported outbox event type: {}", event.getEventType());
+            throw new PaymentDomainException(PaymentErrorCode.UNSUPPORTED_OUTBOX_EVENT_TYPE);
+        }
     }
 
     /**
@@ -44,26 +52,31 @@ public class PaymentMessagePublisher {
      */
     private void publishPaymentCaptured(PaymentOutboxEvent event) {
 
-        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(
+        String traceId = MDC.get(TraceConstants.TRACE_ID);
+        ProducerRecord<String, String> record = new ProducerRecord<>(
                 PaymentTopics.PAYMENT_CAPTURED,
                 event.getAggregateId(),
                 event.getPayload()
         );
 
+        record.headers().add(TraceConstants.TRACE_ID_HEADER, traceId.getBytes(StandardCharsets.UTF_8));
+        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(record);
         future.whenComplete((result, exception) -> {
-            if (exception != null) {
-                log.error("Failed to publish outbox event, eventId: {}, eventType: {}",
-                        event.getEventId(), event.getEventType(), exception);
-                return;
-            }
+            try (TraceScope scope = TraceScope.open(traceId)) {
+                if (exception != null) {
+                    log.error("Failed to publish outbox event, eventId: {}, eventType: {}",
+                            event.getEventId(), event.getEventType(), exception);
+                    return;
+                }
 
-            try {
-                paymentOutboxTransactionService.markPublished(event.getId(), Instant.now());
-                log.info("Outbox event marked published, eventId: {}, eventType: {}",
-                        event.getEventId(), event.getEventType());
-            } catch (Exception ex) {
-                log.error("Failed to mark outbox event published, eventId: {}",
-                        event.getEventId(), ex);
+                try {
+                    paymentOutboxTransactionService.markPublished(event.getId(), Instant.now());
+                    log.info("Outbox event marked published, eventId: {}, eventType: {}",
+                            event.getEventId(), event.getEventType());
+                } catch (Exception ex) {
+                    log.error("Failed to mark outbox event published, eventId: {}",
+                            event.getEventId(), ex);
+                }
             }
         });
     }

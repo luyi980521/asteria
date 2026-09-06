@@ -6,6 +6,8 @@ import io.asteria.settlement.domain.enums.SettlementOutboxEventType;
 import io.asteria.settlement.domain.exception.SettlementDomainException;
 import io.asteria.settlement.domain.valueobject.SettlementOutboxEvent;
 import org.junit.jupiter.api.Test;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.mockito.ArgumentCaptor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 
@@ -30,11 +32,15 @@ class SettlementMessagePublisherTest {
 
     @Test
     void sendsStoredPayloadAndMarksPublishedOnlyAfterAcknowledgement() {
-        when(kafkaTemplate.send(SettlementTopics.SETTLEMENT_COMPLETED, "42", event.getPayload())).thenReturn(future);
+        when(kafkaTemplate.send(any(ProducerRecord.class))).thenReturn(future);
 
         publisher.publish(event);
 
-        verify(kafkaTemplate).send(SettlementTopics.SETTLEMENT_COMPLETED, "42", event.getPayload());
+        ArgumentCaptor<ProducerRecord<String, String>> record = ArgumentCaptor.forClass(ProducerRecord.class);
+        verify(kafkaTemplate).send(record.capture());
+        assertEquals(SettlementTopics.SETTLEMENT_COMPLETED, record.getValue().topic());
+        assertEquals("42", record.getValue().key());
+        assertEquals(event.getPayload(), record.getValue().value());
         verifyNoInteractions(transactionService);
         future.complete(null);
         verify(transactionService).markPublished(eq(1L), any(Instant.class));
@@ -42,7 +48,7 @@ class SettlementMessagePublisherTest {
 
     @Test
     void asynchronousFailureDoesNotMarkPublished() {
-        when(kafkaTemplate.send(anyString(), anyString(), anyString())).thenReturn(future);
+        when(kafkaTemplate.send(any(ProducerRecord.class))).thenReturn(future);
         publisher.publish(event);
         future.completeExceptionally(new IllegalStateException("Kafka unavailable"));
         verifyNoInteractions(transactionService);
@@ -50,14 +56,14 @@ class SettlementMessagePublisherTest {
 
     @Test
     void synchronousFailureDoesNotMarkPublished() {
-        when(kafkaTemplate.send(anyString(), anyString(), anyString())).thenThrow(new IllegalStateException("Send rejected"));
+        when(kafkaTemplate.send(any(ProducerRecord.class))).thenThrow(new IllegalStateException("Send rejected"));
         assertThrows(IllegalStateException.class, () -> publisher.publish(event));
         verifyNoInteractions(transactionService);
     }
 
     @Test
     void databaseFailureInCallbackIsContained() {
-        when(kafkaTemplate.send(anyString(), anyString(), anyString())).thenReturn(future);
+        when(kafkaTemplate.send(any(ProducerRecord.class))).thenReturn(future);
         doThrow(new IllegalStateException("Database unavailable")).when(transactionService).markPublished(eq(1L), any());
         publisher.publish(event);
         assertDoesNotThrow(() -> future.complete(null));

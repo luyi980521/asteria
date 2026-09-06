@@ -1,6 +1,10 @@
 package io.asteria.ledger.infrastructure.messaging.consumer;
 
 import io.asteria.common.util.JsonUtils;
+import io.asteria.common.trace.TraceConstants;
+import io.asteria.infrastructure.trace.KafkaTraceUtils;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.slf4j.MDC;
 import io.asteria.ledger.application.message.SettlementCompletedMessage;
 import io.asteria.ledger.application.service.SettlementCompletedLedgerService;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +29,17 @@ public class SettlementCompletedConsumer {
             topics = "settlement-completed",
             groupId = "asteria-ledger-settlement-completed"
     )
-    public void consume(String payload) {
+    public void consume(ConsumerRecord<String, String> record) {
+        try {
+            MDC.put(TraceConstants.TRACE_ID, KafkaTraceUtils.resolveTraceId(record.headers()));
+            String payload = record.value();
+            SettlementCompletedMessage message = JsonUtils.fromJson(payload, SettlementCompletedMessage.class);
+            log.info("Received settlement completed event, eventId: {}, settlementBatchId: {}",
+                    message.eventId(), message.settlementBatchId());
 
-        SettlementCompletedMessage message = JsonUtils.fromJson(payload, SettlementCompletedMessage.class);
-        log.info("Received settlement completed event, eventId: {}, settlementBatchId: {}",
-                message.eventId(), message.settlementBatchId());
-
-        settlementCompletedLedgerService.handle(message);
+            settlementCompletedLedgerService.handle(message);
+        } finally {
+            MDC.remove(TraceConstants.TRACE_ID);
+        }
     }
 }

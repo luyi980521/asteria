@@ -2,6 +2,8 @@ package io.asteria.settlement.application.assembler;
 
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
+import io.asteria.common.trace.TraceConstants;
+import org.slf4j.MDC;
 import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.enums.SettlementOutboxEventType;
 import io.asteria.settlement.domain.enums.SettlementOutboxEventStatus;
@@ -44,6 +46,7 @@ public class SettlementOutboxEventAssembler {
                 .aggregateId(String.valueOf(settlementBatch.getSettlementBatchId().value()))
                 .eventType(SettlementOutboxEventType.SETTLEMENT_COMPLETED)
                 .payload(JsonUtils.toJson(event))
+                .traceId(MDC.get(TraceConstants.TRACE_ID))
                 .status(SettlementOutboxEventStatus.PENDING)
                 .createdAt(Instant.now())
                 .build();

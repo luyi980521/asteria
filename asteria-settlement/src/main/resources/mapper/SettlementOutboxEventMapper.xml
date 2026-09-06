@@ -11,13 +11,14 @@
             <result property="aggregateId" column="aggregate_id" />
             <result property="eventType" column="event_type" />
             <result property="payload" column="payload" />
+            <result property="traceId" column="trace_id" />
             <result property="status" column="status" />
             <result property="createdAt" column="created_at" />
             <result property="publishedAt" column="published_at" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,event_id,aggregate_type,aggregate_id,event_type,payload,
+        id,event_id,aggregate_type,aggregate_id,event_type,payload,trace_id,
         status,created_at,published_at
     </sql>
 </mapper>

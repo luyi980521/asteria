@@ -1,6 +1,9 @@
 package io.asteria.payment.application.task;
 
 import io.asteria.payment.application.publisher.PaymentOutboxPublisher;
+import io.asteria.common.trace.TraceConstants;
+import io.asteria.common.trace.TraceIdGenerator;
+import org.slf4j.MDC;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,9 +31,12 @@ public class PaymentOutboxPublishTask {
     @Scheduled(fixedDelayString = "${asteria.payment.outbox.publish-interval-ms:1000}")
     public void publishPendingEvents() {
         try {
+            MDC.put(TraceConstants.TRACE_ID, TraceIdGenerator.generate());
             paymentOutboxPublisher.publishPendingEvents();
         } catch (Exception ex) {
             log.error("Failed to execute payment outbox publish task: {}", ex.getMessage(), ex);
+        } finally {
+            MDC.remove(TraceConstants.TRACE_ID);
         }
     }
 }

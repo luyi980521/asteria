@@ -5,6 +5,8 @@ import io.asteria.common.domain.error.CommonErrorCode;
 import io.asteria.common.domain.exception.CommonDomainException;
 import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.common.util.JsonUtils;
+import io.asteria.common.trace.TraceConstants;
+import io.asteria.web.filter.TraceIdFilter;
 import io.asteria.currency.domain.error.CurrencyErrorCode;
 import io.asteria.currency.domain.exception.CurrencyDomainException;
 import io.asteria.ledger.application.command.CreateLedgerAccountCommand;
@@ -33,6 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 /**
  * Verifies the public HTTP envelope without accessing PostgreSQL or Kafka.
@@ -49,7 +52,7 @@ class LedgerAccountHttpResponseTest {
     void setUp() {
         service = mock(LedgerAccountApplicationService.class);
         mvc = MockMvcBuilders.standaloneSetup(new LedgerAccountController(service))
-                .setControllerAdvice(new GlobalExceptionHandler()).build();
+                .setControllerAdvice(new GlobalExceptionHandler()).addFilters(new TraceIdFilter()).build();
     }
 
     @Test
@@ -57,7 +60,9 @@ class LedgerAccountHttpResponseTest {
         when(service.createLedgerAccount(any())).thenReturn(LedgerAccountId.of(1001L));
         String body = mvc.perform(post("/api/ledger/accounts")
                         .contentType(MediaType.APPLICATION_JSON).content(REQUEST))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andExpect(header().exists(TraceConstants.TRACE_ID_HEADER))
+                .andReturn().getResponse().getContentAsString();
         assertEquals(JsonUtils.readTree("""
                 {"success":true,"code":"SUCCESS","message":"Success","data":{"value":1001}}
                 """), JsonUtils.readTree(body));
@@ -72,8 +77,11 @@ class LedgerAccountHttpResponseTest {
         when(service.createLedgerAccount(any())).thenThrow(
                 new LedgerDomainException(LedgerErrorCode.LEDGER_ACCOUNT_ALREADY_EXISTS));
         String body = mvc.perform(post("/api/ledger/accounts")
+                        .header(TraceConstants.TRACE_ID_HEADER, "duplicate-request-trace")
                         .contentType(MediaType.APPLICATION_JSON).content(REQUEST))
-                .andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(TraceConstants.TRACE_ID_HEADER, "duplicate-request-trace"))
+                .andReturn().getResponse().getContentAsString();
         assertEquals(JsonUtils.readTree("""
                 {"success":false,"code":"LEDGER_0030",
                  "message":"Ledger account is already exists","data":null}

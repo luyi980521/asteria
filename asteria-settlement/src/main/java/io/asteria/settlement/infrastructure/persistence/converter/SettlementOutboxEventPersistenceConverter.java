@@ -24,6 +24,7 @@ public class SettlementOutboxEventPersistenceConverter {
         eventDO.setAggregateId(event.getAggregateId());
         eventDO.setEventType(event.getEventType().name());
         eventDO.setPayload(event.getPayload());
+        eventDO.setTraceId(event.getTraceId());
         eventDO.setStatus(event.getStatus().name());
         eventDO.setCreatedAt(event.getCreatedAt());
         eventDO.setPublishedAt(event.getPublishedAt());
@@ -44,7 +45,8 @@ public class SettlementOutboxEventPersistenceConverter {
                 eventDO.getPayload(),
                 SettlementOutboxEventStatus.valueOf(eventDO.getStatus()),
                 eventDO.getCreatedAt(),
-                eventDO.getPublishedAt()
+                eventDO.getPublishedAt(),
+                eventDO.getTraceId()
         );
     }
 }

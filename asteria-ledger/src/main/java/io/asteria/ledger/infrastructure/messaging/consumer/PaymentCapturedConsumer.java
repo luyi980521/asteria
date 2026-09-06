@@ -1,6 +1,10 @@
 package io.asteria.ledger.infrastructure.messaging.consumer;
 
 import io.asteria.common.util.JsonUtils;
+import io.asteria.common.trace.TraceConstants;
+import io.asteria.infrastructure.trace.KafkaTraceUtils;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.slf4j.MDC;
 import io.asteria.ledger.application.message.PaymentCapturedMessage;
 import io.asteria.ledger.application.service.PaymentCapturedLedgerService;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +29,18 @@ public class PaymentCapturedConsumer {
             topics = "payment-captured",
             groupId = "asteria-ledger-payment-captured"
     )
-    public void consume(String payload) {
-        PaymentCapturedMessage message = JsonUtils.fromJson(payload, PaymentCapturedMessage.class);
+    public void consume(ConsumerRecord<String, String> record) {
+        try {
+            MDC.put(TraceConstants.TRACE_ID, KafkaTraceUtils.resolveTraceId(record.headers()));
+            String payload = record.value();
+            PaymentCapturedMessage message = JsonUtils.fromJson(payload, PaymentCapturedMessage.class);
 
-        log.info("Received payment captured event, eventId: {}, paymentId: {}",
-                message.eventId(), message.paymentId());
+            log.info("Received payment captured event, eventId: {}, paymentId: {}",
+                    message.eventId(), message.paymentId());
 
-        paymentCapturedLedgerService.handle(message);
+            paymentCapturedLedgerService.handle(message);
+        } finally {
+            MDC.remove(TraceConstants.TRACE_ID);
+        }
     }
 }

@@ -2,6 +2,8 @@ package io.asteria.payment.application.assembler;
 
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
+import io.asteria.common.trace.TraceConstants;
+import org.slf4j.MDC;
 import io.asteria.payment.domain.entity.Payment;
 import io.asteria.payment.domain.enums.PaymentOutboxEventStatus;
 import io.asteria.payment.domain.enums.PaymentOutboxEventType;
@@ -44,6 +46,7 @@ public class PaymentOutboxEventAssembler {
                 .aggregateId(String.valueOf(payment.getPaymentId()))
                 .eventType(PaymentOutboxEventType.PAYMENT_CAPTURED)
                 .payload(JsonUtils.toJson(event))
+                .traceId(MDC.get(TraceConstants.TRACE_ID))
                 .status(PaymentOutboxEventStatus.PENDING)
                 .createdAt(Instant.now())
                 .build();

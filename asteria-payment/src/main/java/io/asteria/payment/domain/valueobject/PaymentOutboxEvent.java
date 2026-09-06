@@ -32,6 +32,7 @@ public class PaymentOutboxEvent {
     /** 消息内容 */
     private final String payload;
 
+
     /** 发布状态 */
     private PaymentOutboxEventStatus status;
 
@@ -41,15 +42,19 @@ public class PaymentOutboxEvent {
     /** 发布时间 */
     private Instant publishedAt;
 
+    /** Persisted correlation ID, independent of the message payload. */
+    private final String traceId;
+
     public PaymentOutboxEvent(Long id, String eventId, String aggregateType, String aggregateId,
                               PaymentOutboxEventType eventType, String payload, PaymentOutboxEventStatus status,
-                              Instant createdAt, Instant publishedAt) {
+                              Instant createdAt, Instant publishedAt, String traceId) {
         this.id = id;
         this.eventId = eventId;
         this.aggregateType = aggregateType;
         this.aggregateId = aggregateId;
         this.eventType = eventType;
         this.payload = payload;
+        this.traceId = traceId;
         this.status = status;
         this.createdAt = createdAt;
         this.publishedAt = publishedAt;

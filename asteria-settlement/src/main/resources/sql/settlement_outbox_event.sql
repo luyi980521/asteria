@@ -8,6 +8,7 @@ CREATE TABLE settlement_outbox_event (
     status VARCHAR(32) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     published_at TIMESTAMPTZ,
+    trace_id VARCHAR(64),
 
     CONSTRAINT uk_settlement_outbox_event_id UNIQUE (event_id),
 
@@ -44,6 +45,8 @@ COMMENT ON COLUMN settlement_outbox_event.created_at
 
 COMMENT ON COLUMN settlement_outbox_event.published_at
     IS '成功发布到 MQ 的时间';
+
+comment on column settlement_outbox_event.trace_id is '链路追踪id';
 
 CREATE INDEX idx_settlement_outbox_event_pending
     ON settlement_outbox_event (status, created_at);

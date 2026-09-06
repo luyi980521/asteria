@@ -1,6 +1,9 @@
 package io.asteria.settlement.application.task;
 
 import io.asteria.settlement.application.publisher.SettlementOutboxPublisher;
+import io.asteria.common.trace.TraceConstants;
+import io.asteria.common.trace.TraceIdGenerator;
+import org.slf4j.MDC;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,9 +31,12 @@ public class SettlementOutboxPublishTask {
     @Scheduled(fixedDelayString = "${asteria.settlement.outbox.publish-interval-ms:1000}")
     public void publishPendingEvents() {
         try {
+            MDC.put(TraceConstants.TRACE_ID, TraceIdGenerator.generate());
             settlementOutboxPublisher.publishPendingEvents();
         } catch (Exception ex) {
             log.error("Failed to execute settlement outbox publish task: {}", ex.getMessage(), ex);
+        } finally {
+            MDC.remove(TraceConstants.TRACE_ID);
         }
     }
 }

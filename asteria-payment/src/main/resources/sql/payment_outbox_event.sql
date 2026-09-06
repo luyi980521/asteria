@@ -8,6 +8,7 @@ CREATE TABLE payment_outbox_event (
     status VARCHAR(32) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     published_at TIMESTAMPTZ,
+    trace_id VARCHAR(64),
 
     CONSTRAINT uk_payment_outbox_event_event_id UNIQUE (event_id),
     CONSTRAINT ck_payment_outbox_event_status
@@ -28,3 +29,4 @@ COMMENT ON COLUMN payment_outbox_event.payload IS '待发送消息的 JSON 内�
 COMMENT ON COLUMN payment_outbox_event.status IS '消息发布状态：PENDING-待发布，PUBLISHED-已发布';
 COMMENT ON COLUMN payment_outbox_event.created_at IS '本地消息创建时间';
 COMMENT ON COLUMN payment_outbox_event.published_at IS '消息成功发布到 MQ 的时间';
+comment on column payment_outbox_event.trace_id is '链路追踪id';
