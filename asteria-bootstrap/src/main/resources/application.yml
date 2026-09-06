@@ -1,7 +1,10 @@
 spring:
   application:
     name: asteria
-
+  datasource:
+    url: jdbc:postgresql://localhost:5432/asteria
+    username: postgres
+    password: 123456
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -14,6 +17,15 @@ spring:
       group-id: ${KAFKA_CONSUMER_GROUP:asteria-default}
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+mybatis-plus:
+  mapper-locations:
+    - classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: input
 
 asteria:
   id-generator:
