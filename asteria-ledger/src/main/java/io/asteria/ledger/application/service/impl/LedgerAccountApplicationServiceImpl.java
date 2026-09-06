@@ -40,7 +40,7 @@ public class LedgerAccountApplicationServiceImpl implements LedgerAccountApplica
     public LedgerAccountId createLedgerAccount(CreateLedgerAccountCommand command) {
 
         boolean isExist = ledgerAccountRepository.existsByAccountCode(command.accountCode());
-        if (!isExist) {
+        if (isExist) {
             log.warn("Ledger account already exists, accountCode: {}", command.accountCode());
             throw new LedgerDomainException(LedgerErrorCode.LEDGER_ACCOUNT_ALREADY_EXISTS);
         }
