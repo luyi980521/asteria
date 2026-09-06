@@ -2,6 +2,7 @@ package io.asteria.settlement.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.asteria.settlement.infrastructure.persistence.dataobject.SettlementItemDO;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 * @createDate 2026-08-31 22:12:27
 * @Entity io.asteria.settlement.infrastructure.persistence.dataobject.SettlementItemDO
 */
+@Mapper
 public interface SettlementItemMapper extends BaseMapper<SettlementItemDO> {
 
     /**

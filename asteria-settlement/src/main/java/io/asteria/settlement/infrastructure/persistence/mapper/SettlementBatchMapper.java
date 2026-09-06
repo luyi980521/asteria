@@ -2,6 +2,7 @@ package io.asteria.settlement.infrastructure.persistence.mapper;
 
 import io.asteria.settlement.infrastructure.persistence.dataobject.SettlementBatchDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author 61421
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2026-08-31 22:12:27
 * @Entity io.asteria.settlement.infrastructure.persistence.dataobject.SettlementBatchDO
 */
+@Mapper
 public interface SettlementBatchMapper extends BaseMapper<SettlementBatchDO> {
 
 }

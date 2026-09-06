@@ -20,6 +20,14 @@
     <dependencies>
         <dependency>
             <groupId>io.asteria</groupId>
+            <artifactId>asteria-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.asteria</groupId>
+            <artifactId>asteria-settlement</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.asteria</groupId>
             <artifactId>asteria-currency</artifactId>
         </dependency>
         <dependency>
