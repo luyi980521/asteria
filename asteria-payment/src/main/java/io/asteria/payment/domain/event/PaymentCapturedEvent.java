@@ -1,8 +1,6 @@
 package io.asteria.payment.domain.event;
 
 import io.asteria.common.domain.valueobject.Money;
-import io.asteria.payment.domain.valueobject.PaymentId;
-import io.asteria.payment.domain.valueobject.PaymentReference;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -13,9 +11,13 @@ import java.time.Instant;
 @Builder
 public record PaymentCapturedEvent(
         String eventId,
-        PaymentId paymentId,
-        PaymentReference paymentReference,
+        Long paymentId,
+        Reference paymentReference,
         Money amount,
         Instant capturedAt
 ) {
+    /** Wire representation retaining both parts of the payment's business reference. */
+    @Builder
+    public record Reference(String referenceType, String referenceId) {
+    }
 }

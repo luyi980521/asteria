@@ -12,6 +12,8 @@ public enum CommonErrorCode {
     MONEY_CURRENCY_MISMATCH("COMMON_0006", "Currencies do not match"),
     MONEY_OTHER_REQUIRED("COMMON_0007", "Other money must not be null"),
 
+    CURRENCY_CODE_REQUIRED("COMMON_0008", "Currency code must not be blank"),
+    INVALID_CURRENCY_CODE("COMMON_0009", "Currency code must contain three letters"),
     ;
 
     private final String code;

@@ -1,5 +1,6 @@
 package io.asteria.ledger.domain.entity;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.enums.JournalEntryStatus;
 import io.asteria.ledger.domain.enums.JournalReferenceEventType;
@@ -20,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Currency;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -242,7 +242,7 @@ public class JournalEntry {
     private static void validateSameCurrency(List<Posting> postings) {
 
         List<Money> monies = postings.stream().map(Posting::getMoney).toList();
-        Set<Currency> currencySet = monies.stream().map(Money::currency).collect(Collectors.toSet());
+        Set<CurrencyCode> currencySet = monies.stream().map(Money::currency).collect(Collectors.toSet());
         if (currencySet.size() != 1) {
             throw new LedgerDomainException(LedgerErrorCode.MULTIPLE_CURRENCIES_NOT_SUPPORTED);
         }

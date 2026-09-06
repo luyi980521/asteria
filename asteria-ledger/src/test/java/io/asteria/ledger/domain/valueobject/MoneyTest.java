@@ -1,12 +1,12 @@
 package io.asteria.ledger.domain.valueobject;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.common.domain.error.CommonErrorCode;
 import io.asteria.common.domain.exception.CommonDomainException;
 import io.asteria.common.domain.valueobject.Money;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -14,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MoneyTest {
 
-    private static final Currency USD = Currency.getInstance("USD");
-    private static final Currency JPY = Currency.getInstance("JPY");
-    private static final Currency EUR = Currency.getInstance("EUR");
+    private static final CurrencyCode USD = CurrencyCode.of("USD");
+    private static final CurrencyCode JPY = CurrencyCode.of("JPY");
+    private static final CurrencyCode EUR = CurrencyCode.of("EUR");
 
     @Test
     void canCreateValidUsdMoney() {

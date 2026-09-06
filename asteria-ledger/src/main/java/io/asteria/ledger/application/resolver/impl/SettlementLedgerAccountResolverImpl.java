@@ -1,5 +1,6 @@
 package io.asteria.ledger.application.resolver.impl;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.ledger.application.model.SettlementCompletedLedgerAccounts;
 import io.asteria.ledger.application.resolver.SettlementLedgerAccountResolver;
 import io.asteria.ledger.domain.entity.LedgerAccount;
@@ -22,11 +23,11 @@ public class SettlementLedgerAccountResolverImpl implements SettlementLedgerAcco
      * 解析结算完成对应的账本账户
      */
     @Override
-    public SettlementCompletedLedgerAccounts resolve(String currency) {
+    public SettlementCompletedLedgerAccounts resolve(CurrencyCode currency) {
 
-        LedgerAccount cashAccount = ledgerAccountRepository.findByAccountCode("BANK_CASH_" + currency);
-        LedgerAccount feeExpenseAccount = ledgerAccountRepository.findByAccountCode("PROCESSING_FEE_EXPENSE_" + currency);
-        LedgerAccount receivableAccount = ledgerAccountRepository.findByAccountCode("PAYMENT_RECEIVABLE_" + currency);
+        LedgerAccount cashAccount = ledgerAccountRepository.findByAccountCode("BANK_CASH_" + currency.value());
+        LedgerAccount feeExpenseAccount = ledgerAccountRepository.findByAccountCode("PROCESSING_FEE_EXPENSE_" + currency.value());
+        LedgerAccount receivableAccount = ledgerAccountRepository.findByAccountCode("PAYMENT_RECEIVABLE_" + currency.value());
         return SettlementCompletedLedgerAccounts.builder()
                 .cashAccountId(cashAccount.getLedgerAccountId())
                 .processingFeeExpenseAccountId(feeExpenseAccount.getLedgerAccountId())

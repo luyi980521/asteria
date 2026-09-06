@@ -1,5 +1,6 @@
 package io.asteria.ledger.infrastructure.persistence.converter;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.common.domain.valueobject.Money;
 import io.asteria.ledger.domain.entity.JournalEntry;
 import io.asteria.ledger.domain.entity.Posting;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -109,7 +109,7 @@ public class JournalEntryPersistenceConverter {
         postingDO.setJournalEntryId(journalEntryId);
         postingDO.setLedgerAccountId(posting.getLedgerAccountId().value());
         postingDO.setAmount(posting.getMoney().amount());
-        postingDO.setCurrency(posting.getMoney().currency().getCurrencyCode());
+        postingDO.setCurrency(posting.getMoney().currency().value());
         postingDO.setDirection(posting.getDirection().name());
         postingDO.setSequenceNo(sequenceNo);
         return postingDO;
@@ -121,7 +121,7 @@ public class JournalEntryPersistenceConverter {
         }
 
         try {
-            return Money.of(amount, Currency.getInstance(currencyCode));
+            return Money.of(amount, CurrencyCode.of(currencyCode));
         } catch (IllegalArgumentException exception) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS, exception);
         }

@@ -39,7 +39,7 @@ public class SettlementCompletedLedgerAssembler {
                 .build();
 
         SettlementCompletedLedgerAccounts ledgerAccounts
-                = settlementLedgerAccountResolver.resolve(message.grossAmount().currency().getSymbol());
+                = settlementLedgerAccountResolver.resolve(message.grossAmount().currency());
 
         List<PostingCommand> postings = new ArrayList<>();
         PostingCommand cashDebitPosting = PostingCommand.builder()

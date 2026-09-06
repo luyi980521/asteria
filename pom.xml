@@ -15,6 +15,7 @@
     <modules>
         <module>asteria-bootstrap</module>
         <module>asteria-common</module>
+        <module>asteria-currency</module>
         <module>asteria-account</module>
         <module>asteria-ledger</module>
         <module>asteria-payment</module>
@@ -36,6 +37,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.asteria</groupId>
+                <artifactId>asteria-currency</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>

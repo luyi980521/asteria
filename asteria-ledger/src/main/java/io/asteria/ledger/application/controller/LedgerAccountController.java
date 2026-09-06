@@ -1,5 +1,6 @@
 package io.asteria.ledger.application.controller;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.ledger.application.command.CreateLedgerAccountCommand;
 import io.asteria.ledger.application.request.CreateLedgerAccountRequest;
 import io.asteria.ledger.application.service.LedgerAccountApplicationService;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Currency;
 
 /**
  * 账本账户功能接口定义
@@ -35,7 +35,7 @@ public class LedgerAccountController {
                 request.ownerType(),
                 request.ownerId(),
                 request.category(),
-                Currency.getInstance(request.currency()),
+                CurrencyCode.of(request.currency()),
                 request.allowNegativeBalance()
         );
 

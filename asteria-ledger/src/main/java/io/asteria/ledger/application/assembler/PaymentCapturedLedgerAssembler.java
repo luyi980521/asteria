@@ -37,7 +37,7 @@ public class PaymentCapturedLedgerAssembler {
                 .build();
 
         PaymentCapturedLedgerAccounts ledgerAccounts
-                = paymentLedgerAccountResolver.resolve(message.amount().currency().getSymbol());
+                = paymentLedgerAccountResolver.resolve(message.amount().currency());
 
         PostingCommand debitPosting = PostingCommand.builder()
                 .ledgerAccountId(ledgerAccounts.creditAccountId())

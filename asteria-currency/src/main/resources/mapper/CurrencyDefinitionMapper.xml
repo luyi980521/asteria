@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.currency.infrastructure.persistence.mapper.CurrencyDefinitionMapper">
+    <resultMap id="BaseResultMap" type="io.asteria.currency.infrastructure.persistence.dataobject.CurrencyDefinitionDO">
+        <id property="code" column="code"/>
+        <result property="numericCode" column="numeric_code"/>
+        <result property="displayName" column="display_name"/>
+        <result property="symbol" column="symbol"/>
+        <result property="minorUnit" column="minor_unit"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+</mapper>

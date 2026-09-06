@@ -1,5 +1,6 @@
 package io.asteria.settlement.infrastructure.persistence.converter;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.common.domain.valueobject.Money;
 import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.entity.SettlementItem;
@@ -12,7 +13,6 @@ import io.asteria.settlement.infrastructure.persistence.dataobject.SettlementIte
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Currency;
 import java.util.List;
 
 /**
@@ -28,7 +28,7 @@ public class SettlementPersistenceConverter {
         return SettlementBatchDO.builder()
                 .id(settlementBatch.getSettlementBatchId().value())
                 .settlementReference(settlementBatch.getReference().value())
-                .currency(settlementBatch.getCurrency())
+                .currency(settlementBatch.getCurrency().value())
                 .grossAmount(settlementBatch.getGrossAmount().amount())
                 .feeAmount(settlementBatch.getFeeAmount().amount())
                 .netAmount(settlementBatch.getNetAmount().amount())
@@ -53,7 +53,7 @@ public class SettlementPersistenceConverter {
                 .paymentId(item.getPaymentId())
                 .paymentReference(item.getPaymentReference())
                 .amount(item.getAmount().amount())
-                .currency(item.getAmount().currency().getSymbol())
+                .currency(item.getAmount().currency().value())
                 .createdAt(item.getCreatedAt())
                 .build();
     }
@@ -73,10 +73,10 @@ public class SettlementPersistenceConverter {
                 SettlementBatchReference.builder()
                         .value(batchDO.getSettlementReference())
                         .build(),
-                batchDO.getCurrency(),
-                Money.of(batchDO.getGrossAmount(), Currency.getInstance(batchDO.getCurrency())),
-                Money.of(batchDO.getFeeAmount(), Currency.getInstance(batchDO.getCurrency())),
-                Money.of(batchDO.getNetAmount(), Currency.getInstance(batchDO.getCurrency())),
+                CurrencyCode.of(batchDO.getCurrency()),
+                Money.of(batchDO.getGrossAmount(), CurrencyCode.of(batchDO.getCurrency())),
+                Money.of(batchDO.getFeeAmount(), CurrencyCode.of(batchDO.getCurrency())),
+                Money.of(batchDO.getNetAmount(), CurrencyCode.of(batchDO.getCurrency())),
                 items,
                 SettlementBatchStatus.valueOf(batchDO.getStatus()),
                 batchDO.getChannelSettlementBatchId(),
@@ -100,7 +100,7 @@ public class SettlementPersistenceConverter {
                 )
                 .paymentId(itemDO.getPaymentId())
                 .paymentReference(itemDO.getPaymentReference())
-                .amount(Money.of(itemDO.getAmount(), Currency.getInstance(itemDO.getCurrency())))
+                .amount(Money.of(itemDO.getAmount(), CurrencyCode.of(itemDO.getCurrency())))
                 .createdAt(itemDO.getCreatedAt())
                 .build();
     }

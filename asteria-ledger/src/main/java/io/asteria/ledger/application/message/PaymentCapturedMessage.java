@@ -12,8 +12,12 @@ import java.time.Instant;
 public record PaymentCapturedMessage(
         String eventId,
         Long paymentId,
-        String paymentReference,
+        Reference paymentReference,
         Money amount,
         Instant capturedAt
 ) {
+    /** Mirrors the producer's wire reference without depending on the Payment domain. */
+    @Builder
+    public record Reference(String referenceType, String referenceId) {
+    }
 }

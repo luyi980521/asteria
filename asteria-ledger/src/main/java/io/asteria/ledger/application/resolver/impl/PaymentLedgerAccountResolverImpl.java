@@ -1,5 +1,6 @@
 package io.asteria.ledger.application.resolver.impl;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.ledger.application.model.PaymentCapturedLedgerAccounts;
 import io.asteria.ledger.application.resolver.PaymentLedgerAccountResolver;
 import io.asteria.ledger.domain.entity.LedgerAccount;
@@ -24,10 +25,10 @@ public class PaymentLedgerAccountResolverImpl implements PaymentLedgerAccountRes
      * 解析支付捕获成功对应的账本账户
      */
     @Override
-    public PaymentCapturedLedgerAccounts resolve(String currency) {
+    public PaymentCapturedLedgerAccounts resolve(CurrencyCode currency) {
 
-        String receivableAccountCode = "PAYMENT_RECEIVABLE_" + currency;
-        String settlementPayableAccountCode = "SETTLEMENT_PAYABLE_" + currency;
+        String receivableAccountCode = "PAYMENT_RECEIVABLE_" + currency.value();
+        String settlementPayableAccountCode = "SETTLEMENT_PAYABLE_" + currency.value();
 
         LedgerAccount receivableAccount = ledgerAccountRepository.findByAccountCode(receivableAccountCode);
         if (receivableAccount == null) {

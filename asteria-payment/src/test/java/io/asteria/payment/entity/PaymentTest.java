@@ -1,5 +1,6 @@
 package io.asteria.payment.entity;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.common.domain.valueobject.Money;
 import io.asteria.payment.domain.entity.Payment;
 import io.asteria.payment.domain.error.PaymentErrorCode;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Currency;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PaymentTest {
 
     private static final PaymentId PAYMENT_ID = PaymentId.of(1001L);
-    private static final Money AMOUNT = Money.of(new BigDecimal("12.34"), Currency.getInstance("USD"));
+    private static final Money AMOUNT = Money.of(new BigDecimal("12.34"), CurrencyCode.of("USD"));
     private static final PaymentReference REFERENCE = new PaymentReference("ORDER", "order-1001");
     private static final Instant CREATED_AT = Instant.parse("2026-01-01T00:00:00Z");
     private static final Instant AUTHORIZED_AT = Instant.parse("2026-01-01T00:01:00Z");

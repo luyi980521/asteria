@@ -1,5 +1,7 @@
 package io.asteria.settlement.domain.entity;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
+
 import io.asteria.common.domain.valueobject.Money;
 import io.asteria.settlement.domain.enums.SettlementBatchStatus;
 import io.asteria.settlement.domain.error.SettlementErrorCode;
@@ -33,7 +35,7 @@ public class SettlementBatch {
     /**
      * 币种
      */
-    private final String currency;
+    private final CurrencyCode currency;
 
     /**
      * 总金额
@@ -106,7 +108,7 @@ public class SettlementBatch {
         return SettlementBatch.builder()
                 .settlementBatchId(settlementBatchId)
                 .reference(reference)
-                .currency(grossAmount.currency().getSymbol())
+                .currency(grossAmount.currency())
                 .grossAmount(grossAmount)
                 .feeAmount(feeAmount)
                 .netAmount(netAmount)
@@ -182,7 +184,7 @@ public class SettlementBatch {
      */
     public static SettlementBatch reconstitute(SettlementBatchId settlementBatchId,
                                                SettlementBatchReference reference,
-                                               String currency,
+                                               CurrencyCode currency,
                                                Money grossAmount,
                                                Money feeAmount,
                                                Money netAmount,

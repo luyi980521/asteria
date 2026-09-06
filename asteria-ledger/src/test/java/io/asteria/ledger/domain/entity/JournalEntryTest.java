@@ -1,5 +1,6 @@
 package io.asteria.ledger.domain.entity;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.enums.JournalEntryStatus;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Currency;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JournalEntryTest {
 
-    private static final Currency USD = Currency.getInstance("USD");
-    private static final Currency EUR = Currency.getInstance("EUR");
+    private static final CurrencyCode USD = CurrencyCode.of("USD");
+    private static final CurrencyCode EUR = CurrencyCode.of("EUR");
     private static final Instant POSTED_AT = Instant.parse("2026-01-01T00:00:00Z");
     private static final Instant REVERSED_AT = Instant.parse("2026-01-02T00:00:00Z");
 
@@ -189,7 +189,7 @@ class JournalEntryTest {
     }
 
     private Posting posting(Long postingId, Long ledgerAccountId,
-                            String amount, DebitCredit direction, Currency currency) {
+                            String amount, DebitCredit direction, CurrencyCode currency) {
         return Posting.create(
                 PostingId.of(postingId),
                 LedgerAccountId.of(ledgerAccountId),

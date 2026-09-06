@@ -1,5 +1,7 @@
 package io.asteria.settlement.application.port.channel;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
+
 import io.asteria.common.domain.valueobject.Money;
 import lombok.Builder;
 
@@ -9,7 +11,7 @@ import java.util.List;
 public record SettlementBatchRequest(
         Long settlementBatchId,
         String settlementBatchReference,
-        String currency,
+        CurrencyCode currency,
         Money grossAmount,
         Money feeAmount,
         Money netAmount,

@@ -1,5 +1,6 @@
 package io.asteria.ledger.domain.entity;
 
+import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.ledger.domain.enums.LedgerAccountCategory;
 import io.asteria.ledger.domain.enums.LedgerAccountOwnerType;
 import io.asteria.ledger.domain.enums.LedgerAccountStatus;
@@ -14,7 +15,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Currency;
 import java.util.Objects;
 
 /**
@@ -42,7 +42,7 @@ public class LedgerAccount {
     private LedgerAccountCategory category;
 
     /** 账户币种 */
-    private Currency currency;
+    private CurrencyCode currency;
 
     /** 账户状态 */
     private LedgerAccountStatus status;
@@ -60,7 +60,7 @@ public class LedgerAccount {
             LedgerAccountOwnerType ownerType,
             Long ownerId,
             LedgerAccountCategory category,
-            Currency currency,
+            CurrencyCode currency,
             boolean allowNegativeBalance
     ) {
         validateLedgerAccountId(ledgerAccountId);
@@ -90,7 +90,7 @@ public class LedgerAccount {
             LedgerAccountOwnerType ownerType,
             Long ownerId,
             LedgerAccountCategory category,
-            Currency currency,
+            CurrencyCode currency,
             LedgerAccountStatus status,
             boolean allowNegativeBalance
     ) {
@@ -252,7 +252,7 @@ public class LedgerAccount {
     /**
      * 校验账户币种
      */
-    private static void validateCurrency(Currency currency) {
+    private static void validateCurrency(CurrencyCode currency) {
         if (currency == null) {
             throw new LedgerDomainException(
                     LedgerErrorCode.LEDGER_ACCOUNT_CURRENCY_REQUIRED

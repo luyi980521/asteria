@@ -28,8 +28,11 @@ public class PaymentOutboxEventAssembler {
 
         PaymentCapturedEvent event = PaymentCapturedEvent.builder()
                 .eventId(String.valueOf(distributedIdGenerator.nextId()))
-                .paymentId(payment.getPaymentId())
-                .paymentReference(payment.getReference())
+                .paymentId(payment.getPaymentId().value())
+                .paymentReference(PaymentCapturedEvent.Reference.builder()
+                        .referenceType(payment.getReference().referenceType())
+                        .referenceId(payment.getReference().referenceId())
+                        .build())
                 .amount(payment.getAmount())
                 .capturedAt(payment.getCapturedAt())
                 .build();

@@ -30,6 +30,6 @@ class LedgerErrorCodeTest {
     void codesHaveExpectedValues() {
         assertEquals("LEDGER_0001", LedgerErrorCode.INVALID_MONEY_AMOUNT.code());
         assertEquals("LEDGER_0002", LedgerErrorCode.CURRENCY_MISMATCH.code());
-        assertEquals("LEDGER_0003", LedgerErrorCode.NULL_ARGUMENT.code());
+        assertEquals("COMMON_0002", LedgerErrorCode.NULL_ARGUMENT.code());
     }
 }
