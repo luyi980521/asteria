@@ -29,4 +29,9 @@ public interface PaymentApplicationService {
      * @param paymentId {@link PaymentId}
      * */
     void capture(PaymentId paymentId);
+
+    /**
+     * 回查渠道捕获结果并恢复本地支付状态
+     * */
+    void recoverCapture(PaymentId paymentId);
 }

@@ -8,6 +8,7 @@ import io.asteria.payment.application.port.router.PaymentChannelRouter;
 import io.asteria.payment.application.service.PaymentApplicationService;
 import io.asteria.payment.application.service.PaymentTransactionService;
 import io.asteria.payment.domain.entity.Payment;
+import io.asteria.payment.domain.enums.PaymentStatus;
 import io.asteria.payment.domain.error.PaymentErrorCode;
 import io.asteria.payment.domain.exception.PaymentDomainException;
 import io.asteria.payment.domain.repository.PaymentRepository;
@@ -36,6 +37,8 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
 
     @Autowired
     private PaymentTransactionService paymentTransactionService;
+    @Autowired
+    private PaymentChannel paymentChannel;
 
     /**
      * 创建支付
@@ -120,5 +123,38 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
             log.error("Capture failed, paymentId: {}, failureCode: {}",
                     paymentId.value(), captureResult.failureCode());
         }
+    }
+
+    /**
+     * 回查渠道捕获结果并恢复本地支付状态
+     */
+    @Override
+    public void recoverCapture(PaymentId paymentId) {
+
+        Payment payment = paymentRepository.findById(paymentId);
+        if (payment.getStatus() != PaymentStatus.CAPTURING) {
+            log.warn("The payment must be capturing to recover: {}, {}", payment, payment.getStatus());
+            throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_CAPTURING_TO_RECOVER);
+        }
+
+        // 回查捕获状态并将内部状态更新为匹配的状态
+        CaptureQueryResult captureQueryResult = paymentChannel.queryCapture(payment);
+        if (captureQueryResult.isSuccess()) {
+            paymentTransactionService.completeCapture(
+                    paymentId, CaptureResult.success(captureQueryResult.channelTransactionId())
+            );
+            return;
+        }
+
+        if (captureQueryResult.isFailed()) {
+            paymentTransactionService.completeCapture(
+                    paymentId, CaptureResult.failure(
+                            captureQueryResult.failureCode(), captureQueryResult.failureMessage()
+                    )
+            );
+            return;
+        }
+
+        log.warn("Capture recovery remains unknown, paymentId: {}", paymentId.value());
     }
 }

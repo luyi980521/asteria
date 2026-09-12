@@ -16,7 +16,7 @@ public record CreateAndPostJournalEntryCommand(
 
     public CreateAndPostJournalEntryCommand {
 
-        if (reference() == null) {
+        if (reference == null) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);
         }
 

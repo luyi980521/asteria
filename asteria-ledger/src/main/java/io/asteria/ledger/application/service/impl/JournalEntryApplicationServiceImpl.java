@@ -76,7 +76,7 @@ public class JournalEntryApplicationServiceImpl implements JournalEntryApplicati
         journalEntryRepository.insert(journalEntry);
 
         log.info("Journal entry create and post successfully, journalEntryId: {}, eventId: {}, postingCount: {}",
-                journalEntryId, eventId, postings.size());
+                journalEntryId.value(), eventId, postings.size());
         return journalEntryId;
     }
 }

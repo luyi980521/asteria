@@ -26,6 +26,7 @@ public enum PaymentErrorCode {
     AUTHORIZATION_TRANSACTION_ID_REQUIRED("PAYMENT_0022", "Authorization transaction id required"),
     AUTHORIZED_AT_REQUIRED("PAYMENT_0023", "Authorized at required"),
     UNSUPPORTED_OUTBOX_EVENT_TYPE("PAYMENT_0024", "Unsupported outbox event type"),
+    PAYMENT_MUST_BE_CAPTURING_TO_RECOVER("PAYMENT_0025", "Payment must be capturing to recover"),
 
     ;
 

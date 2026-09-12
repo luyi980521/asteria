@@ -4,7 +4,7 @@ CREATE TABLE payment_outbox_event (
     aggregate_type VARCHAR(64) NOT NULL,
     aggregate_id VARCHAR(64) NOT NULL,
     event_type VARCHAR(128) NOT NULL,
-    payload JSONB NOT NULL,
+    payload TEXT NOT NULL,
     status VARCHAR(32) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
     published_at TIMESTAMPTZ,

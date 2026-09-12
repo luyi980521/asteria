@@ -1,5 +1,6 @@
 package io.asteria.payment.application.port.channel;
 
+import io.asteria.payment.domain.entity.Payment;
 import io.asteria.payment.domain.enums.PaymentMethod;
 
 /**
@@ -21,4 +22,9 @@ public interface PaymentChannel {
      * 发起支付捕获
      */
     CaptureResult capture(CaptureRequest request);
+
+    /**
+     * 查询外部渠道捕获状态
+     * */
+    CaptureQueryResult queryCapture(Payment payment);
 }

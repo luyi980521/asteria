@@ -33,7 +33,7 @@ asteria:
     datacenter-id: 1
   payment:
     outbox:
-      publish-task-enabled: false
+      publish-task-enabled: true
       publish-interval-ms: 1000
   settlement:
     outbox:
