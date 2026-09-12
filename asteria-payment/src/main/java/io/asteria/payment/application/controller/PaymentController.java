@@ -2,6 +2,8 @@ package io.asteria.payment.application.controller;
 
 import io.asteria.common.util.JsonUtils;
 import io.asteria.payment.application.command.CreatePaymentCommand;
+import io.asteria.payment.application.command.ReversePaymentCapturesCommand;
+import io.asteria.payment.application.response.ReversePaymentCapturesResponse;
 import io.asteria.payment.application.service.PaymentApplicationService;
 import io.asteria.payment.domain.valueobject.PaymentId;
 import io.asteria.web.response.ApiResponse;
@@ -46,5 +48,11 @@ public class PaymentController {
         PaymentId paymentId = PaymentId.of(id);
         paymentApplicationService.recoverCapture(paymentId);
         return ApiResponse.successWithoutData();
+    }
+
+    @PostMapping("/capture/reversals")
+    public ApiResponse<ReversePaymentCapturesResponse> captureReversals(@RequestBody ReversePaymentCapturesCommand command) {
+        log.info("Received capture reversals request: {}", command.paymentIds().size());
+        return ApiResponse.success(paymentApplicationService.reverseCaptures(command));
     }
 }

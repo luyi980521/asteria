@@ -1,6 +1,7 @@
 package io.asteria.web.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.asteria.common.application.response.ServiceResponse;
 import lombok.Builder;
 
 /**
@@ -8,7 +9,7 @@ import lombok.Builder;
  */
 @Builder
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public record ApiResponse<T>(boolean success, String code, String message, T data) {
+public record ApiResponse<T>(boolean success, String code, String message, T data) implements ServiceResponse<T> {
 
     /**
      * Creates a successful response containing the existing endpoint payload.

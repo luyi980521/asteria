@@ -1,6 +1,8 @@
 package io.asteria.payment.application.service;
 
 import io.asteria.payment.application.command.CreatePaymentCommand;
+import io.asteria.payment.application.command.ReversePaymentCapturesCommand;
+import io.asteria.payment.application.response.ReversePaymentCapturesResponse;
 import io.asteria.payment.domain.valueobject.PaymentId;
 
 /**
@@ -34,4 +36,9 @@ public interface PaymentApplicationService {
      * 回查渠道捕获结果并恢复本地支付状态
      * */
     void recoverCapture(PaymentId paymentId);
+
+    /**
+     * 捕获账务冲正
+     * */
+    ReversePaymentCapturesResponse reverseCaptures(ReversePaymentCapturesCommand command);
 }

@@ -43,7 +43,7 @@ public class PaymentOutboxEventAssembler {
                 .id(distributedIdGenerator.nextId())
                 .eventId(event.eventId())
                 .aggregateType("PAYMENT")
-                .aggregateId(String.valueOf(payment.getPaymentId()))
+                .aggregateId(String.valueOf(payment.getPaymentId().value()))
                 .eventType(PaymentOutboxEventType.PAYMENT_CAPTURED)
                 .payload(JsonUtils.toJson(event))
                 .traceId(MDC.get(TraceConstants.TRACE_ID))

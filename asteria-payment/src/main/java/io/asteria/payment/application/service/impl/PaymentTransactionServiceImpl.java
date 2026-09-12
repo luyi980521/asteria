@@ -1,5 +1,6 @@
 package io.asteria.payment.application.service.impl;
 
+import io.asteria.common.util.JsonUtils;
 import io.asteria.payment.application.assembler.PaymentOutboxEventAssembler;
 import io.asteria.payment.application.port.channel.AuthorizationResult;
 import io.asteria.payment.application.port.channel.CaptureResult;
@@ -78,15 +79,16 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         Payment payment = paymentRepository.findById(paymentId);
         if (result.success()) {
             payment.capture(Instant.now());
+            PaymentOutboxEvent paymentOutboxEvent = paymentOutboxEventAssembler.toPaymentCapturedOutboxEvent(payment);
+            paymentOutboxEventRepository.insert(paymentOutboxEvent);
+            log.info("Payment capture completed locally, paymentId: {}, outboxEventId: {}",
+                    paymentId.value(), paymentOutboxEvent.getEventId());
         } else {
             // 暂时先将捕获失败的支付单状态更改回 authorized，未来增加捕获失败的处理
+            log.warn("Payment capture failed, paymentId: {}, result: {}", paymentId, JsonUtils.toJson(result));
             payment.captureFailed();
         }
 
-        PaymentOutboxEvent paymentOutboxEvent = paymentOutboxEventAssembler.toPaymentCapturedOutboxEvent(payment);
-        paymentOutboxEventRepository.insert(paymentOutboxEvent);
         paymentRepository.update(payment);
-        log.info("Payment capture completed, paymentId: {}, outboxEventId: {}",
-                paymentId.value(), paymentOutboxEvent.getEventId());
     }
 }

@@ -20,6 +20,9 @@ public interface PaymentOutboxEventRepository {
      */
     List<PaymentOutboxEvent> findPending(int limit);
 
+    /** 按聚合 ID 批量查询事件，不限制发布状态。 */
+    List<PaymentOutboxEvent> findByAggregateIds(List<String> aggregateIds);
+
     /**
      * 标记为已发布
      */

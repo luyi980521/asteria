@@ -1,3 +1,5 @@
+server:
+  port: 8080
 spring:
   application:
     name: asteria
@@ -28,6 +30,9 @@ mybatis-plus:
       id-type: input
 
 asteria:
+  service:
+    ledger:
+      url: http://localhost:${server.port}
   id-generator:
     worker-id: 1
     datacenter-id: 1

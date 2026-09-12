@@ -32,7 +32,8 @@ public class CardPaymentChannel implements PaymentChannel {
      */
     @Override
     public CaptureResult capture(CaptureRequest request) {
-        return CaptureResult.success("capture_" + request.paymentId().value());
+//        return CaptureResult.success("capture_" + request.paymentId().value());
+        return CaptureResult.failure("50001", "Timeout");
     }
 
     /**

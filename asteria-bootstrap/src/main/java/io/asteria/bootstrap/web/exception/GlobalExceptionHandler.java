@@ -1,6 +1,7 @@
 package io.asteria.bootstrap.web.exception;
 
 import io.asteria.common.domain.exception.CommonDomainException;
+import io.asteria.common.application.exception.RemoteServiceException;
 import io.asteria.currency.domain.exception.CurrencyDomainException;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import io.asteria.payment.domain.exception.PaymentDomainException;
@@ -18,6 +19,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /** Preserves downstream error details using the common HTTP envelope. */
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ExceptionHandler(RemoteServiceException.class)
+    public ApiResponse<Void> handleRemoteServiceException(RemoteServiceException exception) {
+        log.warn("Remote service exception, code: {}, message: {}",
+                exception.code(), exception.getMessage(), exception);
+        return ApiResponse.failure(exception.code(), exception.getMessage());
+    }
 
     /**
      * Handles shared value object validation failures.

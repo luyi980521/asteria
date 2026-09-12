@@ -1,6 +1,8 @@
 package io.asteria.ledger.application.service;
 
+import io.asteria.ledger.application.response.ReverseJournalEntriesResponse;
 import io.asteria.ledger.application.command.CreateAndPostJournalEntryCommand;
+import io.asteria.ledger.application.command.ReverseJournalEntriesCommand;
 import io.asteria.ledger.domain.valueobject.JournalEntryId;
 
 /**
@@ -14,4 +16,9 @@ public interface JournalEntryApplicationService {
      * @return {@link JournalEntryId}
      * */
     JournalEntryId createAndPost(CreateAndPostJournalEntryCommand command);
+
+    /**
+     * 通过 eventId 批量冲正
+     * */
+    ReverseJournalEntriesResponse reverseByEventIds(ReverseJournalEntriesCommand command);
 }

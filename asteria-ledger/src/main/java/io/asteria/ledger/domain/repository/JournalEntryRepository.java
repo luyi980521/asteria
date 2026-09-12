@@ -14,4 +14,7 @@ public interface JournalEntryRepository {
     Optional<JournalEntry> findById(JournalEntryId journalEntryId);
 
     boolean existsByEventId(String eventId);
+
+    /** Loads and locks the entry within the caller transaction. */
+    Optional<JournalEntry> findByEventIdForUpdate(String eventId);
 }

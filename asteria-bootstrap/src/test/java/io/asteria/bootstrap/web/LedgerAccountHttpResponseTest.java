@@ -5,6 +5,8 @@ import io.asteria.common.domain.error.CommonErrorCode;
 import io.asteria.common.domain.exception.CommonDomainException;
 import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.common.util.JsonUtils;
+import io.asteria.common.util.ServiceResponseUtils;
+import io.asteria.web.response.ApiResponse;
 import io.asteria.common.trace.TraceConstants;
 import io.asteria.web.filter.TraceIdFilter;
 import io.asteria.currency.domain.error.CurrencyErrorCode;
@@ -70,6 +72,30 @@ class LedgerAccountHttpResponseTest {
         verify(service).createLedgerAccount(command.capture());
         assertEquals("PAYMENT_RECEIVABLE_USD", command.getValue().accountCode());
         assertEquals(CurrencyCode.of("USD"), command.getValue().currency());
+    }
+
+    @Test
+    void remoteFailurePreservesCodeAndMessageInsteadOfUsingGenericHandler() throws Exception {
+        when(service.createLedgerAccount(any())).thenAnswer(invocation ->
+                ServiceResponseUtils.getData(ApiResponse.failure("LEDGER_0010", "Already reversed")));
+        String body = mvc.perform(post("/api/ledger/accounts")
+                        .contentType(MediaType.APPLICATION_JSON).content(REQUEST))
+                .andExpect(status().isBadGateway())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(JsonUtils.readTree("""
+                {"success":false,"code":"LEDGER_0010","message":"Already reversed","data":null}
+                """), JsonUtils.readTree(body));
+    }
+
+    @Test
+    void emptyRemoteResponseUsesBadGatewayEnvelope() throws Exception {
+        when(service.createLedgerAccount(any())).thenAnswer(invocation -> ServiceResponseUtils.getData(null));
+        String body = mvc.perform(post("/api/ledger/accounts")
+                        .contentType(MediaType.APPLICATION_JSON).content(REQUEST))
+                .andExpect(status().isBadGateway())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals("REMOTE_RESPONSE_EMPTY", JsonUtils.readTree(body).path("code").textValue());
+        assertFalse(JsonUtils.readTree(body).path("success").booleanValue());
     }
 
     @Test

@@ -2,43 +2,48 @@ package io.asteria.payment.application.service.impl;
 
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
+import io.asteria.common.util.ServiceResponseUtils;
 import io.asteria.payment.application.command.CreatePaymentCommand;
+import io.asteria.payment.application.command.ReversePaymentCapturesCommand;
 import io.asteria.payment.application.port.channel.*;
 import io.asteria.payment.application.port.router.PaymentChannelRouter;
+import io.asteria.payment.application.request.ReversePaymentCapturesRequest;
+import io.asteria.payment.application.response.ReversePaymentCapturesResponse;
 import io.asteria.payment.application.service.PaymentApplicationService;
 import io.asteria.payment.application.service.PaymentTransactionService;
 import io.asteria.payment.domain.entity.Payment;
+import io.asteria.payment.domain.enums.PaymentOutboxEventType;
 import io.asteria.payment.domain.enums.PaymentStatus;
 import io.asteria.payment.domain.error.PaymentErrorCode;
 import io.asteria.payment.domain.exception.PaymentDomainException;
+import io.asteria.payment.domain.repository.PaymentOutboxEventRepository;
 import io.asteria.payment.domain.repository.PaymentRepository;
 import io.asteria.payment.domain.valueobject.PaymentId;
+import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
+import io.asteria.payment.infrastructure.client.LedgerClient;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * 支付功能接口定义实现类
  * */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PaymentApplicationServiceImpl implements PaymentApplicationService {
 
-    @Autowired
-    private PaymentRepository paymentRepository;
-
-    @Autowired
-    private DistributedIdGenerator distributedIdGenerator;
-
-    @Autowired
-    private PaymentChannelRouter paymentChannelRouter;
-
-    @Autowired
-    private PaymentTransactionService paymentTransactionService;
-    @Autowired
-    private PaymentChannel paymentChannel;
+    private final PaymentRepository paymentRepository;
+    private final DistributedIdGenerator distributedIdGenerator;
+    private final PaymentChannelRouter paymentChannelRouter;
+    private final PaymentTransactionService paymentTransactionService;
+    private final PaymentChannel paymentChannel;
+    private final LedgerClient ledgerClient;
+    private final PaymentOutboxEventRepository paymentOutboxEventRepository;
 
     /**
      * 创建支付
@@ -156,5 +161,32 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
         }
 
         log.warn("Capture recovery remains unknown, paymentId: {}", paymentId.value());
+    }
+
+    /**
+     * 捕获账务冲正
+     */
+    @Override
+    public ReversePaymentCapturesResponse reverseCaptures(ReversePaymentCapturesCommand command) {
+
+        List<String> aggregateIds = command.paymentIds().stream()
+                .map(paymentId -> PaymentId.of(paymentId).value().toString())
+                .distinct()
+                .toList();
+        List<PaymentOutboxEvent> events = paymentOutboxEventRepository.findByAggregateIds(aggregateIds);
+        List<String> eventIds = events.stream()
+                .filter(event -> event.getEventType() == PaymentOutboxEventType.PAYMENT_CAPTURED)
+                .map(PaymentOutboxEvent::getEventId)
+                .distinct()
+                .toList();
+        if (CollectionUtils.isEmpty(eventIds)) {
+            log.warn("No capture events found for reversal, paymentIds: {}", command.paymentIds());
+            return new ReversePaymentCapturesResponse(List.of());
+        }
+        ReversePaymentCapturesRequest request = ReversePaymentCapturesRequest.builder()
+                .eventIds(eventIds)
+                .reason(command.reason())
+                .build();
+        return ServiceResponseUtils.getData(ledgerClient.reverseJournalEntries(request));
     }
 }

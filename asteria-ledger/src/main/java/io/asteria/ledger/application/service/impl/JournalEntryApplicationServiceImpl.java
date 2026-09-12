@@ -1,24 +1,32 @@
 package io.asteria.ledger.application.service.impl;
 
 import io.asteria.common.application.port.DistributedIdGenerator;
+import io.asteria.ledger.application.response.ReverseJournalEntriesResponse;
 import io.asteria.common.util.JsonUtils;
 import io.asteria.ledger.application.assembler.PostingAssembler;
 import io.asteria.ledger.application.command.CreateAndPostJournalEntryCommand;
+import io.asteria.ledger.application.command.ReverseJournalEntriesCommand;
 import io.asteria.ledger.application.service.JournalEntryApplicationService;
 import io.asteria.ledger.application.service.LedgerAccountApplicationService;
 import io.asteria.ledger.domain.entity.JournalEntry;
 import io.asteria.ledger.domain.entity.Posting;
+import io.asteria.ledger.domain.enums.JournalEntryReverseStatus;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import io.asteria.ledger.domain.repository.JournalEntryRepository;
 import io.asteria.ledger.domain.valueobject.JournalEntryId;
+import io.asteria.ledger.domain.valueobject.PostingId;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 记账凭证功能接口定义实现类
@@ -27,17 +35,28 @@ import java.util.List;
 @Service
 public class JournalEntryApplicationServiceImpl implements JournalEntryApplicationService {
 
-    @Autowired
-    private JournalEntryRepository journalEntryRepository;
+    private final TransactionTemplate reversalTransaction;
 
-    @Autowired
-    private PostingAssembler postingAssembler;
+    private final JournalEntryRepository journalEntryRepository;
 
-    @Autowired
-    private DistributedIdGenerator distributedIdGenerator;
+    private final PostingAssembler postingAssembler;
 
-    @Autowired
-    private LedgerAccountApplicationService ledgerAccountApplicationService;
+    private final DistributedIdGenerator distributedIdGenerator;
+
+    private final LedgerAccountApplicationService ledgerAccountApplicationService;
+
+    public JournalEntryApplicationServiceImpl(PlatformTransactionManager transactionManager,
+                                              JournalEntryRepository journalEntryRepository,
+                                              PostingAssembler postingAssembler,
+                                              DistributedIdGenerator distributedIdGenerator,
+                                              LedgerAccountApplicationService ledgerAccountApplicationService) {
+        this.reversalTransaction = new TransactionTemplate(transactionManager);
+        this.reversalTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.journalEntryRepository = journalEntryRepository;
+        this.postingAssembler = postingAssembler;
+        this.distributedIdGenerator = distributedIdGenerator;
+        this.ledgerAccountApplicationService = ledgerAccountApplicationService;
+    }
 
     /**
      * 创建并入账
@@ -67,7 +86,7 @@ public class JournalEntryApplicationServiceImpl implements JournalEntryApplicati
         ledgerAccountApplicationService.validatePostable(command.postings());
 
         List<Posting> postings = command.postings().stream()
-                .map(pc -> postingAssembler.toEntity(pc))
+                .map(postingAssembler::toEntity)
                 .toList();
 
         JournalEntryId journalEntryId = JournalEntryId.of(distributedIdGenerator.nextId());
@@ -78,5 +97,82 @@ public class JournalEntryApplicationServiceImpl implements JournalEntryApplicati
         log.info("Journal entry create and post successfully, journalEntryId: {}, eventId: {}, postingCount: {}",
                 journalEntryId.value(), eventId, postings.size());
         return journalEntryId;
+    }
+
+    /**
+     * 通过 eventId 批量冲正
+     */
+    @Override
+    public ReverseJournalEntriesResponse reverseByEventIds(ReverseJournalEntriesCommand command) {
+
+        List<ReverseJournalEntriesResponse.Result> results = new ArrayList<>();
+        for (String eventId : command.eventIds()) {
+            try {
+                results.add(reversalTransaction.execute(status -> reverseOne(eventId, command.reason())));
+            } catch (LedgerDomainException exception) {
+                log.warn("Journal entry reversal rejected, eventId: {}, code: {}, message: {}",
+                        eventId, exception.errorCode().code(), exception.getMessage());
+                results.add(
+                        new ReverseJournalEntriesResponse.Result(
+                                eventId, JournalEntryReverseStatus.FAILED,
+                                exception.errorCode().code(),
+                                exception.getMessage()
+                        )
+                );
+            } catch (RuntimeException exception) {
+                log.error("Journal entry reversal failed, eventId: {}, message: {}",
+                        eventId, exception.getMessage(), exception);
+                results.add(new ReverseJournalEntriesResponse.Result(
+                        eventId, JournalEntryReverseStatus.FAILED,
+                        "SYSTEM_ERROR",
+                        "Journal entry reversal failed"
+                ));
+            }
+        }
+        return new ReverseJournalEntriesResponse(results);
+    }
+
+    private ReverseJournalEntriesResponse.Result reverseOne(String eventId, String reason) {
+
+        Optional<JournalEntry> original = journalEntryRepository.findByEventIdForUpdate(eventId);
+        if (original.isEmpty()) {
+            log.warn("Journal entry not found for reversal, eventId: {}", eventId);
+            return new ReverseJournalEntriesResponse.Result(
+                    eventId,
+                    JournalEntryReverseStatus.FAILED,
+                    "JOURNAL_ENTRY_NOT_FOUND",
+                    "Journal entry not found"
+            );
+        }
+        JournalEntry entry = original.get();
+        if (entry.getReversingJournalEntryId() != null) {
+            log.info("Journal entry already reversed, eventId: {}, reversalJournalEntryId: {}",
+                    eventId, entry.getReversingJournalEntryId().value());
+            return new ReverseJournalEntriesResponse.Result(
+                    eventId,
+                    JournalEntryReverseStatus.ALREADY_REVERSED,
+                    null,
+                    null
+            );
+        }
+        List<PostingId> postingIds = entry.getPostings()
+                .stream()
+                .map(posting -> PostingId.of(distributedIdGenerator.nextId()))
+                .toList();
+        JournalEntry reversal = entry.reverse(
+                JournalEntryId.of(distributedIdGenerator.nextId()),
+                postingIds,
+                Instant.now(),
+                reason
+        );
+        journalEntryRepository.insert(reversal);
+        journalEntryRepository.update(entry);
+        log.info("Journal entry reversed, eventId: {}, reversalId: {}", eventId, reversal.getJournalEntryId().value());
+        return new ReverseJournalEntriesResponse.Result(
+                eventId,
+                JournalEntryReverseStatus.REVERSED,
+                null,
+                null
+        );
     }
 }

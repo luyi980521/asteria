@@ -78,6 +78,13 @@ public class JournalEntryRepositoryImpl implements JournalEntryRepository {
     }
 
     @Override
+    public Optional<JournalEntry> findByEventIdForUpdate(String eventId) {
+        JournalEntryDO entry = journalEntryMapper.selectOne(new LambdaQueryWrapper<JournalEntryDO>()
+                .eq(JournalEntryDO::getEventId, eventId).last("FOR UPDATE"));
+        return entry == null ? Optional.empty() : findById(JournalEntryId.of(entry.getId()));
+    }
+
+    @Override
     public boolean existsByEventId(String eventId) {
         if (StringUtils.isBlank(eventId)) {
             throw new LedgerDomainException(LedgerErrorCode.INVALID_PARAMS);

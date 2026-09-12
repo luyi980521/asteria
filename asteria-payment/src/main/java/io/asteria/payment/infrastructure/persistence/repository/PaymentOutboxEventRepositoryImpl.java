@@ -26,6 +26,20 @@ public class PaymentOutboxEventRepositoryImpl implements PaymentOutboxEventRepos
     private final PaymentOutboxEventMapper paymentOutboxEventMapper;
     private final PaymentOutboxEventPersistenceConverter converter;
 
+    @Override
+    public List<PaymentOutboxEvent> findByAggregateIds(List<String> aggregateIds) {
+        if (aggregateIds == null || aggregateIds.isEmpty()) {
+            return List.of();
+        }
+        return paymentOutboxEventMapper.selectList(
+                        new LambdaQueryWrapper<PaymentOutboxEventDO>()
+                                .in(PaymentOutboxEventDO::getAggregateId, aggregateIds)
+                                .orderByAsc(PaymentOutboxEventDO::getId))
+                .stream()
+                .map(converter::toDomain)
+                .toList();
+    }
+
     /**
      * 插入 Outbox 事件
      */
