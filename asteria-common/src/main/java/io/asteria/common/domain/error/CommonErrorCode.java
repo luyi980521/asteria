@@ -14,6 +14,7 @@ public enum CommonErrorCode {
 
     CURRENCY_CODE_REQUIRED("COMMON_0008", "Currency code must not be blank"),
     INVALID_CURRENCY_CODE("COMMON_0009", "Currency code must contain three letters"),
+    MONEY_AMOUNT_MUST_BE_NON_NEGATIVE("COMMON_0010", "Money amount must not be negative"),
     ;
 
     private final String code;

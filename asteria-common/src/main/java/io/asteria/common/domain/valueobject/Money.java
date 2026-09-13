@@ -15,14 +15,33 @@ public final class Money {
     private final CurrencyCode currency;
 
     private Money(BigDecimal amount, CurrencyCode currency) {
+        this(amount, currency, false);
+    }
+
+    private Money(BigDecimal amount, CurrencyCode currency, boolean allowZero) {
         this.currency = requireCurrency(currency);
-        this.amount = normalize(requirePositiveAmount(amount), this.currency);
+        if (allowZero) {
+            if (amount == null) {
+                throw new CommonDomainException(CommonErrorCode.MONEY_AMOUNT_REQUIRED);
+            }
+            if (amount.signum() < 0) {
+                throw new CommonDomainException(CommonErrorCode.MONEY_AMOUNT_MUST_BE_NON_NEGATIVE);
+            }
+            this.amount = normalize(amount, this.currency);
+        } else {
+            this.amount = normalize(requirePositiveAmount(amount), this.currency);
+        }
     }
 
     @JsonCreator
     public static Money of(@JsonProperty("amount") BigDecimal amount,
                            @JsonProperty("currency") CurrencyCode currency) {
         return new Money(amount, currency);
+    }
+
+    /** 创建允许零的余额金额；业务交易金额仍使用 of 并要求大于零。 */
+    public static Money ofNonNegative(BigDecimal amount, CurrencyCode currency) {
+        return new Money(amount, currency, true);
     }
 
     @JsonProperty("amount")

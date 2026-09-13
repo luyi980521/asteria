@@ -18,6 +18,7 @@
         <module>asteria-web</module>
         <module>asteria-currency</module>
         <module>asteria-account</module>
+        <module>asteria-balance</module>
         <module>asteria-ledger</module>
         <module>asteria-payment</module>
         <module>asteria-settlement</module>
@@ -39,6 +40,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.asteria</groupId>
+                <artifactId>asteria-balance</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
