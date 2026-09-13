@@ -1,5 +1,6 @@
 package io.asteria.currency.infrastructure.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -27,7 +28,8 @@ public class CurrencyDefinitionDO {
     private String symbol;
     private int minorUnit;
     private boolean enabled;
-    @TableField(updateStrategy = FieldStrategy.NEVER)
+    @TableField(fill = FieldFill.INSERT, updateStrategy = FieldStrategy.NEVER)
     private Instant createdAt;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Instant updatedAt;
 }

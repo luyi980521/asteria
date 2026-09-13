@@ -1,5 +1,7 @@
 package io.asteria.settlement.infrastructure.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -55,6 +57,7 @@ public class SettlementOutboxEventDO {
     /**
      * 事件创建时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private Instant createdAt;
 
     /**

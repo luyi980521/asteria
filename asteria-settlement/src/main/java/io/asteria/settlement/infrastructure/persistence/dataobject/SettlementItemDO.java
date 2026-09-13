@@ -1,5 +1,7 @@
 package io.asteria.settlement.infrastructure.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
@@ -50,5 +52,6 @@ public class SettlementItemDO {
     /**
      * 结算明细创建时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private Instant createdAt;
 }

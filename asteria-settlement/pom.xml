@@ -45,6 +45,10 @@
             <artifactId>asteria-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.asteria</groupId>
+            <artifactId>asteria-web</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>

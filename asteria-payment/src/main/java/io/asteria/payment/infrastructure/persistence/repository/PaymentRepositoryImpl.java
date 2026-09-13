@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 
 /**
  * Payment 仓储实现
@@ -55,7 +54,6 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                         dataObject.getAuthorizationTransactionId())
                 .set(PaymentDO::getAuthorizedAt, dataObject.getAuthorizedAt())
                 .set(PaymentDO::getCapturedAt, dataObject.getCapturedAt())
-                .set(PaymentDO::getUpdatedAt, new Date())
                 .set(PaymentDO::getVersion, existing.getVersion() + 1);
 
         log.info("Updating payment, paymentId={}, status={}, version={}",

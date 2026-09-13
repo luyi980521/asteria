@@ -2,7 +2,6 @@ package io.asteria.settlement.application.service;
 
 import io.asteria.settlement.application.command.CompleteSettlementBatchCommand;
 import io.asteria.settlement.application.command.CreateSettlementBatchCommand;
-import io.asteria.settlement.domain.entity.SettlementBatch;
 import io.asteria.settlement.domain.valueobject.SettlementBatchId;
 
 /**
@@ -13,7 +12,7 @@ public interface SettlementBatchApplicationService {
     /**
      * 创建结算批次。
      */
-    SettlementBatch create(CreateSettlementBatchCommand command);
+    SettlementBatchId create(CreateSettlementBatchCommand command);
 
     /**
      * 提交结算批次。

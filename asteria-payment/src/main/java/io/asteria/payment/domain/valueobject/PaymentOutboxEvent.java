@@ -32,7 +32,6 @@ public class PaymentOutboxEvent {
     /** 消息内容 */
     private final String payload;
 
-
     /** 发布状态 */
     private PaymentOutboxEventStatus status;
 

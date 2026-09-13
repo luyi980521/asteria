@@ -1,5 +1,7 @@
 package io.asteria.payment.infrastructure.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -25,9 +27,11 @@ public class PaymentDO {
     private String referenceId;
     private String status;
     private String authorizationTransactionId;
+    @TableField(fill = FieldFill.INSERT)
     private Date createdAt;
     private Date authorizedAt;
     private Date capturedAt;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updatedAt;
 
     @Version

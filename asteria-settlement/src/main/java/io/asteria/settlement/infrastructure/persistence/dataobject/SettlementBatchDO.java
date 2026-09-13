@@ -1,5 +1,7 @@
 package io.asteria.settlement.infrastructure.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
@@ -60,6 +62,7 @@ public class SettlementBatchDO {
     /**
      * 结算批次创建时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private Instant createdAt;
 
     /**
@@ -85,5 +88,6 @@ public class SettlementBatchDO {
     /**
      * 最后更新时间
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Instant updatedAt;
 }

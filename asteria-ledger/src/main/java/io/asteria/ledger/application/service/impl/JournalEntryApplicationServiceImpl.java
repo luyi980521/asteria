@@ -14,6 +14,7 @@ import io.asteria.ledger.domain.enums.JournalEntryReverseStatus;
 import io.asteria.ledger.domain.error.LedgerErrorCode;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
 import io.asteria.ledger.domain.repository.JournalEntryRepository;
+import io.asteria.ledger.domain.valueobject.EventId;
 import io.asteria.ledger.domain.valueobject.JournalEntryId;
 import io.asteria.ledger.domain.valueobject.PostingId;
 import lombok.extern.slf4j.Slf4j;
@@ -162,6 +163,7 @@ public class JournalEntryApplicationServiceImpl implements JournalEntryApplicati
         JournalEntry reversal = entry.reverse(
                 JournalEntryId.of(distributedIdGenerator.nextId()),
                 postingIds,
+                EventId.of(distributedIdGenerator.nextId()),
                 Instant.now(),
                 reason
         );

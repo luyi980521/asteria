@@ -1,6 +1,7 @@
 package io.asteria.ledger.domain.entity;
 
 import io.asteria.common.domain.valueobject.CurrencyCode;
+import io.asteria.ledger.domain.constants.LedgerSourceIds;
 import io.asteria.ledger.domain.enums.DebitCredit;
 import io.asteria.ledger.domain.enums.JournalEntryStatus;
 import io.asteria.ledger.domain.enums.JournalReferenceEventType;
@@ -156,6 +157,7 @@ public class JournalEntry {
      * */
     public JournalEntry reverse(JournalEntryId reversalJournalEntryId,
                                 List<PostingId> reversalPostingIds,
+                                EventId reversalEventId,
                                 Instant reversedAt,
                                 String reason) {
 
@@ -169,6 +171,7 @@ public class JournalEntry {
         JournalEntry reversalEntry = createReversal(
                 reversalJournalEntryId,
                 reversedPostings,
+                reversalEventId,
                 journalEntryId,
                 reason);
         reversalEntry.post(reversedAt);
@@ -181,6 +184,7 @@ public class JournalEntry {
 
     private JournalEntry createReversal(JournalEntryId reversalJournalEntryId,
                                         List<Posting> reversedPostings,
+                                        EventId reversalEventId,
                                         JournalEntryId originalJournalEntryId, String reason) {
 
         validatePostingCount(postings);
@@ -190,9 +194,9 @@ public class JournalEntry {
 
         JournalReference journalReference = new JournalReference(
                 JournalReferenceSourceType.JOURNAL_ENTRY.name(),
-                originalJournalEntryId.value().toString(),
+                LedgerSourceIds.journalEntry(originalJournalEntryId.value()),
                 JournalReferenceEventType.JOURNAL_ENTRY_REVERSED.name(),
-                EventId.generate().value()
+                reversalEventId.value().toString()
         );
 
         return JournalEntry.builder()

@@ -3,6 +3,7 @@ package io.asteria.settlement.infrastructure.persistence.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.asteria.settlement.infrastructure.persistence.dataobject.SettlementItemDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface SettlementItemMapper extends BaseMapper<SettlementItemDO> {
     /**
      * 批量插入结算明细。
      */
-    int batchInsert(List<SettlementItemDO> items);
+    int batchInsert(@Param("items") List<SettlementItemDO> items);
 }
 
 

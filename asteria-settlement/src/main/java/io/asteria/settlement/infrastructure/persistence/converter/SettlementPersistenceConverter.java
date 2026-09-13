@@ -12,7 +12,6 @@ import io.asteria.settlement.infrastructure.persistence.dataobject.SettlementBat
 import io.asteria.settlement.infrastructure.persistence.dataobject.SettlementItemDO;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -39,7 +38,6 @@ public class SettlementPersistenceConverter {
                 .acceptedAt(settlementBatch.getAcceptedAt())
                 .settledAt(settlementBatch.getSettledAt())
                 .failedAt(settlementBatch.getFailedAt())
-                .updatedAt(Instant.now())
                 .build();
     }
 

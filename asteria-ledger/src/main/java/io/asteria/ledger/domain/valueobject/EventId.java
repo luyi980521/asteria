@@ -1,24 +1,18 @@
 package io.asteria.ledger.domain.valueobject;
 
-import org.apache.commons.lang3.StringUtils;
+/**
+ * 事件ID
+ */
+public record EventId(Long value) {
 
-import java.util.UUID;
-
-public record EventId(String value) {
-
-    private static final String PREFIX = "evt_";
-
-    public EventId {
-        if (StringUtils.isBlank(value)) {
-            throw new IllegalArgumentException("Event id must not be blank");
+    /**
+     * 创建事件ID
+     */
+    public static EventId of(Long value) {
+        if (value == null || value <= 0) {
+            throw new IllegalArgumentException("Event id must be positive");
         }
-    }
 
-    public static EventId generate() {
-        String uuid = UUID.randomUUID()
-                .toString()
-                .replace("-", "");
-
-        return new EventId(PREFIX + uuid);
+        return new EventId(value);
     }
 }

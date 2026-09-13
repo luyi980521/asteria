@@ -5,8 +5,16 @@ package io.asteria.ledger.domain.constants;
  */
 public final class LedgerSourceIds {
 
+    private static final String JOURNAL_ENTRY__PREFIX = "JOURNAL_ENTRY_";
     private static final String PAYMENT_PREFIX = "PAYMENT_";
     private static final String SETTLEMENT_PREFIX = "SETTLEMENT_";
+
+    /**
+     * 生成账本 SourceId
+     */
+    public static String journalEntry(Long journalEntryId) {
+        return JOURNAL_ENTRY__PREFIX + journalEntryId;
+    }
 
     /**
      * 生成支付 SourceId

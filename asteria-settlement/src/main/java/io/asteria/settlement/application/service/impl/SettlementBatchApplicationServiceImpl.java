@@ -37,7 +37,7 @@ public class SettlementBatchApplicationServiceImpl implements SettlementBatchApp
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SettlementBatch create(CreateSettlementBatchCommand command) {
+    public SettlementBatchId create(CreateSettlementBatchCommand command) {
 
         SettlementBatchReference reference = SettlementBatchReference.builder()
                 .value(command.reference())
@@ -56,7 +56,7 @@ public class SettlementBatchApplicationServiceImpl implements SettlementBatchApp
                 settlementBatch.getReference().value(),
                 settlementBatch.getItems().size());
 
-        return settlementBatch;
+        return settlementBatch.getSettlementBatchId();
     }
 
     /**
