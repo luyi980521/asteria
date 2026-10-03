@@ -13,6 +13,7 @@ public enum BalanceErrorCode {
     RESERVATION_REQUEST_IDENTICAL("BALANCE_0009", "Reservation request is identical to the existing reservation"),
     RESERVATION_REQUEST_CONFLICT("BALANCE_0010", "Reservation request conflicts with the existing reservation"),
     RESERVATION_STATUS_INCORRECT("BALANCE_0011", "Reservation status is incorrect"),
+    BALANCE_ALREADY_EXISTS("BALANCE_0012", "Balance already exists"),
 
     ;
 

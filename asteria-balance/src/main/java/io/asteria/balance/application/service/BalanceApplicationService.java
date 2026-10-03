@@ -1,9 +1,6 @@
 package io.asteria.balance.application.service;
 
-import io.asteria.balance.application.command.ConsumeBalanceCommand;
-import io.asteria.balance.application.command.CreditBalanceCommand;
-import io.asteria.balance.application.command.ReleaseBalanceCommand;
-import io.asteria.balance.application.command.ReserveBalanceCommand;
+import io.asteria.balance.application.command.*;
 
 /**
  * 余额功能接口定义
@@ -29,4 +26,9 @@ public interface BalanceApplicationService {
      * 扣除预留余额：将预留金额正式从余额中扣除。
      */
     void consume(ConsumeBalanceCommand command);
+
+    /**
+     * 开户
+     */
+    void create(CreateBalanceCommand command);
 }

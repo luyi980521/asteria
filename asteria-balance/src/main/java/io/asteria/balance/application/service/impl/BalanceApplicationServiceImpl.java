@@ -1,9 +1,6 @@
 package io.asteria.balance.application.service.impl;
 
-import io.asteria.balance.application.command.ConsumeBalanceCommand;
-import io.asteria.balance.application.command.CreditBalanceCommand;
-import io.asteria.balance.application.command.ReleaseBalanceCommand;
-import io.asteria.balance.application.command.ReserveBalanceCommand;
+import io.asteria.balance.application.command.*;
 import io.asteria.balance.application.service.BalanceApplicationService;
 import io.asteria.balance.domain.entity.Balance;
 import io.asteria.balance.domain.entity.BalanceMovement;
@@ -15,6 +12,7 @@ import io.asteria.balance.domain.exception.BalanceDomainException;
 import io.asteria.balance.domain.repository.BalanceMovementRepository;
 import io.asteria.balance.domain.repository.BalanceRepository;
 import io.asteria.balance.domain.repository.BalanceReservationRepository;
+import io.asteria.balance.domain.valueobject.BalanceId;
 import io.asteria.balance.domain.valueobject.BalanceMovementId;
 import io.asteria.balance.domain.valueobject.BalanceReservationId;
 import io.asteria.common.application.port.DistributedIdGenerator;
@@ -284,5 +282,28 @@ public class BalanceApplicationServiceImpl implements BalanceApplicationService 
         balanceMovementRepository.save(newBalanceMovement);
         balanceReservationRepository.update(oldReservation);
         balanceRepository.update(oldBalance);
+    }
+
+    /**
+     * 开户
+     */
+    @Override
+    public void create(CreateBalanceCommand command) {
+
+        Optional<Balance> oldBalanceOptional = balanceRepository.findByBalanceAccountIdAndCurrency(
+                command.getBalanceAccountId(), command.getCurrency()
+        );
+        if (oldBalanceOptional.isPresent()) {
+            log.warn("Balance already exists: {}, {}", command.getBalanceAccountId().value(), command.getCurrency());
+            throw new BalanceDomainException(BalanceErrorCode.BALANCE_ALREADY_EXISTS);
+        }
+        Balance newBalance = Balance.create(
+                BalanceId.of(distributedIdGenerator.nextId()),
+                command.getBalanceAccountId(),
+                command.getCurrency()
+        );
+        balanceRepository.save(newBalance);
+        log.info("Balance create successfully: {}, {}",
+                command.getBalanceAccountId().value(), command.getCurrency());
     }
 }

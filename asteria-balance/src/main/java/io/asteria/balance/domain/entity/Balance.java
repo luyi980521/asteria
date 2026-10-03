@@ -10,6 +10,7 @@ import io.asteria.common.domain.valueobject.Money;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -66,6 +67,25 @@ public final class Balance {
         this.version = version;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    /** 创建指定余额账户及币种的余额，初始可用金额、预留金额和版本均为零。 */
+    public static Balance create(BalanceId balanceId, BalanceAccountId balanceAccountId, CurrencyCode currency) {
+        if (balanceId == null || balanceAccountId == null || currency == null) {
+            throw new BalanceDomainException(BalanceErrorCode.INVALID_PARAMS);
+        }
+        Instant now = Instant.now();
+        Money zero = Money.ofNonNegative(BigDecimal.ZERO, currency);
+        return Balance.builder()
+                .balanceId(balanceId)
+                .balanceAccountId(balanceAccountId)
+                .currency(currency)
+                .availableAmount(zero)
+                .reservedAmount(zero)
+                .version(0L)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
     }
 
     /** 入账至可用余额。 */
