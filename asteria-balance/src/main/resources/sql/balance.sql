@@ -22,6 +22,6 @@ COMMENT ON COLUMN balance.balance_account_id IS '余额账户ID，当前不映�
 COMMENT ON COLUMN balance.currency IS '币种，可用金额与预留金额共用';
 COMMENT ON COLUMN balance.available_amount IS '可用余额，允许零，不允许负数';
 COMMENT ON COLUMN balance.reserved_amount IS '预留余额，允许零，不允许负数';
-COMMENT ON COLUMN balance.version IS '乐观锁版本，后续条件更新时检查并递增';
+COMMENT ON COLUMN balance.version IS '乐观锁版本，条件更新时由数据库检查并递增';
 COMMENT ON COLUMN balance.created_at IS '创建时间';
 COMMENT ON COLUMN balance.updated_at IS '最后更新时间，由应用更新';

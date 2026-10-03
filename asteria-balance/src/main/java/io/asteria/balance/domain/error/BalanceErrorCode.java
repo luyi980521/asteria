@@ -7,7 +7,9 @@ public enum BalanceErrorCode {
     INSUFFICIENT_AVAILABLE_BALANCE("BALANCE_0003", "Insufficient available balance"),
     INSUFFICIENT_RESERVED_BALANCE("BALANCE_0004", "Insufficient reserved balance"),
     INVALID_BALANCE_STATE("BALANCE_0005", "Invalid balance state"),
-    INVALID_PARAMS("BALANCE_0006", "Invalid balance parameters");
+    INVALID_PARAMS("BALANCE_0006", "Invalid balance parameters"),
+    INVALID_RESERVATION_STATE("BALANCE_0007", "Invalid reservation state"),
+    BALANCE_CONCURRENT_MODIFICATION("BALANCE_0008", "Balance was concurrently modified");
 
     /** 错误码 */
     private final String code;

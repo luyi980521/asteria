@@ -12,7 +12,7 @@ import lombok.Getter;
 import java.time.Instant;
 
 /**
- * 余额预留快照；当前不实现状态流转。
+ * 余额预留；仅生效中的预留可释放或消费。
  * */
 @Getter
 public final class BalanceReservation {
@@ -24,7 +24,7 @@ public final class BalanceReservation {
     private final BalanceId balanceId;
 
     /** 预留状态 */
-    private final BalanceReservationStatus status;
+    private BalanceReservationStatus status;
 
     /** 含币种的正数金额 */
     private final Money amount;
@@ -39,7 +39,7 @@ public final class BalanceReservation {
     private final Instant createdAt;
 
     /** 最后更新时间 */
-    private final Instant updatedAt;
+    private Instant updatedAt;
 
     @Builder
     private BalanceReservation(BalanceReservationId reservationId, BalanceId balanceId,
@@ -63,5 +63,25 @@ public final class BalanceReservation {
         this.referenceId = referenceId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    /** 释放生效中的预留。 */
+    public void release() {
+        requireReservedState();
+        status = BalanceReservationStatus.RELEASED;
+        updatedAt = Instant.now();
+    }
+
+    /** 消费生效中的预留。 */
+    public void consume() {
+        requireReservedState();
+        status = BalanceReservationStatus.CONSUMED;
+        updatedAt = Instant.now();
+    }
+
+    private void requireReservedState() {
+        if (status != BalanceReservationStatus.RESERVED) {
+            throw new BalanceDomainException(BalanceErrorCode.INVALID_RESERVATION_STATE);
+        }
     }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.balance.infrastructure.persistence.mapper.BalanceMapper">
+    <resultMap id="BaseResultMap" type="io.asteria.balance.infrastructure.persistence.dataobject.BalanceDO">
+        <id property="id" column="id"/>
+        <result property="balanceAccountId" column="balance_account_id"/>
+        <result property="currency" column="currency"/>
+        <result property="availableAmount" column="available_amount"/>
+        <result property="reservedAmount" column="reserved_amount"/>
+        <result property="version" column="version"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, balance_account_id, currency, available_amount, reserved_amount, version, created_at, updated_at
+    </sql>
+
+    <select id="findByBalanceId" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM balance WHERE id = #{id}
+    </select>
+
+    <select id="findByBalanceAccountIdAndCurrency" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM balance
+        WHERE balance_account_id = #{balanceAccountId} AND currency = #{currency}
+    </select>
+
+    <update id="updateWithVersion">
+        UPDATE balance
+        SET available_amount = #{availableAmount},
+            reserved_amount = #{reservedAmount},
+            version = version + 1,
+            updated_at = #{updatedAt}
+        WHERE id = #{id} AND version = #{version}
+    </update>
+</mapper>

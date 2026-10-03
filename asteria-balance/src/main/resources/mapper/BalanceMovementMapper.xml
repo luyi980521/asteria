@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.balance.infrastructure.persistence.mapper.BalanceMovementMapper">
+    <resultMap id="BaseResultMap" type="io.asteria.balance.infrastructure.persistence.dataobject.BalanceMovementDO">
+        <id property="id" column="id"/>
+        <result property="balanceId" column="balance_id"/>
+        <result property="movementType" column="movement_type"/>
+        <result property="amount" column="amount"/>
+        <result property="currency" column="currency"/>
+        <result property="referenceType" column="reference_type"/>
+        <result property="referenceId" column="reference_id"/>
+        <result property="eventId" column="event_id"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, balance_id, movement_type, amount, currency, reference_type, reference_id, event_id, created_at
+    </sql>
+
+    <select id="existsByEventIdAndBalanceIdAndMovementType" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM balance_movement
+            WHERE event_id = #{eventId} AND balance_id = #{balanceId} AND movement_type = #{movementType}
+        )
+    </select>
+</mapper>

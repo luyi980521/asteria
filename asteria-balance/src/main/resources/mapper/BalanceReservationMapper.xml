@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.balance.infrastructure.persistence.mapper.BalanceReservationMapper">
+    <resultMap id="BaseResultMap" type="io.asteria.balance.infrastructure.persistence.dataobject.BalanceReservationDO">
+        <id property="id" column="id"/>
+        <result property="balanceId" column="balance_id"/>
+        <result property="amount" column="amount"/>
+        <result property="currency" column="currency"/>
+        <result property="status" column="status"/>
+        <result property="referenceType" column="reference_type"/>
+        <result property="referenceId" column="reference_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, balance_id, amount, currency, status, reference_type, reference_id, created_at, updated_at
+    </sql>
+
+    <select id="findByReservationId" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM balance_reservation WHERE id = #{id}
+    </select>
+
+    <select id="findByBalanceIdAndReference" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM balance_reservation
+        WHERE balance_id = #{balanceId} AND reference_type = #{referenceType} AND reference_id = #{referenceId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE balance_reservation
+        SET status = #{status}, updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+</mapper>

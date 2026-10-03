@@ -54,7 +54,7 @@ class BalanceRecordTest {
     }
 
     @Test
-    void reservationCanRepresentEachStatusWithoutImplementingTransitions() {
+    void reservationCanRepresentEachStatusAndRejectsInvalidInput() {
         for (BalanceReservationStatus status : BalanceReservationStatus.values()) {
             assertEquals(status, reservationBuilder().status(status).build().getStatus());
         }
@@ -63,6 +63,40 @@ class BalanceRecordTest {
         assertError(BalanceErrorCode.INVALID_PARAMS, () -> reservationBuilder().referenceType(" ").build());
         assertError(BalanceErrorCode.INVALID_AMOUNT, () -> reservationBuilder().amount(null).build());
         assertError(BalanceErrorCode.INVALID_AMOUNT, () -> reservationBuilder().amount(ZERO).build());
+    }
+
+    @Test
+    void reservationReleaseUpdatesStatusAndTimestamp() {
+        BalanceReservation reservation = reservationBuilder().build();
+        Instant before = Instant.now();
+        reservation.release();
+        assertEquals(BalanceReservationStatus.RELEASED, reservation.getStatus());
+        assertFalse(reservation.getUpdatedAt().isBefore(before));
+        assertFalse(reservation.getUpdatedAt().isAfter(Instant.now()));
+        assertEquals(CREATED, reservation.getCreatedAt());
+    }
+
+    @Test
+    void reservationConsumeUpdatesStatusAndTimestamp() {
+        BalanceReservation reservation = reservationBuilder().build();
+        Instant before = Instant.now();
+        reservation.consume();
+        assertEquals(BalanceReservationStatus.CONSUMED, reservation.getStatus());
+        assertFalse(reservation.getUpdatedAt().isBefore(before));
+        assertFalse(reservation.getUpdatedAt().isAfter(Instant.now()));
+        assertEquals(CREATED, reservation.getCreatedAt());
+    }
+
+    @Test
+    void terminalReservationsRejectBothTransitionsWithoutChangingState() {
+        for (BalanceReservationStatus status : Arrays.asList(
+                BalanceReservationStatus.RELEASED, BalanceReservationStatus.CONSUMED)) {
+            BalanceReservation reservation = reservationBuilder().status(status).build();
+            assertError(BalanceErrorCode.INVALID_RESERVATION_STATE, reservation::release);
+            assertError(BalanceErrorCode.INVALID_RESERVATION_STATE, reservation::consume);
+            assertEquals(status, reservation.getStatus());
+            assertEquals(CREATED, reservation.getUpdatedAt());
+        }
     }
 
     private static BalanceMovement.BalanceMovementBuilder movementBuilder() {
