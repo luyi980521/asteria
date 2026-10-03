@@ -65,6 +65,22 @@ public final class BalanceReservation {
         this.updatedAt = updatedAt;
     }
 
+    /** 创建生效中的余额预留记录。 */
+    public static BalanceReservation create(BalanceReservationId reservationId, BalanceId balanceId,
+                                            Money amount, String referenceType, String referenceId) {
+        Instant now = Instant.now();
+        return BalanceReservation.builder()
+                .reservationId(reservationId)
+                .balanceId(balanceId)
+                .status(BalanceReservationStatus.RESERVED)
+                .amount(amount)
+                .referenceType(referenceType)
+                .referenceId(referenceId)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
     /** 释放生效中的预留。 */
     public void release() {
         requireReservedState();

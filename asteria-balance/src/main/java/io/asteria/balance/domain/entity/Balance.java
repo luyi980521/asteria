@@ -1,5 +1,6 @@
 package io.asteria.balance.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.Version;
 import io.asteria.balance.domain.error.BalanceErrorCode;
 import io.asteria.balance.domain.exception.BalanceDomainException;
 import io.asteria.balance.domain.valueobject.BalanceAccountId;
@@ -33,6 +34,7 @@ public final class Balance {
     private Money reservedAmount;
 
     /** 持久化乐观锁版本，领域操作不自行递增 */
+    @Version
     private final Long version;
 
     /** 创建时间 */

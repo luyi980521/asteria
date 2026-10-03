@@ -9,7 +9,12 @@ public enum BalanceErrorCode {
     INVALID_BALANCE_STATE("BALANCE_0005", "Invalid balance state"),
     INVALID_PARAMS("BALANCE_0006", "Invalid balance parameters"),
     INVALID_RESERVATION_STATE("BALANCE_0007", "Invalid reservation state"),
-    BALANCE_CONCURRENT_MODIFICATION("BALANCE_0008", "Balance was concurrently modified");
+    BALANCE_CONCURRENT_MODIFICATION("BALANCE_0008", "Balance was concurrently modified"),
+    RESERVATION_REQUEST_IDENTICAL("BALANCE_0009", "Reservation request is identical to the existing reservation"),
+    RESERVATION_REQUEST_CONFLICT("BALANCE_0010", "Reservation request conflicts with the existing reservation"),
+    RESERVATION_STATUS_INCORRECT("BALANCE_0011", "Reservation status is incorrect"),
+
+    ;
 
     /** 错误码 */
     private final String code;

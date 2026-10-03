@@ -64,4 +64,22 @@ public final class BalanceMovement {
         this.eventId = eventId;
         this.createdAt = createdAt;
     }
+
+    /**
+     * 创建可用余额入账流水
+     * */
+    public static BalanceMovement create(BalanceMovementId balanceMovementId, BalanceId balanceId,
+                                         BalanceMovementType movementType, Money amount, String referenceType,
+                                         String referenceId, String eventId) {
+        return BalanceMovement.builder()
+                .movementId(balanceMovementId)
+                .balanceId(balanceId)
+                .movementType(movementType)
+                .amount(amount)
+                .referenceType(referenceType)
+                .referenceId(referenceId)
+                .eventId(eventId)
+                .createdAt(Instant.now())
+                .build();
+    }
 }
