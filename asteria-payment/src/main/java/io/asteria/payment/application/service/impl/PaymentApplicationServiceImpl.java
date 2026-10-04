@@ -1,5 +1,8 @@
 package io.asteria.payment.application.service.impl;
 
+import io.asteria.balance.api.request.ConsumeBalanceRequest;
+import io.asteria.balance.api.request.ReleaseBalanceRequest;
+import io.asteria.balance.api.request.ReserveBalanceRequest;
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
 import io.asteria.common.util.ServiceResponseUtils;
@@ -21,6 +24,7 @@ import io.asteria.payment.domain.repository.PaymentRepository;
 import io.asteria.payment.domain.valueobject.PaymentId;
 import io.asteria.payment.domain.valueobject.PaymentOutboxEvent;
 import io.asteria.payment.infrastructure.client.LedgerClient;
+import io.asteria.payment.infrastructure.client.BalanceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,6 +47,7 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
     private final PaymentTransactionService paymentTransactionService;
     private final PaymentChannel paymentChannel;
     private final LedgerClient ledgerClient;
+    private final BalanceClient balanceClient;
     private final PaymentOutboxEventRepository paymentOutboxEventRepository;
 
     /**
@@ -87,6 +92,16 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
         // 将支付流程推进为授权中并更新状态
         Payment payment = paymentTransactionService.startAuthorization(paymentId);
 
+        ReserveBalanceRequest reserveBalanceRequest = ReserveBalanceRequest.builder()
+                .merchantId(payment.getMerchantId())
+                .currency(payment.getAmount().currency().value())
+                .amount(payment.getAmount().amount())
+                .referenceType(payment.getReference().referenceType())
+                .referenceId(payment.getReference().referenceId())
+                .eventId(payment.getPaymentId().value())
+                .build();
+        ServiceResponseUtils.getData(balanceClient.reserve(reserveBalanceRequest));
+
         AuthorizationRequest authorizationRequest = AuthorizationRequest.builder()
                 .paymentId(paymentId)
                 .amount(payment.getAmount())
@@ -94,6 +109,21 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
                 .build();
         PaymentChannel paymentChannel = paymentChannelRouter.route(payment);
         AuthorizationResult authorizationResult = paymentChannel.authorize(authorizationRequest);
+        // An exception or unknown result leaves the reservation in place for recovery.
+        if (authorizationResult == null || authorizationResult.isUnknown()) {
+            log.warn("Authorization remains unknown, paymentId: {}", paymentId.value());
+            return;
+        }
+        if (!authorizationResult.success()) {
+            ReleaseBalanceRequest releaseBalanceRequest = ReleaseBalanceRequest.builder()
+                    .merchantId(payment.getMerchantId())
+                    .currency(payment.getAmount().currency().value())
+                    .referenceType(payment.getReference().referenceType())
+                    .referenceId(payment.getReference().referenceId())
+                    .eventId(payment.getPaymentId().value())
+                    .build();
+            ServiceResponseUtils.getData(balanceClient.release(releaseBalanceRequest));
+        }
         paymentTransactionService.completeAuthorization(paymentId, authorizationResult);
         if (authorizationResult.success()) {
             log.info("Authorization succeeded, paymentId: {}", paymentId.value());
@@ -121,6 +151,13 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
                 .build();
         PaymentChannel paymentChannel = paymentChannelRouter.route(payment);
         CaptureResult captureResult = paymentChannel.capture(captureRequest);
+        if (captureResult == null || captureResult.isUnknown()) {
+            log.warn("Capture remains unknown, paymentId: {}", paymentId.value());
+            return;
+        }
+        if (captureResult.success()) {
+            consumeBalance(payment);
+        }
         paymentTransactionService.completeCapture(paymentId, captureResult);
         if (captureResult.success()) {
             log.info("Capture succeeded, paymentId: {}", paymentId.value());
@@ -145,6 +182,7 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
         // 回查捕获状态并将内部状态更新为匹配的状态
         CaptureQueryResult captureQueryResult = paymentChannel.queryCapture(payment);
         if (captureQueryResult.isSuccess()) {
+            consumeBalance(payment);
             paymentTransactionService.completeCapture(
                     paymentId, CaptureResult.success(captureQueryResult.channelTransactionId())
             );
@@ -161,6 +199,17 @@ public class PaymentApplicationServiceImpl implements PaymentApplicationService 
         }
 
         log.warn("Capture recovery remains unknown, paymentId: {}", paymentId.value());
+    }
+
+    private void consumeBalance(Payment payment) {
+        ConsumeBalanceRequest consumeBalanceRequest = ConsumeBalanceRequest.builder()
+                .merchantId(payment.getMerchantId())
+                .currency(payment.getAmount().currency().value())
+                .referenceType(payment.getReference().referenceType())
+                .referenceId(payment.getReference().referenceId())
+                .eventId(payment.getPaymentId().value())
+                .build();
+        ServiceResponseUtils.getData(balanceClient.consume(consumeBalanceRequest));
     }
 
     /**

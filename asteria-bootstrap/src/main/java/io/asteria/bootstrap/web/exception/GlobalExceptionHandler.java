@@ -1,5 +1,6 @@
 package io.asteria.bootstrap.web.exception;
 
+import io.asteria.balance.domain.exception.BalanceDomainException;
 import io.asteria.common.domain.exception.CommonDomainException;
 import io.asteria.common.application.exception.RemoteServiceException;
 import io.asteria.currency.domain.exception.CurrencyDomainException;
@@ -19,6 +20,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BalanceDomainException.class)
+    public ApiResponse<Void> handleBalanceDomainException(BalanceDomainException exception) {
+        log.warn("Balance domain exception, code: {}, message: {}",
+                exception.errorCode().code(), exception.getMessage(), exception);
+        return ApiResponse.failure(exception.errorCode().code(), exception.getMessage());
+    }
 
     /** Preserves downstream error details using the common HTTP envelope. */
     @ResponseStatus(HttpStatus.BAD_GATEWAY)

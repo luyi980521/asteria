@@ -18,6 +18,7 @@
         <module>asteria-web</module>
         <module>asteria-currency</module>
         <module>asteria-account</module>
+        <module>asteria-balance-api</module>
         <module>asteria-balance</module>
         <module>asteria-ledger</module>
         <module>asteria-payment</module>
@@ -40,6 +41,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.asteria</groupId>
+                <artifactId>asteria-balance-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.asteria</groupId>
                 <artifactId>asteria-balance</artifactId>

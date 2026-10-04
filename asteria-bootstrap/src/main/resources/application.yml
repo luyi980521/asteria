@@ -31,6 +31,8 @@ mybatis-plus:
 
 asteria:
   service:
+    balance:
+      url: http://localhost:${server.port}
     ledger:
       url: http://localhost:${server.port}
   id-generator:

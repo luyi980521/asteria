@@ -10,6 +10,16 @@ public record CaptureResult(
         String failureMessage
 ) {
 
+    /** No definitive channel outcome; retain the reservation and local in-flight state. */
+    public static CaptureResult unknown() {
+        return new CaptureResult(false, null, null, null);
+    }
+
+    public boolean isUnknown() {
+        return !success && (failureCode == null || failureCode.isBlank()
+                || "UNKNOWN".equalsIgnoreCase(failureCode) || "TIMEOUT".equalsIgnoreCase(failureCode));
+    }
+
     /**
      * 创建捕获成功结果
      */

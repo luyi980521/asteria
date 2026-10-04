@@ -12,9 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class BalanceAccountApplicationServiceImpl implements BalanceAccountApplicationService {
+
     private final BalanceAccountRepository repository;
     private final DistributedIdGenerator distributedIdGenerator;
 
@@ -27,7 +30,7 @@ public class BalanceAccountApplicationServiceImpl implements BalanceAccountAppli
         if (ownerType == null || ownerId == null || ownerId <= 0) {
             throw new BalanceDomainException(BalanceErrorCode.INVALID_PARAMS);
         }
-        var existing = repository.findByOwner(ownerType, ownerId);
+        Optional<BalanceAccount> existing = repository.findByOwner(ownerType, ownerId);
         if (existing.isPresent()) {
             return existing.get().getBalanceAccountId();
         }
