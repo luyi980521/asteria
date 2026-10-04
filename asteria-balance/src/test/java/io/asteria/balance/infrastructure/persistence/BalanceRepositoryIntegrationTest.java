@@ -2,14 +2,18 @@ package io.asteria.balance.infrastructure.persistence;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.MybatisSqlSessionFactoryBuilder;
+import io.asteria.balance.domain.entity.BalanceAccount;
 import io.asteria.balance.domain.entity.Balance;
 import io.asteria.balance.domain.entity.BalanceMovement;
 import io.asteria.balance.domain.entity.BalanceReservation;
 import io.asteria.balance.domain.enums.BalanceMovementType;
+import io.asteria.balance.domain.enums.BalanceAccountOwnerType;
+import io.asteria.balance.domain.enums.BalanceAccountStatus;
 import io.asteria.balance.domain.enums.BalanceReservationStatus;
 import io.asteria.balance.domain.error.BalanceErrorCode;
 import io.asteria.balance.domain.exception.BalanceDomainException;
 import io.asteria.balance.domain.repository.BalanceMovementRepository;
+import io.asteria.balance.domain.repository.BalanceAccountRepository;
 import io.asteria.balance.domain.repository.BalanceRepository;
 import io.asteria.balance.domain.repository.BalanceReservationRepository;
 import io.asteria.balance.domain.valueobject.BalanceAccountId;
@@ -17,12 +21,15 @@ import io.asteria.balance.domain.valueobject.BalanceId;
 import io.asteria.balance.domain.valueobject.BalanceMovementId;
 import io.asteria.balance.domain.valueobject.BalanceReservationId;
 import io.asteria.balance.infrastructure.persistence.converter.BalanceMovementPersistenceConverter;
+import io.asteria.balance.infrastructure.persistence.converter.BalanceAccountPersistenceConverter;
 import io.asteria.balance.infrastructure.persistence.converter.BalancePersistenceConverter;
 import io.asteria.balance.infrastructure.persistence.converter.BalanceReservationPersistenceConverter;
 import io.asteria.balance.infrastructure.persistence.mapper.BalanceMovementMapper;
+import io.asteria.balance.infrastructure.persistence.mapper.BalanceAccountMapper;
 import io.asteria.balance.infrastructure.persistence.mapper.BalanceMapper;
 import io.asteria.balance.infrastructure.persistence.mapper.BalanceReservationMapper;
 import io.asteria.balance.infrastructure.persistence.repository.BalanceMovementRepositoryImpl;
+import io.asteria.balance.infrastructure.persistence.repository.BalanceAccountRepositoryImpl;
 import io.asteria.balance.infrastructure.persistence.repository.BalanceRepositoryImpl;
 import io.asteria.balance.infrastructure.persistence.repository.BalanceReservationRepositoryImpl;
 import io.asteria.common.domain.valueobject.CurrencyCode;
@@ -40,6 +47,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -52,6 +60,7 @@ class BalanceRepositoryIntegrationTest {
     private static final BalanceId BALANCE_ID = BalanceId.of(1L);
     private static final Instant CREATED = Instant.parse("2026-01-01T00:00:00Z");
     private SqlSession session;
+    private BalanceAccountRepository accounts;
     private BalanceRepository balances;
     private BalanceReservationRepository reservations;
     private BalanceMovementRepository movements;
@@ -65,7 +74,8 @@ class BalanceRepositoryIntegrationTest {
                 System.getenv("ASTERIA_BALANCE_TEST_DB_USER"), System.getenv("ASTERIA_BALANCE_TEST_DB_PASSWORD"));
         configuration.setEnvironment(new Environment("balance-test", new JdbcTransactionFactory(), dataSource));
         configuration.setLocalCacheScope(LocalCacheScope.STATEMENT);
-        for (String mapper : new String[]{"BalanceMapper", "BalanceReservationMapper", "BalanceMovementMapper"}) {
+        for (String mapper : new String[]{"BalanceAccountMapper", "BalanceMapper",
+                "BalanceReservationMapper", "BalanceMovementMapper"}) {
             String resource = "mapper/" + mapper + ".xml";
             try (var input = getClass().getClassLoader().getResourceAsStream(resource)) {
                 assertNotNull(input, resource);
@@ -76,7 +86,7 @@ class BalanceRepositoryIntegrationTest {
         connection.setAutoCommit(false);
         session = new MybatisSqlSessionFactoryBuilder().build(configuration).openSession(connection);
         // 临时表仅对当前连接可见；关闭连接并回滚，不改动已有业务表。
-        for (String table : new String[]{"balance", "balance_reservation", "balance_movement"}) {
+        for (String table : new String[]{"balance_account", "balance", "balance_reservation", "balance_movement"}) {
             try (var input = getClass().getClassLoader().getResourceAsStream("sql/" + table + ".sql");
                  var statement = connection.createStatement()) {
                 assertNotNull(input, table);
@@ -85,6 +95,8 @@ class BalanceRepositoryIntegrationTest {
                 statement.execute(sql);
             }
         }
+        accounts = new BalanceAccountRepositoryImpl(session.getMapper(BalanceAccountMapper.class),
+                new BalanceAccountPersistenceConverter());
         balances = new BalanceRepositoryImpl(session.getMapper(BalanceMapper.class), new BalancePersistenceConverter());
         reservations = new BalanceReservationRepositoryImpl(session.getMapper(BalanceReservationMapper.class),
                 new BalanceReservationPersistenceConverter());
@@ -182,6 +194,41 @@ class BalanceRepositoryIntegrationTest {
         assertFalse(movements.existsByEventIdAndBalanceIdAndMovementType("event-1", BALANCE_ID,
                 BalanceMovementType.RESERVE));
         assertThrows(PersistenceException.class, () -> movements.save(movement(6L)));
+    }
+
+    @Test
+    void accountQueriesPreserveOwnerTypeStatusAndTimestamps() {
+        assertTrue(accounts.findByBalanceAccountId(BalanceAccountId.of(10L)).isEmpty());
+        assertTrue(accounts.findByOwner(BalanceAccountOwnerType.MERCHANT, 100L).isEmpty());
+        for (BalanceAccountOwnerType ownerType : BalanceAccountOwnerType.values()) {
+            BalanceAccountStatus status = BalanceAccountStatus.values()[ownerType.ordinal()];
+            BalanceAccount account = BalanceAccount.builder()
+                    .balanceAccountId(BalanceAccountId.of(10L + ownerType.ordinal()))
+                    .ownerType(ownerType).ownerId(100L).status(status)
+                    .createdAt(CREATED).updatedAt(CREATED).build();
+            accounts.save(account);
+            BalanceAccount byId = accounts.findByBalanceAccountId(account.getBalanceAccountId()).orElseThrow();
+            BalanceAccount byOwner = accounts.findByOwner(ownerType, 100L).orElseThrow();
+            for (BalanceAccount restored : new BalanceAccount[]{byId, byOwner}) {
+                assertEquals(account.getBalanceAccountId(), restored.getBalanceAccountId());
+                assertEquals(ownerType, restored.getOwnerType());
+                assertEquals(100L, restored.getOwnerId());
+                assertEquals(status, restored.getStatus());
+                assertEquals(CREATED, restored.getCreatedAt());
+                assertEquals(CREATED, restored.getUpdatedAt());
+            }
+        }
+    }
+
+    @Test
+    void accountOwnerMustBeUnique() {
+        accounts.save(BalanceAccount.create(BalanceAccountId.of(10L), BalanceAccountOwnerType.MERCHANT, 100L));
+
+        PersistenceException exception = assertThrows(PersistenceException.class,
+                () -> accounts.save(BalanceAccount.create(
+                        BalanceAccountId.of(11L), BalanceAccountOwnerType.MERCHANT, 100L)));
+
+        assertEquals("23505", assertInstanceOf(SQLException.class, exception.getCause()).getSQLState());
     }
 
     private static Balance balance() {

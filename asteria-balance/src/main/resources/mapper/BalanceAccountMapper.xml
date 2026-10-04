@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.balance.infrastructure.persistence.mapper.BalanceAccountMapper">
+    <resultMap id="BaseResultMap" type="io.asteria.balance.infrastructure.persistence.dataobject.BalanceAccountDO">
+        <id property="balanceAccountId" column="id"/>
+        <result property="ownerType" column="owner_type"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, owner_type, owner_id, status, created_at, updated_at
+    </sql>
+
+    <select id="findByBalanceAccountId" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM balance_account WHERE id = #{balanceAccountId}
+    </select>
+
+    <select id="findByOwner" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM balance_account
+        WHERE owner_type = #{ownerType} AND owner_id = #{ownerId}
+    </select>
+</mapper>
