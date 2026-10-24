@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationRuleMapper">
+    <!-- 显式映射列名，JSON 文本以 String 原样存取，金额与币种分别保存。 -->
+    <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationRuleDO">
+        <id property="id" column="id"/>
+        <result property="ruleCode" column="rule_code"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="leftSourceType" column="left_source_type"/>
+        <result property="rightSourceType" column="right_source_type"/>
+        <result property="enabled" column="enabled"/>
+        <result property="gracePeriodSeconds" column="grace_period_seconds"/>
+        <result property="details" column="details"/>
+        <result property="version" column="version"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, rule_code, name, type, left_source_type, right_source_type, enabled, grace_period_seconds, details, version, created_at, updated_at
+    </sql>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_rule WHERE id = #{id}
+    </select>
+
+    <!-- 按稳定规则编码读取当前版本。 -->
+    <select id="findByRuleCode" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_rule
+        WHERE rule_code = #{ruleCode}
+    </select>
+
+    <!-- 冲突由受影响行数报告；身份、业务关联、规则快照及创建时间不允许被覆盖。 -->
+    <update id="updateWithVersion">
+        UPDATE reconciliation_rule
+        SET enabled = #{enabled},
+            grace_period_seconds = #{gracePeriodSeconds},
+            details = #{details},
+            updated_at = #{updatedAt},
+            version = version + 1
+        WHERE id = #{id} AND version = #{version}
+    </update>
+</mapper>

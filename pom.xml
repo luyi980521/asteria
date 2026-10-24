@@ -22,6 +22,7 @@
         <module>asteria-ledger</module>
         <module>asteria-payment</module>
         <module>asteria-settlement</module>
+        <module>asteria-reconciliation</module>
         <module>asteria-infrastructure</module>
     </modules>
 
@@ -40,6 +41,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.asteria</groupId>
+                <artifactId>asteria-reconciliation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.asteria</groupId>
                 <artifactId>asteria-balance</artifactId>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationCaseActionMapper">
+    <!-- 显式映射列名，JSON 文本以 String 原样存取，金额与币种分别保存。 -->
+    <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationCaseActionDO">
+        <id property="id" column="id"/>
+        <result property="caseId" column="case_id"/>
+        <result property="actionType" column="action_type"/>
+        <result property="operatorType" column="operator_type"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="fromStatus" column="from_status"/>
+        <result property="toStatus" column="to_status"/>
+        <result property="reason" column="reason"/>
+        <result property="details" column="details"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, case_id, action_type, operator_type, operator_id, from_status, to_status, reason, details, created_at
+    </sql>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_case_action WHERE id = #{id}
+    </select>
+</mapper>

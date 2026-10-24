@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationSourceRecordMapper">
+    <!-- 显式映射列名，JSON 文本以 String 原样存取，金额与币种分别保存。 -->
+    <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationSourceRecordDO">
+        <id property="id" column="id"/>
+        <result property="sourceType" column="source_type"/>
+        <result property="sourceRecordId" column="source_record_id"/>
+        <result property="sourceVersion" column="source_version"/>
+        <result property="businessKey" column="business_key"/>
+        <result property="amount" column="amount"/>
+        <result property="currency" column="currency"/>
+        <result property="sourceStatus" column="source_status"/>
+        <result property="postingStatus" column="posting_status"/>
+        <result property="occurredAt" column="occurred_at"/>
+        <result property="payload" column="payload"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, source_type, source_record_id, source_version, business_key, amount, currency, source_status, posting_status, occurred_at, payload, created_at
+    </sql>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_source_record WHERE id = #{id}
+    </select>
+
+    <!-- 按来源幂等键读取不可变快照。 -->
+    <select id="findBySource" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_source_record
+        WHERE source_type = #{sourceType} AND source_record_id = #{sourceRecordId} AND source_version = #{sourceVersion}
+    </select>
+</mapper>

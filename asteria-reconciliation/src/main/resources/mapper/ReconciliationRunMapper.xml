@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationRunMapper">
+    <!-- 显式映射列名，JSON 文本以 String 原样存取，金额与币种分别保存。 -->
+    <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationRunDO">
+        <id property="id" column="id"/>
+        <result property="ruleCode" column="rule_code"/>
+        <result property="ruleVersion" column="rule_version"/>
+        <result property="type" column="type"/>
+        <result property="ruleSnapshot" column="rule_snapshot"/>
+        <result property="windowStart" column="window_start"/>
+        <result property="windowEnd" column="window_end"/>
+        <result property="sourceCutoffAt" column="source_cutoff_at"/>
+        <result property="status" column="status"/>
+        <result property="totalCount" column="total_count"/>
+        <result property="matchedCount" column="matched_count"/>
+        <result property="mismatchedCount" column="mismatched_count"/>
+        <result property="missingCount" column="missing_count"/>
+        <result property="pendingCount" column="pending_count"/>
+        <result property="duplicatedCount" column="duplicated_count"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="finishedAt" column="finished_at"/>
+        <result property="failureReason" column="failure_reason"/>
+        <result property="version" column="version"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, rule_code, rule_version, type, rule_snapshot, window_start, window_end, source_cutoff_at, status, total_count, matched_count, mismatched_count, missing_count, pending_count, duplicated_count, started_at, finished_at, failure_reason, version, created_at, updated_at
+    </sql>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_run WHERE id = #{id}
+    </select>
+
+    <!-- 冲突由受影响行数报告；身份、业务关联、规则快照及创建时间不允许被覆盖。 -->
+    <update id="updateWithVersion">
+        UPDATE reconciliation_run
+        SET status = #{status},
+            total_count = #{totalCount},
+            matched_count = #{matchedCount},
+            mismatched_count = #{mismatchedCount},
+            missing_count = #{missingCount},
+            pending_count = #{pendingCount},
+            duplicated_count = #{duplicatedCount},
+            started_at = #{startedAt},
+            finished_at = #{finishedAt},
+            failure_reason = #{failureReason},
+            updated_at = #{updatedAt},
+            version = version + 1
+        WHERE id = #{id} AND version = #{version}
+    </update>
+</mapper>

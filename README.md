@@ -19,6 +19,7 @@ Current architecture: modular monolith.
 - `asteria-account`: account domain module
 - `asteria-ledger`: double-entry ledger domain module
 - `asteria-payment`: payment orchestration domain module
+- `asteria-reconciliation`: [Reconciliation v1 domain models and PostgreSQL design](asteria-reconciliation/README.md)
 - `asteria-infrastructure`: database, messaging, and external integration implementations
 
 ## Build

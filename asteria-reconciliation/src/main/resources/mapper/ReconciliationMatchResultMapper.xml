@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationMatchResultMapper">
+    <!-- 显式映射列名，JSON 文本以 String 原样存取，金额与币种分别保存。 -->
+    <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationMatchResultDO">
+        <id property="id" column="id"/>
+        <result property="runId" column="run_id"/>
+        <result property="ruleCode" column="rule_code"/>
+        <result property="businessKey" column="business_key"/>
+        <result property="status" column="status"/>
+        <result property="differenceType" column="difference_type"/>
+        <result property="expectedAmount" column="expected_amount"/>
+        <result property="expectedCurrency" column="expected_currency"/>
+        <result property="actualAmount" column="actual_amount"/>
+        <result property="actualCurrency" column="actual_currency"/>
+        <result property="sourceRecordIds" column="source_record_ids"/>
+        <result property="details" column="details"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, run_id, rule_code, business_key, status, difference_type, expected_amount, expected_currency, actual_amount, actual_currency, source_record_ids, details, created_at
+    </sql>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_match_result WHERE id = #{id}
+    </select>
+
+    <!-- 按运行、规则与业务键读取唯一结论。 -->
+    <select id="findByRunAndBusinessKey" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_match_result
+        WHERE run_id = #{runId} AND rule_code = #{ruleCode} AND business_key = #{businessKey}
+    </select>
+</mapper>
