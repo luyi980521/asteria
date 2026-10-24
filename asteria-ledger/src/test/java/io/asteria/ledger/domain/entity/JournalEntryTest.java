@@ -108,6 +108,7 @@ class JournalEntryTest {
         JournalEntry reversal = original.reverse(
                 JournalEntryId.of(1002L),
                 List.of(PostingId.of(2003L), PostingId.of(2004L)),
+                EventId.of(4002L),
                 REVERSED_AT,
                 "reversal");
 
@@ -134,17 +135,18 @@ class JournalEntryTest {
     void cannotReverseDraftEntry() {
         assertError(LedgerErrorCode.ONLY_POSTED_ENTRY_CAN_BE_REVERSED,
                 () -> createDraft().reverse(
-                        JournalEntryId.of(1002L), reversalPostingIds(), REVERSED_AT, "reversal"));
+                        JournalEntryId.of(1002L), reversalPostingIds(), EventId.of(4002L), REVERSED_AT, "reversal"));
     }
 
     @Test
     void cannotReverseTwice() {
         JournalEntry entry = createPosted();
-        entry.reverse(JournalEntryId.of(1002L), reversalPostingIds(), REVERSED_AT, "first");
+        entry.reverse(JournalEntryId.of(1002L), reversalPostingIds(), EventId.of(4002L), REVERSED_AT, "first");
 
         assertError(LedgerErrorCode.JOURNAL_ENTRY_ALREADY_REVERSED,
                 () -> entry.reverse(JournalEntryId.of(1003L),
                         List.of(PostingId.of(2005L), PostingId.of(2006L)),
+                        EventId.of(4003L),
                         REVERSED_AT, "second"));
     }
 
@@ -153,6 +155,7 @@ class JournalEntryTest {
         assertError(LedgerErrorCode.REVERSED_AT_BEFORE_POSTED_AT,
                 () -> createPosted().reverse(
                         JournalEntryId.of(1002L), reversalPostingIds(),
+                        EventId.of(4002L),
                         POSTED_AT.minusSeconds(1), "reversal"));
     }
 
@@ -160,7 +163,7 @@ class JournalEntryTest {
     void reversalReasonCannotBeBlank() {
         assertError(LedgerErrorCode.INVALID_PARAMS,
                 () -> createPosted().reverse(
-                        JournalEntryId.of(1002L), reversalPostingIds(), REVERSED_AT, "  "));
+                        JournalEntryId.of(1002L), reversalPostingIds(), EventId.of(4002L), REVERSED_AT, "  "));
     }
 
     private JournalEntry createDraft() {
@@ -198,7 +201,7 @@ class JournalEntryTest {
     }
 
     private JournalReference reference(String sourceId) {
-        return new JournalReference("TEST", sourceId, "TEST_CREATED", EventId.generate().value());
+        return new JournalReference("TEST", sourceId, "TEST_CREATED", "4001");
     }
 
     private void assertError(LedgerErrorCode expected,

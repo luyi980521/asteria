@@ -5,7 +5,7 @@ import io.asteria.balance.api.request.ConsumeBalanceRequest;
 import io.asteria.balance.api.request.ReleaseBalanceRequest;
 import io.asteria.balance.api.request.ReserveBalanceRequest;
 import io.asteria.balance.application.assembler.BalanceRequestAssembler;
-import io.asteria.balance.application.controller.BalanceController;
+import io.asteria.balance.application.controller.BalanceInternalController;
 import io.asteria.balance.application.service.impl.BalanceApplicationServiceImpl;
 import io.asteria.balance.domain.entity.Balance;
 import io.asteria.balance.domain.entity.BalanceAccount;
@@ -64,7 +64,7 @@ class BalanceFeignHttpTest {
 
     @Configuration(proxyBeanMethods = false)
     @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, MybatisPlusAutoConfiguration.class})
-    @Import({PaymentFeignConfiguration.class, BalanceController.class, BalanceRequestAssembler.class,
+    @Import({PaymentFeignConfiguration.class, BalanceInternalController.class, BalanceRequestAssembler.class,
             BalanceApplicationServiceImpl.class, GlobalExceptionHandler.class})
     static class TestApplication {
     }

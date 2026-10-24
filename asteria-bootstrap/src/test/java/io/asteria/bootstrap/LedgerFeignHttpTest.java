@@ -1,7 +1,7 @@
 package io.asteria.bootstrap;
 
-import io.asteria.ledger.application.request.ReverseJournalEntriesRequest;
-import io.asteria.ledger.application.response.ReverseJournalEntriesResponse;
+import io.asteria.payment.application.request.ReversePaymentCapturesRequest;
+import io.asteria.payment.application.response.ReversePaymentCapturesResponse;
 import io.asteria.common.domain.valueobject.CurrencyCode;
 import io.asteria.common.domain.valueobject.Money;
 import io.asteria.ledger.domain.entity.JournalEntry;
@@ -34,7 +34,9 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "asteria.service.ledger.url=http://localhost:${local.server.port}",
         "spring.cloud.openfeign.lazy-attributes-resolution=true",
+        "spring.main.lazy-initialization=true",
         "asteria.payment.outbox.publish-task-enabled=false",
+        "asteria.settlement.outbox.publish-task-enabled=false",
         "spring.kafka.listener.auto-startup=false"
 })
 class LedgerFeignHttpTest {
@@ -61,18 +63,18 @@ class LedgerFeignHttpTest {
         when(repository.findByEventIdForUpdate("broken")).thenThrow(new IllegalStateException("private details"));
 
         LedgerClient client = context.getBean(LedgerClient.class);
-        ApiResponse<ReverseJournalEntriesResponse> response = client.reverseJournalEntries(new ReverseJournalEntriesRequest(
+        ApiResponse<ReversePaymentCapturesResponse> response = client.reverseJournalEntries(new ReversePaymentCapturesRequest(
                 List.of("broken", "captured-1", "missing", "captured-1"), "Manual recovery"));
 
         assertTrue(response.success());
         assertEquals(List.of("FAILED", "REVERSED", "FAILED", "ALREADY_REVERSED"),
-                response.data().results().stream().map(result -> result.status()).toList());
+                response.data().results().stream().map(result -> result.status().name()).toList());
         assertEquals("SYSTEM_ERROR", response.data().results().getFirst().code());
         assertFalse(response.data().results().getFirst().message().contains("private details"));
         assertEquals("JOURNAL_ENTRY_NOT_FOUND", response.data().results().get(2).code());
         assertEquals("ALREADY_REVERSED", client.reverseJournalEntries(
-                new ReverseJournalEntriesRequest(List.of("captured-1"), "Retry"))
-                .data().results().getFirst().status());
+                new ReversePaymentCapturesRequest(List.of("captured-1"), "Retry"))
+                .data().results().getFirst().status().name());
         verify(repository, times(1)).insert(any());
         verify(repository, times(1)).update(entry);
         verify(transactionManager, times(1)).rollback(any());
@@ -85,7 +87,7 @@ class LedgerFeignHttpTest {
     void invalidInputUsesExistingBadRequestEnvelope() {
         FeignException.BadRequest exception = assertThrows(FeignException.BadRequest.class,
                 () -> context.getBean(LedgerClient.class).reverseJournalEntries(
-                        new ReverseJournalEntriesRequest(List.of("captured-1"), " ")));
+                        new ReversePaymentCapturesRequest(List.of("captured-1"), " ")));
         assertTrue(exception.contentUTF8().contains("\"success\":false"));
         verifyNoInteractions(repository);
     }

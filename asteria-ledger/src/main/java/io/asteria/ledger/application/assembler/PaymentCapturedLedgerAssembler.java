@@ -40,13 +40,13 @@ public class PaymentCapturedLedgerAssembler {
                 = paymentLedgerAccountResolver.resolve(message.amount().currency());
 
         PostingCommand debitPosting = PostingCommand.builder()
-                .ledgerAccountId(ledgerAccounts.creditAccountId())
+                .ledgerAccountId(ledgerAccounts.debitAccountId())
                 .direction(DebitCredit.DEBIT)
                 .money(message.amount())
                 .build();
 
         PostingCommand creditPosting = PostingCommand.builder()
-                .ledgerAccountId(ledgerAccounts.debitAccountId())
+                .ledgerAccountId(ledgerAccounts.creditAccountId())
                 .direction(DebitCredit.CREDIT)
                 .money(message.amount())
                 .build();
