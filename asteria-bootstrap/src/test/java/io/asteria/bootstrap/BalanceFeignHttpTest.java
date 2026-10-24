@@ -1,9 +1,9 @@
 package io.asteria.bootstrap;
 
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
-import io.asteria.balance.api.request.ConsumeBalanceRequest;
-import io.asteria.balance.api.request.ReleaseBalanceRequest;
-import io.asteria.balance.api.request.ReserveBalanceRequest;
+import io.asteria.payment.application.request.ConsumeBalanceRequest;
+import io.asteria.payment.application.request.ReleaseBalanceRequest;
+import io.asteria.payment.application.request.ReserveBalanceRequest;
 import io.asteria.balance.application.assembler.BalanceRequestAssembler;
 import io.asteria.balance.application.controller.BalanceInternalController;
 import io.asteria.balance.application.service.impl.BalanceApplicationServiceImpl;

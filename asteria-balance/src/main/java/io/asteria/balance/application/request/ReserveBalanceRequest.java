@@ -1,9 +1,10 @@
-package io.asteria.balance.api.request;
+package io.asteria.balance.application.request;
 
 import lombok.Builder;
 
 import java.math.BigDecimal;
 
+/** Balance HTTP request owned by the receiving module. */
 @Builder
 public record ReserveBalanceRequest(
         Long merchantId,

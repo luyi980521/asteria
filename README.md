@@ -27,6 +27,10 @@ Current architecture: modular monolith.
 mvn clean verify
 ```
 
+The real HTTP/Feign + PostgreSQL + Kafka Payment/Balance/Ledger/Settlement E2E is opt-in.
+See [Core Payment Flow E2E](docs/core-payment-flow-e2e.md) for the command, prerequisites,
+database evidence and the current Settlement accounting rule.
+
 ## Run locally
 
 ```bash

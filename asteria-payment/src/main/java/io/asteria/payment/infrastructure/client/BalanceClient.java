@@ -1,8 +1,8 @@
 package io.asteria.payment.infrastructure.client;
 
-import io.asteria.balance.api.request.ConsumeBalanceRequest;
-import io.asteria.balance.api.request.ReleaseBalanceRequest;
-import io.asteria.balance.api.request.ReserveBalanceRequest;
+import io.asteria.payment.application.request.ConsumeBalanceRequest;
+import io.asteria.payment.application.request.ReleaseBalanceRequest;
+import io.asteria.payment.application.request.ReserveBalanceRequest;
 import io.asteria.web.response.ApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,9 +1,9 @@
 package io.asteria.bootstrap;
 
-import io.asteria.balance.api.request.ConsumeBalanceRequest;
+import io.asteria.payment.application.request.ConsumeBalanceRequest;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.asteria.balance.api.request.ReleaseBalanceRequest;
-import io.asteria.balance.api.request.ReserveBalanceRequest;
+import io.asteria.payment.application.request.ReleaseBalanceRequest;
+import io.asteria.payment.application.request.ReserveBalanceRequest;
 import io.asteria.balance.application.command.CreateBalanceCommand;
 import io.asteria.balance.application.command.CreditBalanceCommand;
 import io.asteria.balance.application.service.BalanceAccountApplicationService;

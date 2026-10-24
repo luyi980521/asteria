@@ -1,8 +1,8 @@
 package io.asteria.balance.application.controller;
 
-import io.asteria.balance.api.request.ConsumeBalanceRequest;
-import io.asteria.balance.api.request.ReleaseBalanceRequest;
-import io.asteria.balance.api.request.ReserveBalanceRequest;
+import io.asteria.balance.application.request.ConsumeBalanceRequest;
+import io.asteria.balance.application.request.ReleaseBalanceRequest;
+import io.asteria.balance.application.request.ReserveBalanceRequest;
 import io.asteria.balance.application.assembler.BalanceRequestAssembler;
 import io.asteria.balance.application.command.ConsumeBalanceCommand;
 import io.asteria.balance.application.command.ReleaseBalanceCommand;

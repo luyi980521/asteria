@@ -1,8 +1,8 @@
 package io.asteria.payment.application.service.impl;
 
-import io.asteria.balance.api.request.ConsumeBalanceRequest;
-import io.asteria.balance.api.request.ReleaseBalanceRequest;
-import io.asteria.balance.api.request.ReserveBalanceRequest;
+import io.asteria.payment.application.request.ConsumeBalanceRequest;
+import io.asteria.payment.application.request.ReleaseBalanceRequest;
+import io.asteria.payment.application.request.ReserveBalanceRequest;
 import io.asteria.common.application.port.DistributedIdGenerator;
 import io.asteria.common.util.JsonUtils;
 import io.asteria.common.util.ServiceResponseUtils;

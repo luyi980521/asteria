@@ -1,8 +1,8 @@
-package io.asteria.balance.api.request;
+package io.asteria.payment.application.request;
 
 import lombok.Builder;
 
-/** The amount comes from the existing reservation. */
+/** Payment-owned request for the Balance HTTP client. The amount comes from the existing reservation. */
 @Builder
 public record ConsumeBalanceRequest(
         Long merchantId,
