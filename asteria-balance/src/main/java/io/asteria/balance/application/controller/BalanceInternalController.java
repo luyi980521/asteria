@@ -5,6 +5,7 @@ import io.asteria.balance.api.request.ReleaseBalanceRequest;
 import io.asteria.balance.api.request.ReserveBalanceRequest;
 import io.asteria.balance.application.assembler.BalanceRequestAssembler;
 import io.asteria.balance.application.service.BalanceApplicationService;
+import io.asteria.common.util.JsonUtils;
 import io.asteria.web.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,18 +25,21 @@ public class BalanceInternalController {
 
     @PostMapping("/reserve")
     public ApiResponse<Void> reserve(@RequestBody ReserveBalanceRequest request) {
+        log.info("Receive reserve balance request: {}", JsonUtils.toJson(request));
         balanceApplicationService.reserve(balanceRequestAssembler.toCommand(request));
         return ApiResponse.successWithoutData();
     }
 
     @PostMapping("/release")
     public ApiResponse<Void> release(@RequestBody ReleaseBalanceRequest request) {
+        log.info("Receive reserve release request: {}", JsonUtils.toJson(request));
         balanceApplicationService.release(balanceRequestAssembler.toCommand(request));
         return ApiResponse.successWithoutData();
     }
 
     @PostMapping("/consume")
     public ApiResponse<Void> consume(@RequestBody ConsumeBalanceRequest request) {
+        log.info("Receive reserve consume request: {}", JsonUtils.toJson(request));
         balanceApplicationService.consume(balanceRequestAssembler.toCommand(request));
         return ApiResponse.successWithoutData();
     }
