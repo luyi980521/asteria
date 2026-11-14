@@ -9,17 +9,42 @@ import java.time.Instant;
  */
 @Builder
 public record PaymentCaptureExportRecord(
-        /** Outbox 行主键。 */ Long outboxId,
-        /** 捕获事件唯一标识，不以 Payment ID 替代。 */ String eventId,
-        /** 支付聚合主键。 */ Long paymentId,
-        /** 支付业务引用类型。 */ String referenceType,
-        /** 支付业务引用标识。 */ String referenceId,
-        /** 捕获事件类型。 */ String eventType,
-        /** 捕获金额，来自事件 Money.amount。 */ BigDecimal amount,
-        /** 币种，来自事件 Money.currency。 */ String currency,
-        /** Outbox 发布状态，不代表支付状态。 */ String publicationStatus,
-        /** 捕获业务时间。 */ Instant capturedAt,
-        /** Outbox 创建时间。 */ Instant createdAt,
-        /** Outbox 发布时间，可空。 */ Instant publishedAt,
-        /** 链路标识，可空。 */ String traceId
+        /* Outbox 行主键。 */
+        Long outboxId,
+
+        /* 捕获事件唯一标识，不以 Payment ID 替代。 */
+        String eventId,
+
+        /* 支付聚合主键。 */
+        Long paymentId,
+
+        /* 支付业务引用类型。 */
+        String referenceType,
+
+        /* 支付业务引用标识。 */
+        String referenceId,
+
+        /* 捕获事件类型。 */
+        String eventType,
+
+        /* 捕获金额，来自事件 Money.amount。 */
+        BigDecimal amount,
+
+        /* 币种，来自事件 Money.currency。 */
+        String currency,
+
+        /* Outbox 发布状态，不代表支付状态。 */
+        String publicationStatus,
+
+        /* 捕获业务时间。 */
+        Instant capturedAt,
+
+        /* Outbox 创建时间。 */
+        Instant createdAt,
+
+        /* Outbox 发布时间，可空。 */
+        Instant publishedAt,
+
+        /* 链路标识，可空。 */
+        String traceId
 ) { }

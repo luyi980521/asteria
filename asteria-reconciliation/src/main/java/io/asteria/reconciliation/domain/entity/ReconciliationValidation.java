@@ -12,6 +12,7 @@ import java.util.HashSet;
  * 六个对账对象共用的构造校验；仅作用于本模块，不引入新的公共基础类型。
  */
 final class ReconciliationValidation {
+
     private ReconciliationValidation() { }
 
     /**

@@ -15,6 +15,7 @@ import static io.asteria.reconciliation.domain.entity.ReconciliationValidation.*
  */
 @Getter
 public final class ReconciliationRule {
+
     /** 主键，由 DistributedIdGenerator 生成正数雪花 ID。 */
     private final ReconciliationRuleId ruleId;
 
