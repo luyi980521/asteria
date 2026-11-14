@@ -8,7 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Locale;
 
-/** A syntactically valid currency code, independent of currency master data. */
+/**
+ * A syntactically valid currency code, independent of currency master data.
+ */
 public record CurrencyCode(String value) {
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)

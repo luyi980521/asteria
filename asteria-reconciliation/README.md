@@ -1,5 +1,11 @@
 # Reconciliation v1
 
+当前 MinIO 接入、多文件交付批次、增量 SQL、启动方式与 JavaDoc 审查说明见
+[MINIO_INGESTION.md](MINIO_INGESTION.md)。
+
+文件式批量采集基础设施、CSV 字段、公开接口与用户待实现的方法建议见
+[FILE_INGESTION_V1.md](FILE_INGESTION_V1.md)。以下为上一阶段领域模型与核心表说明。
+
 本模块只提供领域模型、基本状态转换、Repository 持久化端口及 PostgreSQL DDL。
 未引入 Controller、业务应用服务、Consumer、调度任务、Matcher 或自动恢复逻辑。
 

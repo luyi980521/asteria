@@ -1,11 +1,11 @@
 package io.asteria.ledger.domain.error;
 
 public enum LedgerErrorCode {
-    /*********************** 通用错误 ***********************/
+    /** ********************* 通用错误 ********************** */
     INVALID_PARAMS("COMMON_0001", "Invalid params"),
     NULL_ARGUMENT("COMMON_0002", "Argument must not be null"),
 
-    /*********************** 账本模块错误 ***********************/
+    /** ********************* 账本模块错误 ********************** */
     INVALID_MONEY_AMOUNT("LEDGER_0001", "Money amount must be greater than zero"),
     CURRENCY_MISMATCH("LEDGER_0002", "Currencies do not match"),
     INSUFFICIENT_POSTINGS("LEDGER_0003", "Journal entry must contain at least two postings"),

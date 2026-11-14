@@ -18,40 +18,26 @@ import java.time.Instant;
 @Data
 @Builder
 public class SettlementItemDO {
-    /**
-     * 结算明细 ID，使用雪花 ID
-     */
+    /** 结算明细 ID，使用雪花 ID */
     @TableId
     private Long id;
 
-    /**
-     * 所属结算批次 ID
-     */
+    /** 所属结算批次 ID */
     private Long settlementBatchId;
 
-    /**
-     * 关联的 Payment ID
-     */
+    /** 关联的 Payment ID */
     private Long paymentId;
 
-    /**
-     * 关联的 Payment 业务引用
-     */
+    /** 关联的 Payment 业务引用 */
     private String paymentReference;
 
-    /**
-     * 该支付明细参与结算的金额
-     */
+    /** 该支付明细参与结算的金额 */
     private BigDecimal amount;
 
-    /**
-     * 该支付明细的币种
-     */
+    /** 该支付明细的币种 */
     private String currency;
 
-    /**
-     * 结算明细创建时间
-     */
+    /** 结算明细创建时间 */
     @TableField(fill = FieldFill.INSERT)
     private Instant createdAt;
 }

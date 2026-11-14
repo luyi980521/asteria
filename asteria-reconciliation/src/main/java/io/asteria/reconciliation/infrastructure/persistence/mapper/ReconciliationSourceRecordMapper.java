@@ -11,6 +11,10 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface ReconciliationSourceRecordMapper extends BaseMapper<ReconciliationSourceRecordDO> {
     /**
+     * 仅忽略来源三元组冲突，不覆盖已存在的证据。
+     */
+    int insertAllIfAbsent(@Param("records") java.util.List<ReconciliationSourceRecordDO> records);
+    /**
      * 按主键读取单行，避免加载关联记录集合。
      */
     ReconciliationSourceRecordDO findById(@Param("id") Long id);

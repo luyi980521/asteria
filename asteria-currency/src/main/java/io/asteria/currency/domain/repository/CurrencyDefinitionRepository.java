@@ -10,7 +10,9 @@ public interface CurrencyDefinitionRepository {
 
     void update(CurrencyDefinition currencyDefinition);
 
-    /** Returns null when the code does not exist. */
+    /**
+     * Returns null when the code does not exist.
+     */
     CurrencyDefinition findByCode(CurrencyCode code);
 
     List<CurrencyDefinition> findAllEnabled();

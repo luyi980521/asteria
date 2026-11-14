@@ -7,7 +7,7 @@ import lombok.Getter;
 
 /**
  * 开户指令对象
- * */
+ */
 @Getter
 @Builder
 public class CreateBalanceCommand {

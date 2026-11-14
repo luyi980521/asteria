@@ -13,7 +13,7 @@ import java.time.Instant;
 
 /**
  * 余额变化审计快照；当前不自动生成流水或执行幂等处理。
- * */
+ */
 @Getter
 public final class BalanceMovement {
 
@@ -67,7 +67,7 @@ public final class BalanceMovement {
 
     /**
      * 创建可用余额入账流水
-     * */
+     */
     public static BalanceMovement create(BalanceMovementId balanceMovementId, BalanceId balanceId,
                                          BalanceMovementType movementType, Money amount, String referenceType,
                                          String referenceId, String eventId) {

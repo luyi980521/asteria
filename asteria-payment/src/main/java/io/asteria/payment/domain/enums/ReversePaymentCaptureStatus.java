@@ -5,7 +5,7 @@ import lombok.Getter;
 
 /**
  * 捕获账务冲正状态枚举定义
- * */
+ */
 @Getter
 @AllArgsConstructor
 public enum ReversePaymentCaptureStatus {

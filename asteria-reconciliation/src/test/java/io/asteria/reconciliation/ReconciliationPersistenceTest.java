@@ -31,9 +31,9 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * 在真实 PostgreSQL 上验证 DDL 与六套映射；只创建临时表，结束时回滚并关闭连接。
  */
 class ReconciliationPersistenceTest {
-    private static final String[] TYPES = {"Rule", "SourceRecord", "Run", "MatchResult", "Case", "CaseAction"};
+    private static final String[] TYPES = {"Rule", "SourceRecord", "Run", "MatchResult", "Case", "CaseAction", "FileBatch", "DeliveryBatch"};
     private static final String[] TABLES = {"reconciliation_rule", "reconciliation_source_record", "reconciliation_run",
-            "reconciliation_match_result", "reconciliation_case", "reconciliation_case_action"};
+            "reconciliation_match_result", "reconciliation_case", "reconciliation_case_action", "reconciliation_file_batch", "reconciliation_delivery_batch"};
     private SqlSession session;
     private ReconciliationRuleRepositoryImpl rules;
     private ReconciliationSourceRecordRepositoryImpl sources;
@@ -41,6 +41,8 @@ class ReconciliationPersistenceTest {
     private ReconciliationMatchResultRepositoryImpl results;
     private ReconciliationCaseRepositoryImpl cases;
     private ReconciliationCaseActionRepositoryImpl actions;
+    private ReconciliationFileBatchRepositoryImpl files;
+    private ReconciliationDeliveryBatchRepositoryImpl deliveries;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -50,6 +52,7 @@ class ReconciliationPersistenceTest {
                 System.getenv("ASTERIA_RECONCILIATION_TEST_DB_USER"),
                 System.getenv("ASTERIA_RECONCILIATION_TEST_DB_PASSWORD"));
         var configuration = new MybatisConfiguration();
+        configuration.setMapUnderscoreToCamelCase(true);
         configuration.setEnvironment(new Environment("reconciliation-test", new JdbcTransactionFactory(), dataSource));
         configuration.setLocalCacheScope(LocalCacheScope.STATEMENT);
         for (String type : TYPES) {
@@ -63,7 +66,8 @@ class ReconciliationPersistenceTest {
         connection.setAutoCommit(false);
         session = new MybatisSqlSessionFactoryBuilder().build(configuration).openSession(connection);
         for (String table : TABLES) {
-            try (var input = getClass().getClassLoader().getResourceAsStream("sql/" + table + ".sql");
+            String resource = table.equals("reconciliation_delivery_batch") ? "sql/reconciliation_file_ingestion_v2.sql" : "sql/" + table + ".sql";
+            try (var input = getClass().getClassLoader().getResourceAsStream(resource);
                  var statement = connection.createStatement()) {
                 assertNotNull(input, table);
                 // 仅改变表的生命周期，其余 DDL、索引和注释完全使用交付脚本。
@@ -83,6 +87,67 @@ class ReconciliationPersistenceTest {
                 new ReconciliationCasePersistenceConverter());
         actions = new ReconciliationCaseActionRepositoryImpl(session.getMapper(ReconciliationCaseActionMapper.class),
                 new ReconciliationCaseActionPersistenceConverter());
+        files = new ReconciliationFileBatchRepositoryImpl(session.getMapper(ReconciliationFileBatchMapper.class),
+                new ReconciliationFileBatchPersistenceConverter());
+        deliveries = new ReconciliationDeliveryBatchRepositoryImpl(session.getMapper(ReconciliationDeliveryBatchMapper.class),
+                new ReconciliationDeliveryBatchPersistenceConverter());
+    }
+
+    @Test
+    void sourceBatchInsertsIgnoreOnlySourceKeyAndPreserveOriginalEvidence() throws Exception {
+        assertTrue(sources.saveIfAbsent(source(2L, 0L)));
+        assertFalse(sources.saveIfAbsent(source(20L, 0L)));
+        assertEquals(1, sources.saveAllIfAbsent(java.util.List.of(source(21L, 0L), source(22L, 1L), source(23L, 1L))));
+        assertEquals(0, sources.saveAllIfAbsent(java.util.List.of()));
+        assertEquals(2L, sources.findBySource(ReconciliationSourceType.PAYMENT, "channel-a:payment-1", 0L)
+                .orElseThrow().getRecordId().value());
+        assertEquals(22L, sources.findBySource(ReconciliationSourceType.PAYMENT, "channel-a:payment-1", 1L)
+                .orElseThrow().getRecordId().value());
+        assertConflict(() -> sources.saveIfAbsent(source(2L, 2L)));
+    }
+
+    @Test
+    void fileRegistrationIsIdempotentAndImportStatusUsesCompareAndSet() throws Exception {
+        var batch = new ReconciliationFileBatch(100L, "payment/captures.csv", "PAYMENT", "PAYMENT_CAPTURE",
+                START, END, 0L, 1, "a".repeat(64), 2L, 100L, ReconciliationFileBatchStatus.CREATED, null, NOW, null,
+                200L, java.time.LocalDate.of(2026, 10, 1), NOW, null, NOW);
+        assertTrue(files.saveIfAbsent(batch));
+        assertFalse(files.saveIfAbsent(batch));
+        var differentDigest = new ReconciliationFileBatch(101L, batch.objectKey(), batch.sourceSystem(), batch.recordType(),
+                START, END, 0L, 1, "b".repeat(64), 3L, 120L, ReconciliationFileBatchStatus.CREATED, null, NOW, null,
+                200L, batch.businessDate(), NOW, null, NOW);
+        assertFalse(files.saveIfAbsent(differentDigest));
+        assertEquals(batch, files.findByDelivery("PAYMENT", batch.objectKey(), 0L).orElseThrow());
+        assertTrue(files.updateImportStatus(100L, "CREATED", "IMPORTING", null, null));
+        assertFalse(files.updateImportStatus(100L, "CREATED", "IMPORTING", null, null));
+        assertTrue(files.updateImportStatus(100L, "IMPORTING", "COMPLETED", NOW.plusSeconds(1), null));
+        var completed = files.findById(100L).orElseThrow();
+        assertEquals(ReconciliationFileBatchStatus.COMPLETED, completed.status());
+        assertEquals(NOW.plusSeconds(1), completed.completedAt());
+        assertSqlState("23514", () -> files.updateImportStatus(100L, "COMPLETED", "UNKNOWN", NOW.plusSeconds(2), null));
+        assertEquals(1, files.findByBatchId(200L, 0, 10).size());
+        assertEquals(1, files.findBySourceAndBusinessDate("PAYMENT", batch.businessDate(), 0, 10).size());
+        assertEquals(1, files.findByStatus(ReconciliationFileBatchStatus.COMPLETED, 0, 10).size());
+    }
+
+    @Test
+    void deliveryHeadersSupportMultiFileIdentityPagingAndConcurrentMetadataUpdates() {
+        var day = java.time.LocalDate.of(2026, 10, 1);
+        var batch = new ReconciliationDeliveryBatch(200L, "ledger/manifest.json", "LEDGER", day,
+                START, END, NOW, 0L, 1, 30L, null, ReconciliationFileBatchStatus.CREATED, null, NOW, NOW, null);
+        assertTrue(deliveries.saveIfAbsent(batch));
+        assertFalse(deliveries.saveIfAbsent(batch));
+        assertEquals(batch, deliveries.findById(200L).orElseThrow());
+        assertEquals(batch, deliveries.findByDelivery("LEDGER", batch.manifestObjectKey(), 0L).orElseThrow());
+        assertEquals(1, deliveries.findBySourceAndBusinessDate("LEDGER", day, 0, 1).size());
+        assertTrue(deliveries.findBySourceAndBusinessDate("LEDGER", day, 200, 1).isEmpty());
+        assertEquals(1, deliveries.findByStatus(ReconciliationFileBatchStatus.CREATED, 0, 10).size());
+        var updated = new ReconciliationDeliveryBatch(200L, batch.manifestObjectKey(), "LEDGER", day,
+                START, END, NOW, 0L, 1, 30L, 29L, ReconciliationFileBatchStatus.QUARANTINED, "file evidence", NOW, NOW.plusSeconds(1), NOW.plusSeconds(1));
+        assertTrue(deliveries.updateMetadata(updated, ReconciliationFileBatchStatus.CREATED, NOW));
+        assertFalse(deliveries.updateMetadata(updated, ReconciliationFileBatchStatus.CREATED, NOW));
+        assertEquals(updated, deliveries.findById(200L).orElseThrow());
+        assertThrows(IllegalArgumentException.class, () -> deliveries.findByStatus(ReconciliationFileBatchStatus.CREATED, -1, 10));
     }
 
     @AfterEach

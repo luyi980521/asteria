@@ -30,6 +30,16 @@ mybatis-plus:
       id-type: input
 
 asteria:
+  reconciliation:
+    storage:
+      provider: ${ASTERIA_RECONCILIATION_STORAGE_PROVIDER:local}
+      local-directory: ${ASTERIA_RECONCILIATION_STORAGE_DIRECTORY:./data/reconciliation-objects}
+      minio:
+        endpoint: ${ASTERIA_RECONCILIATION_MINIO_ENDPOINT:}
+        access-key: ${ASTERIA_RECONCILIATION_MINIO_ACCESS_KEY:}
+        secret-key: ${ASTERIA_RECONCILIATION_MINIO_SECRET_KEY:}
+        bucket: ${ASTERIA_RECONCILIATION_MINIO_BUCKET:asteria-reconciliation}
+        initialize-bucket: ${ASTERIA_RECONCILIATION_MINIO_INITIALIZE_BUCKET:false}
   service:
     balance:
       url: http://localhost:${server.port}

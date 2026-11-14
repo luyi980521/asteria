@@ -26,12 +26,16 @@ public final class JsonUtils {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    /** Returns the shared mapper for advanced Jackson use cases. */
+    /**
+     * Returns the shared mapper for advanced Jackson use cases.
+     */
     public static ObjectMapper mapper() {
         return OBJECT_MAPPER;
     }
 
-    /** Serializes an object to compact JSON. */
+    /**
+     * Serializes an object to compact JSON.
+     */
     public static String toJson(Object value) {
         try {
             return OBJECT_MAPPER.writeValueAsString(value);
@@ -40,7 +44,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Serializes an object to formatted JSON. */
+    /**
+     * Serializes an object to formatted JSON.
+     */
     public static String toPrettyJson(Object value) {
         try {
             return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(value);
@@ -49,7 +55,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Serializes an object to UTF-8 JSON bytes. */
+    /**
+     * Serializes an object to UTF-8 JSON bytes.
+     */
     public static byte[] toJsonBytes(Object value) {
         try {
             return OBJECT_MAPPER.writeValueAsBytes(value);
@@ -58,7 +66,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Deserializes JSON into a concrete class. */
+    /**
+     * Deserializes JSON into a concrete class.
+     */
     public static <T> T fromJson(String json, Class<T> targetType) {
         requireJson(json);
         requireTargetType(targetType);
@@ -69,7 +79,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Deserializes JSON into a generic type, such as List<Foo>. */
+    /**
+     * Deserializes JSON into a generic type, such as List<Foo>.
+     */
     public static <T> T fromJson(String json, TypeReference<T> typeReference) {
         requireJson(json);
         if (typeReference == null) {
@@ -82,7 +94,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Deserializes JSON using a Jackson JavaType. */
+    /**
+     * Deserializes JSON using a Jackson JavaType.
+     */
     public static <T> T fromJson(String json, JavaType targetType) {
         requireJson(json);
         if (targetType == null) {
@@ -95,7 +109,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Deserializes a JSON array into a typed list, similar to FastJSON's parseArray. */
+    /**
+     * Deserializes a JSON array into a typed list, similar to FastJSON's parseArray.
+     */
     public static <T> List<T> parseArray(String json, Class<T> elementType) {
         requireJson(json);
         requireTargetType(elementType);
@@ -108,7 +124,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Deserializes UTF-8 JSON bytes into a concrete class. */
+    /**
+     * Deserializes UTF-8 JSON bytes into a concrete class.
+     */
     public static <T> T fromJson(byte[] json, Class<T> targetType) {
         if (json == null || json.length == 0) {
             throw new IllegalArgumentException("JSON bytes must not be null or empty");
@@ -121,7 +139,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Parses JSON into a tree. */
+    /**
+     * Parses JSON into a tree.
+     */
     public static JsonNode readTree(String json) {
         requireJson(json);
         try {
@@ -131,7 +151,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Converts an object to another type through Jackson's data binding. */
+    /**
+     * Converts an object to another type through Jackson's data binding.
+     */
     public static <T> T convert(Object value, Class<T> targetType) {
         requireTargetType(targetType);
         try {
@@ -141,7 +163,9 @@ public final class JsonUtils {
         }
     }
 
-    /** Converts an object to a generic type, such as Map<String, Object>. */
+    /**
+     * Converts an object to a generic type, such as Map<String, Object>.
+     */
     public static <T> T convert(Object value, TypeReference<T> typeReference) {
         if (typeReference == null) {
             throw new IllegalArgumentException("Target type must not be null");

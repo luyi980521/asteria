@@ -5,7 +5,7 @@ import lombok.Builder;
 
 /**
  * 结算完成账户
- * */
+ */
 @Builder
 public record SettlementCompletedLedgerAccounts(
         LedgerAccountId cashAccountId,

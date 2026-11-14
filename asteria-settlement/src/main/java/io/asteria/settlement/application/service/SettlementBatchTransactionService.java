@@ -8,7 +8,7 @@ import java.time.Instant;
 
 /**
  * 结算批次事务操作功能接口定义
- * */
+ */
 public interface SettlementBatchTransactionService {
 
     /**

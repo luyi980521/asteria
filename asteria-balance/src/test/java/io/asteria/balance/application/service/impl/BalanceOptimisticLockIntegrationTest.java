@@ -280,7 +280,9 @@ class BalanceOptimisticLockIntegrationTest {
         }
     }
 
-    /** 只同步真实 Mapper 的调用，不替换 Repository、不改变 SQL 或影响行数。 */
+    /**
+     * 只同步真实 Mapper 的调用，不替换 Repository、不改变 SQL 或影响行数。
+     */
     @Intercepts({
             @Signature(type = Executor.class, method = "query",
                     args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),

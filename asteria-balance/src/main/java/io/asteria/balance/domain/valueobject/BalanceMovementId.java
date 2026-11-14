@@ -3,7 +3,9 @@ package io.asteria.balance.domain.valueobject;
 import io.asteria.balance.domain.error.BalanceErrorCode;
 import io.asteria.balance.domain.exception.BalanceDomainException;
 
-/** 余额领域标识。 */
+/**
+ * 余额领域标识。
+ */
 public record BalanceMovementId(Long value) {
     public BalanceMovementId {
         if (value == null || value <= 0) {

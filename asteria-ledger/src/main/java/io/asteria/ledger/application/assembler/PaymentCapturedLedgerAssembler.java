@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * 支付捕获事件记账转换器
- * */
+ */
 @Component
 @RequiredArgsConstructor
 public class PaymentCapturedLedgerAssembler {

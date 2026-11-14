@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * 结算完成事件记账转换器
- * */
+ */
 @Component
 @RequiredArgsConstructor
 public class SettlementCompletedLedgerAssembler {

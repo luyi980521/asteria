@@ -7,7 +7,7 @@ import lombok.Getter;
 
 /**
  * 扣除预留余额指令对象
- * */
+ */
 @Getter
 @Builder
 public class ConsumeBalanceCommand {

@@ -11,7 +11,9 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/** Payment 持久化对象 */
+/**
+ * Payment 持久化对象
+ */
 @TableName("payment")
 @Data
 public class PaymentDO {

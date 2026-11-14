@@ -6,7 +6,7 @@ import io.asteria.payment.domain.valueobject.PaymentReference;
 
 /**
  * 创建支付命令
- * */
+ */
 public record CreatePaymentCommand(
         Long merchantId,
         Money amount,

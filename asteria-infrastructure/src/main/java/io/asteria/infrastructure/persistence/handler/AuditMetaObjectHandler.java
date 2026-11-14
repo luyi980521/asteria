@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Date;
 
-/** 各模块共用的审计时间填充：插入时补空值，更新时刷新更新时间。 */
+/**
+ * 各模块共用的审计时间填充：插入时补空值，更新时刷新更新时间。
+ */
 @Component
 public class AuditMetaObjectHandler implements MetaObjectHandler {
 

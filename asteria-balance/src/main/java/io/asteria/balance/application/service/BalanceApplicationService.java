@@ -4,7 +4,7 @@ import io.asteria.balance.application.command.*;
 
 /**
  * 余额功能接口定义
- * */
+ */
 public interface BalanceApplicationService {
 
     /**

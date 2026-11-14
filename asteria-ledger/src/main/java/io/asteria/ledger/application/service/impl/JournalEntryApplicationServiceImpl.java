@@ -31,7 +31,7 @@ import java.util.Optional;
 
 /**
  * 记账凭证功能接口定义实现类
- * */
+ */
 @Slf4j
 @Service
 public class JournalEntryApplicationServiceImpl implements JournalEntryApplicationService {

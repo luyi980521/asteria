@@ -5,7 +5,7 @@ import lombok.Getter;
 
 /**
  * 记账凭证冲正状态枚举定义
- * */
+ */
 @Getter
 @AllArgsConstructor
 public enum JournalEntryReverseStatus {

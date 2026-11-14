@@ -2,7 +2,7 @@ package io.asteria.payment.domain.enums;
 
 /**
  * 支付状态枚举定义
- * */
+ */
 public enum PaymentStatus {
 
     /** 已创建 */

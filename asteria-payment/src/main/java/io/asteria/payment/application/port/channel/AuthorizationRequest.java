@@ -7,7 +7,6 @@ import lombok.Builder;
 
 /**
  * 支付授权请求
- *
  */
 @Builder
 public record AuthorizationRequest(

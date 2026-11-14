@@ -5,7 +5,7 @@ import lombok.Getter;
 
 /**
  * 账本账户会计分类
- * */
+ */
 @Getter
 @AllArgsConstructor
 public enum LedgerAccountCategory {

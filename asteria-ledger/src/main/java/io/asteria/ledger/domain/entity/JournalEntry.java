@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 /**
  * 记账凭证实体定义
- * */
+ */
 @Getter
 @Builder
 @NoArgsConstructor
@@ -64,7 +64,7 @@ public class JournalEntry {
 
     /**
      * 创建记账凭证
-     * */
+     */
     public static JournalEntry create(JournalEntryId journalEntryId,
                                       List<Posting> postings,
                                       JournalReference reference) {
@@ -132,7 +132,7 @@ public class JournalEntry {
 
     /**
      * 记账凭证入账
-     * */
+     */
     public void post(Instant postedAt) {
 
         if (this.status != JournalEntryStatus.DRAFT) {
@@ -154,7 +154,7 @@ public class JournalEntry {
 
     /**
      * 冲正
-     * */
+     */
     public JournalEntry reverse(JournalEntryId reversalJournalEntryId,
                                 List<PostingId> reversalPostingIds,
                                 EventId reversalEventId,
@@ -232,7 +232,7 @@ public class JournalEntry {
 
     /**
      * 校验分录记录数量是否达到标准
-     * */
+     */
     private static void validatePostingCount(List<Posting> postings) {
 
         if (CollectionUtils.isEmpty(postings) || postings.size() < 2) {
@@ -242,7 +242,7 @@ public class JournalEntry {
 
     /**
      * 校验分录币种是否一致
-     * */
+     */
     private static void validateSameCurrency(List<Posting> postings) {
 
         List<Money> monies = postings.stream().map(Posting::getMoney).toList();
@@ -254,7 +254,7 @@ public class JournalEntry {
 
     /**
      * 校验分录借贷金额是否平衡
-     * */
+     */
     private static void validateBalanced(List<Posting> postings) {
 
         BigDecimal debitTotal = BigDecimal.ZERO;
@@ -278,7 +278,7 @@ public class JournalEntry {
 
     /**
      * 校验分录金额是否为正数
-     * */
+     */
     private static void validatePositiveAmounts(List<Posting> postings) {
 
         boolean hasIllegalAmount = postings.stream()
@@ -302,7 +302,7 @@ public class JournalEntry {
      * 5. 原因不能为空
      * 6. 反向凭证必须自动正式入账
      * 7. 原凭证历史分录不能被修改
-     * */
+     */
     private void validateReversible(Instant reversedAt, String reason) {
 
         if (reversedAt == null || StringUtils.isBlank(reason)) {

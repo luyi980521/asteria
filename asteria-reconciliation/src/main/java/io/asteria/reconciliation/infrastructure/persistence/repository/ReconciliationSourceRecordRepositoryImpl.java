@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 复用现有 Mapper + Converter 适配方式，事务边界由调用方负责。
@@ -45,5 +47,22 @@ public class ReconciliationSourceRecordRepositoryImpl implements ReconciliationS
     @Override
     public void save(ReconciliationSourceRecord domain) {
         mapper.insert(converter.toDataObject(domain));
+    }
+
+    @Override
+    public boolean saveIfAbsent(ReconciliationSourceRecord domain) {
+        return saveAllIfAbsent(List.of(domain)) == 1;
+    }
+
+    @Override
+    public int saveAllIfAbsent(List<ReconciliationSourceRecord> records) {
+        Objects.requireNonNull(records, "records");
+        int inserted = 0;
+        for (int offset = 0; offset < records.size(); offset += 500) {
+            var rows = records.subList(offset, Math.min(offset + 500, records.size()))
+                    .stream().map(converter::toDataObject).toList();
+            inserted += mapper.insertAllIfAbsent(rows);
+        }
+        return inserted;
     }
 }

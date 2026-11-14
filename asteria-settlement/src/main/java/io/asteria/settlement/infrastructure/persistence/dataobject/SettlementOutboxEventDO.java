@@ -15,53 +15,35 @@ import java.time.Instant;
 @TableName(value ="settlement_outbox_event")
 @Data
 public class SettlementOutboxEventDO {
-    /**
-     * 本地消息记录 ID，使用雪花 ID
-     */
+    /** 本地消息记录 ID，使用雪花 ID */
     @TableId
     private Long id;
 
-    /**
-     * 业务事件唯一 ID
-     */
+    /** 业务事件唯一 ID */
     private String eventId;
 
-    /**
-     * 聚合类型，例如 SETTLEMENT_BATCH
-     */
+    /** 聚合类型，例如 SETTLEMENT_BATCH */
     private String aggregateType;
 
-    /**
-     * 聚合 ID，例如 SettlementBatchId
-     */
+    /** 聚合 ID，例如 SettlementBatchId */
     private String aggregateId;
 
-    /**
-     * 事件类型，例如 SETTLEMENT_COMPLETED
-     */
+    /** 事件类型，例如 SETTLEMENT_COMPLETED */
     private String eventType;
 
-    /**
-     * 待发送消息 JSON 内容
-     */
+    /** 待发送消息 JSON 内容 */
     private String payload;
 
     /** Persisted correlation ID; nullable for historical events. */
     private String traceId;
 
-    /**
-     * 发布状态：PENDING-待发布，PUBLISHED-已发布
-     */
+    /** 发布状态：PENDING-待发布，PUBLISHED-已发布 */
     private String status;
 
-    /**
-     * 事件创建时间
-     */
+    /** 事件创建时间 */
     @TableField(fill = FieldFill.INSERT)
     private Instant createdAt;
 
-    /**
-     * 成功发布到 MQ 的时间
-     */
+    /** 成功发布到 MQ 的时间 */
     private Instant publishedAt;
 }

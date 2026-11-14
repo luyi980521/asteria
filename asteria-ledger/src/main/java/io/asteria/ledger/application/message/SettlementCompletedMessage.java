@@ -6,7 +6,7 @@ import java.time.Instant;
 
 /**
  * 结算完成事件 payload
- * */
+ */
 public record SettlementCompletedMessage(
         /* 事件 ID */
         String eventId,

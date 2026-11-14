@@ -14,7 +14,7 @@ import java.time.Instant;
 
 /**
  * 支付值对象定义
- * */
+ */
 @Getter
 public class Payment {
 
@@ -65,7 +65,7 @@ public class Payment {
 
     /**
      * 创建支付
-     * */
+     */
     public static Payment create(PaymentId paymentId, Long merchantId, Money amount,
                                  PaymentMethod paymentMethod, PaymentReference reference,
                                  Instant createdAt) {
@@ -94,7 +94,7 @@ public class Payment {
 
     /**
      * 标记支付进入授权处理中
-     * */
+     */
     public void startAuthorization() {
         if (status != PaymentStatus.CREATED) {
             throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_CREATED_TO_AUTHORIZE);
@@ -126,7 +126,7 @@ public class Payment {
 
     /**
      * 标记支付进入捕获处理中
-     * */
+     */
     public void startCapture() {
         if (status != PaymentStatus.AUTHORIZED) {
             throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_AUTHORIZED_TO_CAPTURE);
@@ -141,7 +141,7 @@ public class Payment {
 
     /**
      * 标记支付捕获成功
-     * */
+     */
     public void capture(Instant capturedAt) {
         if (status != PaymentStatus.CAPTURING) {
             throw new PaymentDomainException(PaymentErrorCode.PAYMENT_MUST_BE_CAPTURING_TO_CAPTURE);
@@ -167,7 +167,7 @@ public class Payment {
 
     /**
      * 标记支付失败
-     * */
+     */
     public void fail() {
         if (status == PaymentStatus.CAPTURED || status == PaymentStatus.CANCELLED) {
             throw new PaymentDomainException(PaymentErrorCode.PAYMENT_CANNOT_FAIL_IN_CURRENT_STATUS);
@@ -178,7 +178,7 @@ public class Payment {
 
     /**
      * 取消支付
-     * */
+     */
     public void cancel() {
         if (status != PaymentStatus.CREATED && status != PaymentStatus.AUTHORIZED) {
             throw new PaymentDomainException(PaymentErrorCode.PAYMENT_CANNOT_CANCEL_IN_CURRENT_STATUS);
@@ -189,7 +189,7 @@ public class Payment {
 
     /**
      * 从持久化数据恢复支付
-     * */
+     */
     public static Payment reconstitute(PaymentId paymentId, Long merchantId, Money amount,
                                        PaymentMethod paymentMethod, PaymentReference reference,
                                        PaymentStatus status, Instant createdAt,
@@ -200,7 +200,7 @@ public class Payment {
 
     /**
      * 从持久化数据恢复包含授权交易号的 Payment
-     * */
+     */
     public static Payment reconstitute(PaymentId paymentId, Long merchantId, Money amount,
                                        PaymentMethod paymentMethod, PaymentReference reference,
                                        String authorizationTransactionId, PaymentStatus status,

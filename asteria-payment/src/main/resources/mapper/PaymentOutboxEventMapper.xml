@@ -21,4 +21,18 @@
         id,event_id,aggregate_type,aggregate_id,event_type,payload,trace_id,
         status,created_at,published_at
     </sql>
+    <!-- JsonUtils 默认 Instant 为带小数的 epoch 秒，同时兼容 ISO-8601 字符串；不改变 TEXT 存储。 -->
+    <sql id="CapturedEpoch">
+        CASE WHEN json_typeof(CAST(payload AS json) -&gt; 'capturedAt') = 'number'
+             THEN CAST(CAST(payload AS json) -&gt;&gt; 'capturedAt' AS numeric)
+             ELSE EXTRACT(EPOCH FROM CAST(CAST(payload AS json) -&gt;&gt; 'capturedAt' AS timestamptz)) END
+    </sql>
+    <select id="findCapturedInWindow" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM payment_outbox_event
+        WHERE event_type = 'PAYMENT_CAPTURED' AND aggregate_type = 'PAYMENT'
+          AND id &gt; #{afterId}
+          AND (<include refid="CapturedEpoch"/>) &gt;= EXTRACT(EPOCH FROM CAST(#{start} AS timestamptz))
+          AND (<include refid="CapturedEpoch"/>) &lt; EXTRACT(EPOCH FROM CAST(#{end} AS timestamptz))
+        ORDER BY id LIMIT #{limit}
+    </select>
 </mapper>

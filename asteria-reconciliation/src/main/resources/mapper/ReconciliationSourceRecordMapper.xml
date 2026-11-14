@@ -30,4 +30,12 @@
         SELECT <include refid="BaseColumns"/> FROM reconciliation_source_record
         WHERE source_type = #{sourceType} AND source_record_id = #{sourceRecordId} AND source_version = #{sourceVersion}
     </select>
+    <insert id="insertAllIfAbsent">
+        INSERT INTO reconciliation_source_record (<include refid="BaseColumns"/>) VALUES
+        <foreach collection="records" item="r" separator=",">
+            (#{r.id}, #{r.sourceType}, #{r.sourceRecordId}, #{r.sourceVersion}, #{r.businessKey},
+             #{r.amount}, #{r.currency}, #{r.sourceStatus}, #{r.postingStatus}, #{r.occurredAt}, #{r.payload}, #{r.createdAt})
+        </foreach>
+        ON CONFLICT (source_type, source_record_id, source_version) DO NOTHING
+    </insert>
 </mapper>

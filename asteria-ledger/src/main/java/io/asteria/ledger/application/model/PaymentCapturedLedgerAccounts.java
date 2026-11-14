@@ -5,7 +5,7 @@ import lombok.Builder;
 
 /**
  * 支付捕获事件借贷账户
- * */
+ */
 @Builder
 public record PaymentCapturedLedgerAccounts(
         LedgerAccountId debitAccountId,

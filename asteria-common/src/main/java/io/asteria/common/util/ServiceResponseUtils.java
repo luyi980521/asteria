@@ -8,7 +8,9 @@ public final class ServiceResponseUtils {
     private ServiceResponseUtils() {
     }
 
-    /** Returns successful data (including null), or throws the remote error. */
+    /**
+     * Returns successful data (including null), or throws the remote error.
+     */
     public static <T> T getData(ServiceResponse<T> response) {
         if (response == null) {
             throw new RemoteServiceException("REMOTE_RESPONSE_EMPTY", "Remote service returned no response");

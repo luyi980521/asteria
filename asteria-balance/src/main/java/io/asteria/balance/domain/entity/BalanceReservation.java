@@ -13,7 +13,7 @@ import java.time.Instant;
 
 /**
  * 余额预留；仅生效中的预留可释放或消费。
- * */
+ */
 @Getter
 public final class BalanceReservation {
 
@@ -65,7 +65,9 @@ public final class BalanceReservation {
         this.updatedAt = updatedAt;
     }
 
-    /** 创建生效中的余额预留记录。 */
+    /**
+     * 创建生效中的余额预留记录。
+     */
     public static BalanceReservation create(BalanceReservationId reservationId, BalanceId balanceId,
                                             Money amount, String referenceType, String referenceId) {
         Instant now = Instant.now();
@@ -81,14 +83,18 @@ public final class BalanceReservation {
                 .build();
     }
 
-    /** 释放生效中的预留。 */
+    /**
+     * 释放生效中的预留。
+     */
     public void release() {
         requireReservedState();
         status = BalanceReservationStatus.RELEASED;
         updatedAt = Instant.now();
     }
 
-    /** 消费生效中的预留。 */
+    /**
+     * 消费生效中的预留。
+     */
     public void consume() {
         requireReservedState();
         status = BalanceReservationStatus.CONSUMED;

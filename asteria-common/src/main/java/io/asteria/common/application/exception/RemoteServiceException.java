@@ -1,6 +1,8 @@
 package io.asteria.common.application.exception;
 
-/** Preserves the error returned by a remote service. */
+/**
+ * Preserves the error returned by a remote service.
+ */
 public class RemoteServiceException extends RuntimeException {
     private final String code;
 

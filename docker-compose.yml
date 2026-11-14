@@ -1,4 +1,18 @@
 services:
+  # 历史固定镜像仅用于本地开发，可通过环境变量替换为自行维护的镜像。
+  minio:
+    image: ${ASTERIA_MINIO_IMAGE:minio/minio:RELEASE.2025-04-22T22-12-26Z}
+    profiles: [reconciliation]
+    command: server /data --console-address ":9001"
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${ASTERIA_RECONCILIATION_MINIO_ACCESS_KEY:-}
+      MINIO_ROOT_PASSWORD: ${ASTERIA_RECONCILIATION_MINIO_SECRET_KEY:-}
+    volumes:
+      - reconciliation-minio-data:/data
+
   kafka:
     image: apache/kafka:4.0.0
     container_name: asteria-kafka
@@ -16,3 +30,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 1
+
+volumes:
+  reconciliation-minio-data:

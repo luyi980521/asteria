@@ -22,74 +22,46 @@ import java.util.List;
 @Builder
 public class SettlementBatch {
 
-    /**
-     * 结算批次 ID
-     */
+    /** 结算批次 ID */
     private final SettlementBatchId settlementBatchId;
 
-    /**
-     * 结算批次引用
-     */
+    /** 结算批次引用 */
     private final SettlementBatchReference reference;
 
-    /**
-     * 币种
-     */
+    /** 币种 */
     private final CurrencyCode currency;
 
-    /**
-     * 总金额
-     */
+    /** 总金额 */
     private final Money grossAmount;
 
-    /**
-     * 手续费
-     */
+    /** 手续费 */
     private final Money feeAmount;
 
-    /**
-     * 净结算金额
-     */
+    /** 净结算金额 */
     private final Money netAmount;
 
-    /**
-     * 结算明细
-     */
+    /** 结算明细 */
     private final List<SettlementItem> items;
 
-    /**
-     * 状态
-     */
+    /** 状态 */
     private SettlementBatchStatus status;
 
-    /**
-     * 上游渠道结算批次 ID
-     */
+    /** 上游渠道结算批次 ID */
     private String channelSettlementBatchId;
 
-    /**
-     * 创建时间
-     */
+    /** 创建时间 */
     private final Instant createdAt;
 
-    /**
-     * 开始处理时间
-     */
+    /** 开始处理时间 */
     private Instant processingAt;
 
-    /**
-     * 渠道受理时间
-     */
+    /** 渠道受理时间 */
     private Instant acceptedAt;
 
-    /**
-     * 实际结算完成时间
-     */
+    /** 实际结算完成时间 */
     private Instant settledAt;
 
-    /**
-     * 失败时间
-     */
+    /** 失败时间 */
     private Instant failedAt;
 
     /**

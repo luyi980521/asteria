@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationDeliveryBatchMapper">
+    <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationDeliveryBatchDO">
+        <id property="batchId" column="batch_id"/>
+        <result property="manifestObjectKey" column="manifest_object_key"/>
+        <result property="sourceSystem" column="source_system"/>
+        <result property="businessDate" column="business_date"/>
+        <result property="windowStart" column="window_start"/>
+        <result property="windowEnd" column="window_end"/>
+        <result property="cutoffAt" column="cutoff_at"/>
+        <result property="fileVersion" column="file_version"/>
+        <result property="schemaVersion" column="schema_version"/>
+        <result property="expectedRecordCount" column="expected_record_count"/>
+        <result property="actualRecordCount" column="actual_record_count"/>
+        <result property="status" column="status"/>
+        <result property="failureReason" column="failure_reason"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="completedAt" column="completed_at"/>
+    </resultMap>
+    <sql id="BaseColumns">batch_id, manifest_object_key, source_system, business_date, window_start, window_end, cutoff_at, file_version, schema_version, expected_record_count, actual_record_count, status, failure_reason, created_at, updated_at, completed_at</sql>
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_delivery_batch WHERE batch_id = #{id}
+    </select>
+    <select id="findByDelivery" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_delivery_batch
+        WHERE source_system = #{sourceSystem} AND manifest_object_key = #{objectKey} AND file_version = #{fileVersion}
+    </select>
+    <select id="findBySourceAndBusinessDate" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_delivery_batch WHERE source_system = #{sourceSystem}
+        AND business_date = #{businessDate} AND batch_id &gt; #{afterId} ORDER BY batch_id LIMIT #{limit}
+    </select>
+    <select id="findByStatus" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_delivery_batch WHERE status = #{status}
+        AND batch_id &gt; #{afterId} ORDER BY batch_id LIMIT #{limit}
+    </select>
+    <!-- 只忽略指定交付唯一键，不覆盖原始文件元数据。 -->
+    <insert id="insertIfAbsent">
+        INSERT INTO reconciliation_delivery_batch (batch_id, manifest_object_key, source_system, business_date, window_start, window_end, cutoff_at, file_version, schema_version, expected_record_count, actual_record_count, status, failure_reason, created_at, updated_at, completed_at) VALUES (#{batchId}, #{manifestObjectKey}, #{sourceSystem}, #{businessDate}, #{windowStart}, #{windowEnd}, #{cutoffAt}, #{fileVersion}, #{schemaVersion}, #{expectedRecordCount}, #{actualRecordCount}, #{status}, #{failureReason}, #{createdAt}, #{updatedAt}, #{completedAt})
+        ON CONFLICT (source_system, manifest_object_key, file_version) DO NOTHING
+    </insert>
+    <!-- 不实现状态机，以状态与更新时间作为条件，保护并发元数据更新。 -->
+    <update id="updateMetadata">
+        UPDATE reconciliation_delivery_batch SET status = #{row.status}, actual_record_count = #{row.actualRecordCount},
+            failure_reason = #{row.failureReason}, updated_at = #{row.updatedAt}, completed_at = #{row.completedAt}
+        WHERE batch_id = #{row.batchId} AND status = #{expectedStatus} AND updated_at = #{expectedUpdatedAt}
+    </update>
+</mapper>

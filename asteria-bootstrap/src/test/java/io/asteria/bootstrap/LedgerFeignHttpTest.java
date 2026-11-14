@@ -30,7 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/** Exercises the registered Feign proxy, real HTTP controller and application service. */
+/**
+ * Exercises the registered Feign proxy, real HTTP controller and application service.
+ */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "asteria.service.ledger.url=http://localhost:${local.server.port}",
         "spring.cloud.openfeign.lazy-attributes-resolution=true",

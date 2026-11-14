@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-/** Payment 领域对象与持久化对象转换器 */
+/**
+ * Payment 领域对象与持久化对象转换器
+ */
 @Component
 public class PaymentPersistenceConverter {
 

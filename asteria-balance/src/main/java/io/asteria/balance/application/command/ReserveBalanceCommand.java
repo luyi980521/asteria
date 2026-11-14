@@ -8,7 +8,7 @@ import lombok.Getter;
 
 /**
  * 预留余额指令对象
- * */
+ */
 @Getter
 @Builder
 public class ReserveBalanceCommand {

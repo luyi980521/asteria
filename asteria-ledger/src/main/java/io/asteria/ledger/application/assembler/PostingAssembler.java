@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 分录对象转换器
- * */
+ */
 @Component
 @AllArgsConstructor
 public class PostingAssembler {

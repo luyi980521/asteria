@@ -17,45 +17,29 @@ import java.util.Date;
 @TableName(value ="ledger_posting")
 @Data
 public class PostingDO {
-    /**
-     * 分录ID
-     */
+    /** 分录ID */
     @TableId(type = IdType.INPUT)
     private Long id;
 
-    /**
-     * 所属记账凭证ID
-     */
+    /** 所属记账凭证ID */
     private Long journalEntryId;
 
-    /**
-     * 账本账户ID
-     */
+    /** 账本账户ID */
     private Long ledgerAccountId;
 
-    /**
-     * 分录金额，必须大于0；借贷方向由direction字段表达
-     */
+    /** 分录金额，必须大于0；借贷方向由direction字段表达 */
     private BigDecimal amount;
 
-    /**
-     * 币种代码，例如 CNY、USD、EUR
-     */
+    /** 币种代码，例如 CNY、USD、EUR */
     private String currency;
 
-    /**
-     * 借贷方向：DEBIT-借方，CREDIT-贷方
-     */
+    /** 借贷方向：DEBIT-借方，CREDIT-贷方 */
     private String direction;
 
-    /**
-     * 分录在记账凭证中的顺序号
-     */
+    /** 分录在记账凭证中的顺序号 */
     private Integer sequenceNo;
 
-    /**
-     * 记录创建时间
-     */
+    /** 记录创建时间 */
     @TableField(fill = FieldFill.INSERT)
     private Date createdAt;
 }

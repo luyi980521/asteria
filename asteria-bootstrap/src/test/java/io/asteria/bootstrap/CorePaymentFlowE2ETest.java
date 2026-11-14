@@ -57,7 +57,9 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
-/** Real HTTP/Feign, PostgreSQL, transactional outboxes, Kafka and Ledger. Only the external card channel is controlled. */
+/**
+ * Real HTTP/Feign, PostgreSQL, transactional outboxes, Kafka and Ledger. Only the external card channel is controlled.
+ */
 @EnabledIfSystemProperty(named = "asteria.e2e", matches = "true")
 @SpringBootTest(classes = AsteriaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {

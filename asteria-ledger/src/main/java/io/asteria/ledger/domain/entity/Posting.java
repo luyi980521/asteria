@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 分录实体对象定义
- * */
+ */
 @Getter
 @Builder
 @NoArgsConstructor

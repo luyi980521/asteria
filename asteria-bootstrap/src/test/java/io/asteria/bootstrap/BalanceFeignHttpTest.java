@@ -49,7 +49,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/** Real Feign proxy, HTTP serialization, controller and Balance rules; repositories are in-memory mocks. */
+/**
+ * Real Feign proxy, HTTP serialization, controller and Balance rules; repositories are in-memory mocks.
+ */
 @SpringBootTest(classes = BalanceFeignHttpTest.TestApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "asteria.service.balance.url=http://localhost:${local.server.port}",

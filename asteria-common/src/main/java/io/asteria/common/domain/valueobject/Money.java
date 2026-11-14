@@ -39,7 +39,9 @@ public final class Money {
         return new Money(amount, currency);
     }
 
-    /** 创建允许零的余额金额；业务交易金额仍使用 of 并要求大于零。 */
+    /**
+     * 创建允许零的余额金额；业务交易金额仍使用 of 并要求大于零。
+     */
     public static Money ofNonNegative(BigDecimal amount, CurrencyCode currency) {
         return new Money(amount, currency, true);
     }

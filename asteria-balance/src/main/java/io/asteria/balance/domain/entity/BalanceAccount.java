@@ -10,7 +10,9 @@ import lombok.Getter;
 
 import java.time.Instant;
 
-/** 余额账户，按所属主体唯一，具体币种及金额由 Balance 维护。 */
+/**
+ * 余额账户，按所属主体唯一，具体币种及金额由 Balance 维护。
+ */
 @Getter
 public final class BalanceAccount {
     private final BalanceAccountId balanceAccountId;
@@ -35,7 +37,9 @@ public final class BalanceAccount {
         this.updatedAt = updatedAt;
     }
 
-    /** 创建启用状态的余额账户。 */
+    /**
+     * 创建启用状态的余额账户。
+     */
     public static BalanceAccount create(BalanceAccountId balanceAccountId, BalanceAccountOwnerType ownerType,
                                         Long ownerId) {
         Instant now = Instant.now();

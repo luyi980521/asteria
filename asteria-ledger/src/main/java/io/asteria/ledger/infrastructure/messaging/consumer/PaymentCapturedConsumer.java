@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 支付捕获事件消费者
- * */
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

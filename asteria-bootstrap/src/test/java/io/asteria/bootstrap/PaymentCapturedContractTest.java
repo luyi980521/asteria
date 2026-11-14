@@ -21,7 +21,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Exercises both modules' actual boundary types without Kafka or a database. */
+/**
+ * Exercises both modules' actual boundary types without Kafka or a database.
+ */
 class PaymentCapturedContractTest {
     private static final Long PAYMENT_ID = 1001L;
     private static final Money AMOUNT = Money.of(new BigDecimal("100.00"), CurrencyCode.of("USD"));

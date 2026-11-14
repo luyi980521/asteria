@@ -54,7 +54,9 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-/** 设置 ASTERIA_BALANCE_TEST_JDBC_URL、ASTERIA_BALANCE_TEST_DB_USER、ASTERIA_BALANCE_TEST_DB_PASSWORD 后运行。 */
+/**
+ * 设置 ASTERIA_BALANCE_TEST_JDBC_URL、ASTERIA_BALANCE_TEST_DB_USER、ASTERIA_BALANCE_TEST_DB_PASSWORD 后运行。
+ */
 class BalanceRepositoryIntegrationTest {
     private static final CurrencyCode USD = CurrencyCode.of("USD");
     private static final BalanceId BALANCE_ID = BalanceId.of(1L);

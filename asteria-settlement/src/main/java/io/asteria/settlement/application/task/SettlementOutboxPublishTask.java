@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Settlement Outbox 发布定时任务
- * */
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class SettlementOutboxPublishTask {
 
     /**
      * 扫描并发布待发送的 Outbox 事件
-     * */
+     */
     @Scheduled(fixedDelayString = "${asteria.settlement.outbox.publish-interval-ms:1000}")
     public void publishPendingEvents() {
         try {

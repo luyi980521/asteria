@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 账本账户功能接口定义
- * */
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class LedgerAccountController {
 
     /**
      * 创建账本账户
-     * */
+     */
     @PostMapping
     public ApiResponse<LedgerAccountId> create(@RequestBody CreateLedgerAccountRequest request) {
         log.info("Received create ledger account request, accountCode: {}", request.accountCode());

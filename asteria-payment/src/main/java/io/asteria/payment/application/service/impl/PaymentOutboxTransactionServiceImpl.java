@@ -11,7 +11,7 @@ import java.time.Instant;
 
 /**
  * Outbox 功能接口定义实现类
- * */
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

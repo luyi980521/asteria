@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 /**
  * 账户功能接口定义实现类
- * */
+ */
 @Slf4j
 @Service
 public class LedgerAccountApplicationServiceImpl implements LedgerAccountApplicationService {

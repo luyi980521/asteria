@@ -19,7 +19,7 @@ import java.time.Instant;
 
 /**
  * Payment 本地状态事务服务接口定义实现类
- * */
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     /**
      * 开始授权并提交本地状态
-     * */
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Payment startAuthorization(PaymentId paymentId) {
@@ -45,7 +45,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     /**
      * 根据渠道结果完成授权并提交本地状态
-     * */
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void completeAuthorization(PaymentId paymentId, AuthorizationResult result) {
@@ -60,7 +60,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     /**
      * 开始捕获并提交本地状态
-     * */
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Payment startCapture(PaymentId paymentId) {
@@ -72,7 +72,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     /**
      * 根据渠道结果完成捕获并提交本地状态
-     * */
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void completeCapture(PaymentId paymentId, CaptureResult result) {

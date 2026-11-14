@@ -7,7 +7,7 @@ import lombok.Getter;
 
 /**
  * 释放预留余额指令对象
- * */
+ */
 @Getter
 @Builder
 public class ReleaseBalanceCommand {

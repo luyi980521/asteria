@@ -4,7 +4,9 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 
-/** Payment-owned request for the Balance HTTP client. */
+/**
+ * Payment-owned request for the Balance HTTP client.
+ */
 @Builder
 public record ReserveBalanceRequest(
         Long merchantId,

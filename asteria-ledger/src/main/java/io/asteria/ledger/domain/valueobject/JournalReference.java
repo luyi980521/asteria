@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * 用于确认记账凭证是由哪一个业务事件触发产生
- * */
+ */
 @Builder
 public record JournalReference(
 

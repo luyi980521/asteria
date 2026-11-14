@@ -15,7 +15,7 @@ import java.time.Instant;
 
 /**
  * 单个余额账户在指定币种下的余额；持久化版本递增由后续 Repository 负责。
- * */
+ */
 @Getter
 public final class Balance {
 
@@ -69,7 +69,9 @@ public final class Balance {
         this.updatedAt = updatedAt;
     }
 
-    /** 创建指定余额账户及币种的余额，初始可用金额、预留金额和版本均为零。 */
+    /**
+     * 创建指定余额账户及币种的余额，初始可用金额、预留金额和版本均为零。
+     */
     public static Balance create(BalanceId balanceId, BalanceAccountId balanceAccountId, CurrencyCode currency) {
         if (balanceId == null || balanceAccountId == null || currency == null) {
             throw new BalanceDomainException(BalanceErrorCode.INVALID_PARAMS);
@@ -88,14 +90,18 @@ public final class Balance {
                 .build();
     }
 
-    /** 入账至可用余额。 */
+    /**
+     * 入账至可用余额。
+     */
     public void credit(Money amount) {
         requireAmount(amount);
         availableAmount = Money.ofNonNegative(availableAmount.amount().add(amount.amount()), currency);
         updatedAt = Instant.now();
     }
 
-    /** 将可用金额转入预留金额。 */
+    /**
+     * 将可用金额转入预留金额。
+     */
     public void reserve(Money amount) {
         requireAmount(amount);
         if (amount.amount().compareTo(availableAmount.amount()) > 0) {
@@ -108,7 +114,9 @@ public final class Balance {
         updatedAt = Instant.now();
     }
 
-    /** 将预留金额释放回可用金额。 */
+    /**
+     * 将预留金额释放回可用金额。
+     */
     public void release(Money amount) {
         requireReservedAmount(amount);
         Money newAvailable = Money.ofNonNegative(availableAmount.amount().add(amount.amount()), currency);
@@ -118,7 +126,9 @@ public final class Balance {
         updatedAt = Instant.now();
     }
 
-    /** 扣减预留金额，不增加可用金额。 */
+    /**
+     * 扣减预留金额，不增加可用金额。
+     */
     public void debitReserved(Money amount) {
         requireReservedAmount(amount);
         reservedAmount = Money.ofNonNegative(reservedAmount.amount().subtract(amount.amount()), currency);

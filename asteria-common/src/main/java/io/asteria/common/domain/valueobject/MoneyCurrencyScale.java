@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/** Preserves Money's existing precision rules without runtime metadata or database lookups. */
+/**
+ * Preserves Money's existing precision rules without runtime metadata or database lookups.
+ */
 final class MoneyCurrencyScale {
     private static final Properties SCALES = loadScales();
 

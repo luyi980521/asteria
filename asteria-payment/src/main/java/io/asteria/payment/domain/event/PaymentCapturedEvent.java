@@ -16,7 +16,9 @@ public record PaymentCapturedEvent(
         Money amount,
         Instant capturedAt
 ) {
-    /** Wire representation retaining both parts of the payment's business reference. */
+    /**
+     * Wire representation retaining both parts of the payment's business reference.
+     */
     @Builder
     public record Reference(String referenceType, String referenceId) {
     }

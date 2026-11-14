@@ -1,0 +1,11 @@
+# 仅本地开发显式启用；生产用外部配置并预先配置桶和最小权限凭据。
+asteria:
+  reconciliation:
+    storage:
+      provider: minio
+      minio:
+        endpoint: ${ASTERIA_RECONCILIATION_MINIO_ENDPOINT:http://localhost:9000}
+        access-key: ${ASTERIA_RECONCILIATION_MINIO_ACCESS_KEY}
+        secret-key: ${ASTERIA_RECONCILIATION_MINIO_SECRET_KEY}
+        bucket: ${ASTERIA_RECONCILIATION_MINIO_BUCKET:asteria-reconciliation}
+        initialize-bucket: true

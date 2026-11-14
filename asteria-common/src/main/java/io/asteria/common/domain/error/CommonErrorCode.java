@@ -1,10 +1,10 @@
 package io.asteria.common.domain.error;
 
 public enum CommonErrorCode {
-    /*********************** 通用错误 ***********************/
+    /** ********************* 通用错误 ********************** */
     NULL_ARGUMENT("COMMON_0001", "Argument must not be null"),
 
-    /*********************** Money 错误 ***********************/
+    /** ********************* Money 错误 ********************** */
     MONEY_AMOUNT_REQUIRED("COMMON_0002", "Money amount must not be null"),
     MONEY_AMOUNT_MUST_BE_POSITIVE("COMMON_0003", "Money amount must be greater than zero"),
     MONEY_AMOUNT_SCALE_INVALID("COMMON_0004", "Money amount has too many fraction digits"),

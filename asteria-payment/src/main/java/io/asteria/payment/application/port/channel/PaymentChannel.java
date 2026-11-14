@@ -5,7 +5,7 @@ import io.asteria.payment.domain.enums.PaymentMethod;
 
 /**
  * 支付渠道
- * */
+ */
 public interface PaymentChannel {
 
     /**
@@ -15,7 +15,7 @@ public interface PaymentChannel {
 
     /**
      * 发起支付授权
-     * */
+     */
     AuthorizationResult authorize(AuthorizationRequest request);
 
     /**
@@ -25,6 +25,6 @@ public interface PaymentChannel {
 
     /**
      * 查询外部渠道捕获状态
-     * */
+     */
     CaptureQueryResult queryCapture(Payment payment);
 }

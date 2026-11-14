@@ -10,7 +10,9 @@ public record CaptureResult(
         String failureMessage
 ) {
 
-    /** No definitive channel outcome; retain the reservation and local in-flight state. */
+    /**
+     * No definitive channel outcome; retain the reservation and local in-flight state.
+     */
     public static CaptureResult unknown() {
         return new CaptureResult(false, null, null, null);
     }

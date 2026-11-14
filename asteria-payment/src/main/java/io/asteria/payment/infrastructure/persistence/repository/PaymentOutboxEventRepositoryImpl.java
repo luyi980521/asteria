@@ -27,6 +27,15 @@ public class PaymentOutboxEventRepositoryImpl implements PaymentOutboxEventRepos
     private final PaymentOutboxEventPersistenceConverter converter;
 
     @Override
+    public List<PaymentOutboxEvent> findCapturedInWindow(Instant start, Instant end, long afterId, int limit) {
+        if (start == null || end == null || !start.isBefore(end) || afterId < 0 || limit < 1 || limit > 10000) {
+            throw new IllegalArgumentException("Invalid capture export window or page");
+        }
+        return paymentOutboxEventMapper.findCapturedInWindow(start, end, afterId, limit)
+                .stream().map(converter::toDomain).toList();
+    }
+
+    @Override
     public List<PaymentOutboxEvent> findByAggregateIds(List<String> aggregateIds) {
         if (aggregateIds == null || aggregateIds.isEmpty()) {
             return List.of();

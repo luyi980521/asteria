@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 批量冲正请求参数定义
- * */
+ */
 public record ReverseJournalEntriesCommand(
         List<String> eventIds,
         String reason

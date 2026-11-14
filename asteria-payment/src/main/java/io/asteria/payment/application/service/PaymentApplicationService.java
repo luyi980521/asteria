@@ -7,7 +7,7 @@ import io.asteria.payment.domain.valueobject.PaymentId;
 
 /**
  * 支付功能接口定义
- * */
+ */
 public interface PaymentApplicationService {
 
     /**
@@ -15,30 +15,30 @@ public interface PaymentApplicationService {
      *
      * @param command {@link CreatePaymentCommand}
      * @return {@link PaymentId}
-     * */
+     */
     PaymentId create(CreatePaymentCommand command);
 
     /**
      * 授权支付
      *
      * @param paymentId {@link PaymentId}
-     * */
+     */
     void authorize(PaymentId paymentId);
 
     /**
      * 捕获支付
      *
      * @param paymentId {@link PaymentId}
-     * */
+     */
     void capture(PaymentId paymentId);
 
     /**
      * 回查渠道捕获结果并恢复本地支付状态
-     * */
+     */
     void recoverCapture(PaymentId paymentId);
 
     /**
      * 捕获账务冲正
-     * */
+     */
     ReversePaymentCapturesResponse reverseCaptures(ReversePaymentCapturesCommand command);
 }

@@ -29,7 +29,9 @@ public class GlobalExceptionHandler {
         return ApiResponse.failure(exception.errorCode().code(), exception.getMessage());
     }
 
-    /** Preserves downstream error details using the common HTTP envelope. */
+    /**
+     * Preserves downstream error details using the common HTTP envelope.
+     */
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     @ExceptionHandler(RemoteServiceException.class)
     public ApiResponse<Void> handleRemoteServiceException(RemoteServiceException exception) {
