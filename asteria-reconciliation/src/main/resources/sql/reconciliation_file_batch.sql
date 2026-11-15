@@ -1,6 +1,6 @@
 -- 完整建表定义，与 ReconciliationFileBatchDO 的字段及定义顺序对应，不自动执行。
 CREATE TABLE reconciliation_file_batch (
-    file_id BIGINT PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     batch_id BIGINT,
     source_system VARCHAR(64) NOT NULL,
     object_key TEXT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE reconciliation_file_batch (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     -- 同一来源、路径与版本只登记一次，不覆盖原始摘要。
     CONSTRAINT uk_reconciliation_file_batch_delivery UNIQUE (source_system, object_key, file_version),
-    CONSTRAINT ck_reconciliation_file_batch_id CHECK (file_id > 0),
+    CONSTRAINT ck_reconciliation_file_batch_id CHECK (id > 0),
     CONSTRAINT ck_reconciliation_file_batch_window CHECK (window_start < window_end),
     CONSTRAINT ck_reconciliation_file_batch_counts CHECK (file_version >= 0 AND schema_version > 0 AND record_count >= 0 AND byte_size >= 0),
     CONSTRAINT ck_reconciliation_file_batch_sha256 CHECK (sha256 ~ '^[0-9a-f]{64}$'),
@@ -34,7 +34,7 @@ CREATE TABLE reconciliation_file_batch (
     CONSTRAINT ck_reconciliation_file_batch_delivery_id CHECK (batch_id IS NULL OR batch_id > 0)
 );
 COMMENT ON TABLE reconciliation_file_batch IS '独立文件导入批次元数据；不绑定对账 Run；事务与状态策略由文件导入服务实现';
-COMMENT ON COLUMN reconciliation_file_batch.file_id IS '应用分配的文件主键';
+COMMENT ON COLUMN reconciliation_file_batch.id IS '应用分配的文件主键';
 COMMENT ON COLUMN reconciliation_file_batch.batch_id IS '所属多文件交付批次的可空逻辑关联，不建立物理外键';
 COMMENT ON COLUMN reconciliation_file_batch.source_system IS '来源系统';
 COMMENT ON COLUMN reconciliation_file_batch.object_key IS '对象存储相对路径';
@@ -56,9 +56,9 @@ COMMENT ON COLUMN reconciliation_file_batch.created_at IS '元数据创建时间
 COMMENT ON COLUMN reconciliation_file_batch.updated_at IS '元数据最近更新时间';
 CREATE INDEX idx_reconciliation_file_batch_status ON reconciliation_file_batch (status, created_at);
 COMMENT ON INDEX idx_reconciliation_file_batch_status IS '按导入状态和创建时间查询文件批次';
-CREATE INDEX idx_reconciliation_file_batch_delivery ON reconciliation_file_batch (batch_id, file_id);
+CREATE INDEX idx_reconciliation_file_batch_delivery ON reconciliation_file_batch (batch_id, id);
 COMMENT ON INDEX idx_reconciliation_file_batch_delivery IS '按交付批次批量读取文件描述';
-CREATE INDEX idx_reconciliation_file_batch_source_date ON reconciliation_file_batch (source_system, business_date, file_id);
+CREATE INDEX idx_reconciliation_file_batch_source_date ON reconciliation_file_batch (source_system, business_date, id);
 COMMENT ON INDEX idx_reconciliation_file_batch_source_date IS '按来源和业务日期读取文件页';
-CREATE INDEX idx_reconciliation_file_batch_status_page ON reconciliation_file_batch (status, file_id);
+CREATE INDEX idx_reconciliation_file_batch_status_page ON reconciliation_file_batch (status, id);
 COMMENT ON INDEX idx_reconciliation_file_batch_status_page IS '按文件状态进行稳定 ID 分页，保留原状态时间索引';

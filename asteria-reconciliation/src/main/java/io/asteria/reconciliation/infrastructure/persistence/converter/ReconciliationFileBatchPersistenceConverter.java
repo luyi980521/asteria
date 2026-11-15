@@ -17,7 +17,7 @@ public class ReconciliationFileBatchPersistenceConverter {
      */
     public ReconciliationFileBatchDO toDataObject(ReconciliationFileBatch value) {
         var row = new ReconciliationFileBatchDO();
-        row.setFileId(value.fileId());
+        row.setId(value.fileId());
         row.setBatchId(value.batchId());
         row.setSourceSystem(value.sourceSystem());
         row.setObjectKey(value.objectKey());
@@ -46,7 +46,7 @@ public class ReconciliationFileBatchPersistenceConverter {
      */
     public ReconciliationFileBatch toDomain(ReconciliationFileBatchDO row) {
         return ReconciliationFileBatch.builder()
-                .fileId(row.getFileId())
+                .fileId(row.getId())
                 .batchId(row.getBatchId())
                 .sourceSystem(row.getSourceSystem())
                 .objectKey(row.getObjectKey())

@@ -20,7 +20,7 @@ public interface ReconciliationDeliveryBatchMapper extends BaseMapper<Reconcilia
     /**
      * 读取交付唯一键对应的元数据。
      */
-    ReconciliationDeliveryBatchDO findByDelivery(@Param("sourceSystem") String sourceSystem, @Param("objectKey") String objectKey, @Param("fileVersion") Long fileVersion);
+    ReconciliationDeliveryBatchDO findByDelivery(@Param("sourceSystem") String sourceSystem, @Param("objectKey") String objectKey, @Param("deliveryVersion") Long deliveryVersion);
     /**
      * 按来源与业务日期分页。
      */

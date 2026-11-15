@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationFileBatchMapper">
     <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationFileBatchDO">
-        <id property="fileId" column="file_id"/>
+        <id property="id" column="id"/>
         <result property="batchId" column="batch_id"/>
         <result property="sourceSystem" column="source_system"/>
         <result property="objectKey" column="object_key"/>
@@ -24,10 +24,10 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
     <sql id="BaseColumns">
-        file_id, batch_id, source_system, object_key, record_type, file_version, schema_version, business_date, window_start, window_end, cutoff_at, sha256, byte_size, record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at
+        id, batch_id, source_system, object_key, record_type, file_version, schema_version, business_date, window_start, window_end, cutoff_at, sha256, byte_size, record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at
     </sql>
     <select id="findById" resultMap="BaseResultMap">
-        SELECT <include refid="BaseColumns"/> FROM reconciliation_file_batch WHERE file_id = #{id}
+        SELECT <include refid="BaseColumns"/> FROM reconciliation_file_batch WHERE id = #{id}
     </select>
     <select id="findByDelivery" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/> FROM reconciliation_file_batch
@@ -35,30 +35,30 @@
     </select>
     <select id="findByBatchId" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/> FROM reconciliation_file_batch WHERE batch_id = #{batchId}
-        AND file_id &gt; #{afterId} ORDER BY file_id LIMIT #{limit}
+        AND id &gt; #{afterId} ORDER BY id LIMIT #{limit}
     </select>
     <update id="updateImportStatus">
         UPDATE reconciliation_file_batch SET status = #{status}, completed_at = #{completedAt},
             failure_reason = #{failureReason}, updated_at = CURRENT_TIMESTAMP
-        WHERE file_id = #{fileId} AND status = #{expectedStatus}
+        WHERE id = #{fileId} AND status = #{expectedStatus}
     </update>
     <select id="findBySourceAndBusinessDate" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/> FROM reconciliation_file_batch WHERE source_system = #{sourceSystem}
-        AND business_date = #{businessDate} AND file_id &gt; #{afterId} ORDER BY file_id LIMIT #{limit}
+        AND business_date = #{businessDate} AND id &gt; #{afterId} ORDER BY id LIMIT #{limit}
     </select>
     <select id="findByStatus" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/> FROM reconciliation_file_batch WHERE status = #{status}
-        AND file_id &gt; #{afterId} ORDER BY file_id LIMIT #{limit}
+        AND id &gt; #{afterId} ORDER BY id LIMIT #{limit}
     </select>
     <!-- 只忽略指定交付唯一键，不覆盖原始文件元数据。 -->
     <insert id="insertIfAbsent">
-        INSERT INTO reconciliation_file_batch (file_id, batch_id, source_system, object_key, record_type, file_version, schema_version, business_date, window_start, window_end, cutoff_at, sha256, byte_size, record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at) VALUES (#{fileId}, #{batchId}, #{sourceSystem}, #{objectKey}, #{recordType}, #{fileVersion}, #{schemaVersion}, #{businessDate}, #{windowStart}, #{windowEnd}, #{cutoffAt}, #{sha256}, #{byteSize}, #{recordCount}, #{actualRecordCount}, #{status}, #{failureReason}, #{completedAt}, #{createdAt}, #{updatedAt})
+        INSERT INTO reconciliation_file_batch (id, batch_id, source_system, object_key, record_type, file_version, schema_version, business_date, window_start, window_end, cutoff_at, sha256, byte_size, record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at) VALUES (#{id}, #{batchId}, #{sourceSystem}, #{objectKey}, #{recordType}, #{fileVersion}, #{schemaVersion}, #{businessDate}, #{windowStart}, #{windowEnd}, #{cutoffAt}, #{sha256}, #{byteSize}, #{recordCount}, #{actualRecordCount}, #{status}, #{failureReason}, #{completedAt}, #{createdAt}, #{updatedAt})
         ON CONFLICT (source_system, object_key, file_version) DO NOTHING
     </insert>
     <!-- 不实现状态机，以状态与更新时间作为条件，保护并发元数据更新。 -->
     <update id="updateMetadata">
         UPDATE reconciliation_file_batch SET status = #{row.status}, actual_record_count = #{row.actualRecordCount},
             failure_reason = #{row.failureReason}, updated_at = #{row.updatedAt}, completed_at = #{row.completedAt}
-        WHERE file_id = #{row.fileId} AND status = #{expectedStatus} AND updated_at = #{expectedUpdatedAt}
+        WHERE id = #{row.id} AND status = #{expectedStatus} AND updated_at = #{expectedUpdatedAt}
     </update>
 </mapper>

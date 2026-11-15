@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @TableName("reconciliation_delivery_batch")
 public class ReconciliationDeliveryBatchDO {
     /** 应用分配的交付批次主键 */
-    @TableId(value = "batch_id", type = IdType.INPUT)
-    private Long batchId;
+    @TableId(value = "id", type = IdType.INPUT)
+    private Long id;
 
     /** 来源系统 */
     private String sourceSystem;
@@ -22,7 +22,7 @@ public class ReconciliationDeliveryBatchDO {
     private String manifestObjectKey;
 
     /** 交付版本 */
-    private Long fileVersion;
+    private Long deliveryVersion;
 
     /** 清单格式版本 */
     private Integer schemaVersion;

@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @TableName("reconciliation_file_batch")
 public class ReconciliationFileBatchDO {
     /** 应用分配的文件主键 */
-    @TableId(value = "file_id", type = IdType.INPUT)
-    private Long fileId;
+    @TableId(value = "id", type = IdType.INPUT)
+    private Long id;
 
     /** 所属交付批次标识，可空 */
     private Long batchId;

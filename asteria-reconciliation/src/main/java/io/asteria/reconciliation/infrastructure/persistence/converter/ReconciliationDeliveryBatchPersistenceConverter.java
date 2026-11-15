@@ -17,10 +17,10 @@ public class ReconciliationDeliveryBatchPersistenceConverter {
      */
     public ReconciliationDeliveryBatchDO toDataObject(ReconciliationDeliveryBatch value) {
         var row = new ReconciliationDeliveryBatchDO();
-        row.setBatchId(value.batchId());
+        row.setId(value.batchId());
         row.setSourceSystem(value.sourceSystem());
         row.setManifestObjectKey(value.manifestObjectKey());
-        row.setFileVersion(value.fileVersion());
+        row.setDeliveryVersion(value.fileVersion());
         row.setSchemaVersion(value.schemaVersion());
         row.setBusinessDate(value.businessDate());
         row.setWindowStart(value.windowStart());
@@ -42,10 +42,10 @@ public class ReconciliationDeliveryBatchPersistenceConverter {
      */
     public ReconciliationDeliveryBatch toDomain(ReconciliationDeliveryBatchDO row) {
         return ReconciliationDeliveryBatch.builder()
-                .batchId(row.getBatchId())
+                .batchId(row.getId())
                 .sourceSystem(row.getSourceSystem())
                 .manifestObjectKey(row.getManifestObjectKey())
-                .fileVersion(row.getFileVersion())
+                .fileVersion(row.getDeliveryVersion())
                 .schemaVersion(row.getSchemaVersion())
                 .businessDate(row.getBusinessDate())
                 .windowStart(row.getWindowStart())
