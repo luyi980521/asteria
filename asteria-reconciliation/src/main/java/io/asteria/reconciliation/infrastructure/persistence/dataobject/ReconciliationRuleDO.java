@@ -38,11 +38,11 @@ public class ReconciliationRuleDO {
     /** 被核对来源；v1 必须为 LEDGER。 */
     private String rightSourceType;
 
-    /** 是否允许创建新的对账运行。 */
-    private boolean enabled;
-
     /** 等待异步入账的宽限秒数，非负；窗口结束加宽限后才可判定缺失。 */
     private Long gracePeriodSeconds;
+
+    /** 是否允许创建新的对账运行。 */
+    private boolean enabled;
 
     /** 使用 JsonUtils 序列化的 JSON 说明对象，以 TEXT 原样保存。 */
     private String details;

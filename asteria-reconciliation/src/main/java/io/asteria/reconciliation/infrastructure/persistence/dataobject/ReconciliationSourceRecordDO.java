@@ -36,6 +36,9 @@ public class ReconciliationSourceRecordDO {
     /** 规则约定的跨来源业务关联键；须包含必要的租户或渠道命名空间。 */
     private String businessKey;
 
+    /** 来源业务发生时间，按此字段落入左闭右开对账窗口。 */
+    private Instant occurredAt;
+
     /** 标准化金额，允许零；未知金额整体为空。 */
     private BigDecimal amount;
 
@@ -47,9 +50,6 @@ public class ReconciliationSourceRecordDO {
 
     /** 可选的入账或记账状态，由规则解释。 */
     private String postingStatus;
-
-    /** 来源业务发生时间，按此字段落入左闭右开对账窗口。 */
-    private Instant occurredAt;
 
     /** JsonUtils 序列化的原始业务快照 JSON 对象；不可修改。 */
     private String payload;

@@ -9,8 +9,15 @@ import lombok.Builder;
  */
 @Builder
 public record JournalEntrySnapshot(
-        /** 完整凭证与有序分录。 */ JournalEntry journalEntry,
-        /** 数据库乐观锁版本，冲正等更新后递增。 */ Long version,
-        /** 创建时间。 */ Instant createdAt,
-        /** 最近更新时间。 */ Instant updatedAt
+        /* 完整凭证与有序分录。 */
+        JournalEntry journalEntry,
+
+        /* 数据库乐观锁版本，冲正等更新后递增。 */
+        Long version,
+
+        /* 创建时间。 */
+        Instant createdAt,
+
+        /* 最近更新时间。 */
+        Instant updatedAt
 ) { }

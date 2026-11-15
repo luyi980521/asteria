@@ -1,5 +1,9 @@
 # Reconciliation v1
 
+SQL 文件使用 snake_case，与 DO 类名对应，例如 `reconciliation_case.sql` ↔ `ReconciliationCaseDO`。
+每份顶层 SQL 包含对应 DO 的完整字段：文件表 20 列，交付表 16 列；交付表脚本不再修改文件表。
+仅维护当前完整建表定义，执行顺序及字段分组见 [SQL 说明](src/main/resources/sql/README.md)。
+
 当前 MinIO 接入、多文件交付批次、增量 SQL、启动方式与 JavaDoc 审查说明见
 [MINIO_INGESTION.md](MINIO_INGESTION.md)。
 

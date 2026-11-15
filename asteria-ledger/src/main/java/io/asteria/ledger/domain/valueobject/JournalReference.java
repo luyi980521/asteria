@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Builder
 public record JournalReference(
-
         /* 业务对象类型，例如 PAYMENT */
         String sourceType,
 

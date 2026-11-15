@@ -3,27 +3,29 @@
 <mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationFileBatchMapper">
     <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationFileBatchDO">
         <id property="fileId" column="file_id"/>
-        <result property="objectKey" column="object_key"/>
+        <result property="batchId" column="batch_id"/>
         <result property="sourceSystem" column="source_system"/>
+        <result property="objectKey" column="object_key"/>
         <result property="recordType" column="record_type"/>
-        <result property="windowStart" column="window_start"/>
-        <result property="windowEnd" column="window_end"/>
         <result property="fileVersion" column="file_version"/>
         <result property="schemaVersion" column="schema_version"/>
+        <result property="businessDate" column="business_date"/>
+        <result property="windowStart" column="window_start"/>
+        <result property="windowEnd" column="window_end"/>
+        <result property="cutoffAt" column="cutoff_at"/>
         <result property="sha256" column="sha256"/>
-        <result property="recordCount" column="record_count"/>
         <result property="byteSize" column="byte_size"/>
+        <result property="recordCount" column="record_count"/>
+        <result property="actualRecordCount" column="actual_record_count"/>
         <result property="status" column="status"/>
         <result property="failureReason" column="failure_reason"/>
-        <result property="createdAt" column="created_at"/>
         <result property="completedAt" column="completed_at"/>
-        <result property="batchId" column="batch_id"/>
-        <result property="businessDate" column="business_date"/>
-        <result property="cutoffAt" column="cutoff_at"/>
-        <result property="actualRecordCount" column="actual_record_count"/>
+        <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
-    <sql id="BaseColumns">file_id, object_key, source_system, record_type, window_start, window_end, file_version, schema_version, sha256, record_count, byte_size, status, failure_reason, created_at, completed_at, batch_id, business_date, cutoff_at, actual_record_count, updated_at</sql>
+    <sql id="BaseColumns">
+        file_id, batch_id, source_system, object_key, record_type, file_version, schema_version, business_date, window_start, window_end, cutoff_at, sha256, byte_size, record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at
+    </sql>
     <select id="findById" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/> FROM reconciliation_file_batch WHERE file_id = #{id}
     </select>
@@ -50,7 +52,7 @@
     </select>
     <!-- 只忽略指定交付唯一键，不覆盖原始文件元数据。 -->
     <insert id="insertIfAbsent">
-        INSERT INTO reconciliation_file_batch (file_id, object_key, source_system, record_type, window_start, window_end, file_version, schema_version, sha256, record_count, byte_size, status, failure_reason, created_at, completed_at, batch_id, business_date, cutoff_at, actual_record_count, updated_at) VALUES (#{fileId}, #{objectKey}, #{sourceSystem}, #{recordType}, #{windowStart}, #{windowEnd}, #{fileVersion}, #{schemaVersion}, #{sha256}, #{recordCount}, #{byteSize}, #{status}, #{failureReason}, #{createdAt}, #{completedAt}, #{batchId}, #{businessDate}, #{cutoffAt}, #{actualRecordCount}, #{updatedAt})
+        INSERT INTO reconciliation_file_batch (file_id, batch_id, source_system, object_key, record_type, file_version, schema_version, business_date, window_start, window_end, cutoff_at, sha256, byte_size, record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at) VALUES (#{fileId}, #{batchId}, #{sourceSystem}, #{objectKey}, #{recordType}, #{fileVersion}, #{schemaVersion}, #{businessDate}, #{windowStart}, #{windowEnd}, #{cutoffAt}, #{sha256}, #{byteSize}, #{recordCount}, #{actualRecordCount}, #{status}, #{failureReason}, #{completedAt}, #{createdAt}, #{updatedAt})
         ON CONFLICT (source_system, object_key, file_version) DO NOTHING
     </insert>
     <!-- 不实现状态机，以状态与更新时间作为条件，保护并发元数据更新。 -->

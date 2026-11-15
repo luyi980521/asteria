@@ -3,23 +3,25 @@
 <mapper namespace="io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationDeliveryBatchMapper">
     <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationDeliveryBatchDO">
         <id property="batchId" column="batch_id"/>
-        <result property="manifestObjectKey" column="manifest_object_key"/>
         <result property="sourceSystem" column="source_system"/>
+        <result property="manifestObjectKey" column="manifest_object_key"/>
+        <result property="fileVersion" column="file_version"/>
+        <result property="schemaVersion" column="schema_version"/>
         <result property="businessDate" column="business_date"/>
         <result property="windowStart" column="window_start"/>
         <result property="windowEnd" column="window_end"/>
         <result property="cutoffAt" column="cutoff_at"/>
-        <result property="fileVersion" column="file_version"/>
-        <result property="schemaVersion" column="schema_version"/>
         <result property="expectedRecordCount" column="expected_record_count"/>
         <result property="actualRecordCount" column="actual_record_count"/>
         <result property="status" column="status"/>
         <result property="failureReason" column="failure_reason"/>
+        <result property="completedAt" column="completed_at"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
-        <result property="completedAt" column="completed_at"/>
     </resultMap>
-    <sql id="BaseColumns">batch_id, manifest_object_key, source_system, business_date, window_start, window_end, cutoff_at, file_version, schema_version, expected_record_count, actual_record_count, status, failure_reason, created_at, updated_at, completed_at</sql>
+    <sql id="BaseColumns">
+        batch_id, source_system, manifest_object_key, file_version, schema_version, business_date, window_start, window_end, cutoff_at, expected_record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at
+    </sql>
     <select id="findById" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/> FROM reconciliation_delivery_batch WHERE batch_id = #{id}
     </select>
@@ -37,7 +39,7 @@
     </select>
     <!-- 只忽略指定交付唯一键，不覆盖原始文件元数据。 -->
     <insert id="insertIfAbsent">
-        INSERT INTO reconciliation_delivery_batch (batch_id, manifest_object_key, source_system, business_date, window_start, window_end, cutoff_at, file_version, schema_version, expected_record_count, actual_record_count, status, failure_reason, created_at, updated_at, completed_at) VALUES (#{batchId}, #{manifestObjectKey}, #{sourceSystem}, #{businessDate}, #{windowStart}, #{windowEnd}, #{cutoffAt}, #{fileVersion}, #{schemaVersion}, #{expectedRecordCount}, #{actualRecordCount}, #{status}, #{failureReason}, #{createdAt}, #{updatedAt}, #{completedAt})
+        INSERT INTO reconciliation_delivery_batch (batch_id, source_system, manifest_object_key, file_version, schema_version, business_date, window_start, window_end, cutoff_at, expected_record_count, actual_record_count, status, failure_reason, completed_at, created_at, updated_at) VALUES (#{batchId}, #{sourceSystem}, #{manifestObjectKey}, #{fileVersion}, #{schemaVersion}, #{businessDate}, #{windowStart}, #{windowEnd}, #{cutoffAt}, #{expectedRecordCount}, #{actualRecordCount}, #{status}, #{failureReason}, #{completedAt}, #{createdAt}, #{updatedAt})
         ON CONFLICT (source_system, manifest_object_key, file_version) DO NOTHING
     </insert>
     <!-- 不实现状态机，以状态与更新时间作为条件，保护并发元数据更新。 -->

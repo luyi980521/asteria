@@ -9,8 +9,8 @@
         <result property="type" column="type"/>
         <result property="leftSourceType" column="left_source_type"/>
         <result property="rightSourceType" column="right_source_type"/>
-        <result property="enabled" column="enabled"/>
         <result property="gracePeriodSeconds" column="grace_period_seconds"/>
+        <result property="enabled" column="enabled"/>
         <result property="details" column="details"/>
         <result property="version" column="version"/>
         <result property="createdAt" column="created_at"/>
@@ -18,7 +18,7 @@
     </resultMap>
 
     <sql id="BaseColumns">
-        id, rule_code, name, type, left_source_type, right_source_type, enabled, grace_period_seconds, details, version, created_at, updated_at
+        id, rule_code, name, type, left_source_type, right_source_type, grace_period_seconds, enabled, details, version, created_at, updated_at
     </sql>
 
     <select id="findById" resultMap="BaseResultMap">

@@ -2,11 +2,11 @@
 -- 所有关联均为逻辑关联；payload、details、source_record_ids 等序列化内容仅使用 TEXT。
 CREATE TABLE reconciliation_case (
     id BIGINT PRIMARY KEY,
+    run_id BIGINT NOT NULL,
+    match_result_id BIGINT NOT NULL,
     rule_code VARCHAR(64) NOT NULL,
     business_key VARCHAR(256) NOT NULL,
     difference_type VARCHAR(32) NOT NULL,
-    run_id BIGINT NOT NULL,
-    match_result_id BIGINT NOT NULL,
     status VARCHAR(32) NOT NULL,
     assignee VARCHAR(128),
     details TEXT,
@@ -59,11 +59,11 @@ CREATE TABLE reconciliation_case (
 
 COMMENT ON TABLE reconciliation_case IS '跨运行跟踪的差异工单；OPEN、INVESTIGATING 属于活动状态，解决或忽略后允许后续新建。';
 COMMENT ON COLUMN reconciliation_case.id IS '主键，由 DistributedIdGenerator 生成正数雪花 ID';
+COMMENT ON COLUMN reconciliation_case.run_id IS '首次发现差异的运行 ID，逻辑关联 reconciliation_run.id';
+COMMENT ON COLUMN reconciliation_case.match_result_id IS '首次差异结论 ID，逻辑关联 reconciliation_match_result.id';
 COMMENT ON COLUMN reconciliation_case.rule_code IS '稳定规则编码，逻辑关联 reconciliation_rule.rule_code';
 COMMENT ON COLUMN reconciliation_case.business_key IS '规则约定的跨来源业务关联键；须包含必要的租户或渠道命名空间';
 COMMENT ON COLUMN reconciliation_case.difference_type IS '工单差异类型，参与活动工单唯一性';
-COMMENT ON COLUMN reconciliation_case.run_id IS '首次发现差异的运行 ID，逻辑关联 reconciliation_run.id';
-COMMENT ON COLUMN reconciliation_case.match_result_id IS '首次差异结论 ID，逻辑关联 reconciliation_match_result.id';
 COMMENT ON COLUMN reconciliation_case.status IS 'OPEN、INVESTIGATING、RESOLVED 或 IGNORED';
 COMMENT ON COLUMN reconciliation_case.assignee IS '调查责任人标识，INVESTIGATING 必填';
 COMMENT ON COLUMN reconciliation_case.details IS '使用 JsonUtils 序列化的 JSON 说明对象，以 TEXT 原样保存';

@@ -21,11 +21,23 @@
    */
   ```
 
-- 属性字段、record 组件和枚举常量的 JavaDoc 使用单行格式：`/** 对账批次标识 */`。
+- 普通类的属性字段和枚举常量使用单行 JavaDoc：`/** 对账批次标识 */`。
+- record 组件使用单行普通块注释：`/* 对账批次标识 */`，不使用 JavaDoc；record 类型自身仍使用多行 JavaDoc。
+  注释与属性定义各占一行，相邻组件之间空一行，例如：
+
+  ```java
+  public record Example(
+      /* 对账批次标识 */
+      Long batchId,
+
+      /* 来源系统 */
+      String sourceSystem
+  ) { }
+  ```
   仅对确实需要多行解释的代码示例、HTML 布局、标准块标签等保留多行。
 - 按实际语义添加 @param、@return、@throws 等标签；保留 @see、{@link ...}、代码片段与 HTML。
 - 不把普通 // 解释机械转为 JavaDoc，不为缺少业务含义的字段编造说明。
-- 格式化只改注释范围，不为注释修改业务逻辑、方法签名、字符串或 SQL。
+- 格式化只改注释及其相邻排版空白，不为注释修改业务逻辑、方法签名、字符串或 SQL。
 - 不处理第三方、生成代码、target、外部依赖或缓存目录。
 - 可使用 `tools/javadoc/JavadocFormatter.java` 进行 AST 驱动的预检；批量写入前后核对其非注释内容摘要和备份。
 

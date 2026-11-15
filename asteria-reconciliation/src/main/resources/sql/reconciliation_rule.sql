@@ -7,8 +7,8 @@ CREATE TABLE reconciliation_rule (
     type VARCHAR(32) NOT NULL,
     left_source_type VARCHAR(32) NOT NULL,
     right_source_type VARCHAR(32) NOT NULL,
-    enabled BOOLEAN NOT NULL,
     grace_period_seconds BIGINT NOT NULL,
+    enabled BOOLEAN NOT NULL,
     details TEXT,
     version BIGINT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL,
@@ -55,8 +55,8 @@ COMMENT ON COLUMN reconciliation_rule.name IS '业务可读的规则名称';
 COMMENT ON COLUMN reconciliation_rule.type IS '对账关系类型';
 COMMENT ON COLUMN reconciliation_rule.left_source_type IS '基准来源；v1 为 PAYMENT 或 SETTLEMENT';
 COMMENT ON COLUMN reconciliation_rule.right_source_type IS '被核对来源；v1 必须为 LEDGER';
-COMMENT ON COLUMN reconciliation_rule.enabled IS '是否允许创建新的对账运行';
 COMMENT ON COLUMN reconciliation_rule.grace_period_seconds IS '等待异步入账的宽限秒数，非负；窗口结束加宽限后才可判定缺失';
+COMMENT ON COLUMN reconciliation_rule.enabled IS '是否允许创建新的对账运行';
 COMMENT ON COLUMN reconciliation_rule.details IS '使用 JsonUtils 序列化的 JSON 说明对象，以 TEXT 原样保存';
 COMMENT ON COLUMN reconciliation_rule.version IS '乐观锁版本；更新使用旧版本匹配并由数据库递增，更新后应重新读取';
 COMMENT ON COLUMN reconciliation_rule.created_at IS '记录创建时间，UTC 时间点';

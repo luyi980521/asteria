@@ -22,13 +22,18 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.*;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import io.asteria.common.util.JsonUtils;
 
 import static io.asteria.reconciliation.ReconciliationFixtures.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * 在真实 PostgreSQL 上验证 DDL 与六套映射；只创建临时表，结束时回滚并关闭连接。
+ * 在真实 PostgreSQL 上验证 DDL 与八套映射；只创建临时表，结束时回滚并关闭连接。
  */
 class ReconciliationPersistenceTest {
     private static final String[] TYPES = {"Rule", "SourceRecord", "Run", "MatchResult", "Case", "CaseAction", "FileBatch", "DeliveryBatch"};
@@ -44,6 +49,11 @@ class ReconciliationPersistenceTest {
     private ReconciliationFileBatchRepositoryImpl files;
     private ReconciliationDeliveryBatchRepositoryImpl deliveries;
 
+    /**
+     * 按既有执行顺序加载与 DO 对应的 snake_case 完整建表 SQL。
+     *
+     * @throws Exception 数据库连接或初始化失败
+     */
     @BeforeEach
     void setUp() throws Exception {
         String url = System.getenv("ASTERIA_RECONCILIATION_TEST_JDBC_URL");
@@ -66,10 +76,10 @@ class ReconciliationPersistenceTest {
         connection.setAutoCommit(false);
         session = new MybatisSqlSessionFactoryBuilder().build(configuration).openSession(connection);
         for (String table : TABLES) {
-            String resource = table.equals("reconciliation_delivery_batch") ? "sql/reconciliation_file_ingestion_v2.sql" : "sql/" + table + ".sql";
+            String resource = "sql/" + table + ".sql";
             try (var input = getClass().getClassLoader().getResourceAsStream(resource);
                  var statement = connection.createStatement()) {
-                assertNotNull(input, table);
+                assertNotNull(input, resource);
                 // 仅改变表的生命周期，其余 DDL、索引和注释完全使用交付脚本。
                 statement.execute(new String(input.readAllBytes(), StandardCharsets.UTF_8)
                         .replace("CREATE TABLE ", "CREATE TEMPORARY TABLE "));
@@ -108,14 +118,52 @@ class ReconciliationPersistenceTest {
 
     @Test
     void fileRegistrationIsIdempotentAndImportStatusUsesCompareAndSet() throws Exception {
-        var batch = new ReconciliationFileBatch(100L, "payment/captures.csv", "PAYMENT", "PAYMENT_CAPTURE",
-                START, END, 0L, 1, "a".repeat(64), 2L, 100L, ReconciliationFileBatchStatus.CREATED, null, NOW, null,
-                200L, java.time.LocalDate.of(2026, 10, 1), NOW, null, NOW);
+        var batch = ReconciliationFileBatch.builder()
+                .fileId(100L)
+                .objectKey("payment/captures.csv")
+                .sourceSystem("PAYMENT")
+                .recordType("PAYMENT_CAPTURE")
+                .windowStart(START)
+                .windowEnd(END)
+                .fileVersion(0L)
+                .schemaVersion(1)
+                .sha256("a".repeat(64))
+                .recordCount(2L)
+                .byteSize(100L)
+                .status(ReconciliationFileBatchStatus.CREATED)
+                .failureReason(null)
+                .createdAt(NOW)
+                .completedAt(null)
+                .batchId(200L)
+                .businessDate(java.time.LocalDate.of(2026, 10, 1))
+                .cutoffAt(NOW)
+                .actualRecordCount(null)
+                .updatedAt(NOW)
+                .build();
         assertTrue(files.saveIfAbsent(batch));
         assertFalse(files.saveIfAbsent(batch));
-        var differentDigest = new ReconciliationFileBatch(101L, batch.objectKey(), batch.sourceSystem(), batch.recordType(),
-                START, END, 0L, 1, "b".repeat(64), 3L, 120L, ReconciliationFileBatchStatus.CREATED, null, NOW, null,
-                200L, batch.businessDate(), NOW, null, NOW);
+        var differentDigest = ReconciliationFileBatch.builder()
+                .fileId(101L)
+                .objectKey(batch.objectKey())
+                .sourceSystem(batch.sourceSystem())
+                .recordType(batch.recordType())
+                .windowStart(START)
+                .windowEnd(END)
+                .fileVersion(0L)
+                .schemaVersion(1)
+                .sha256("b".repeat(64))
+                .recordCount(3L)
+                .byteSize(120L)
+                .status(ReconciliationFileBatchStatus.CREATED)
+                .failureReason(null)
+                .createdAt(NOW)
+                .completedAt(null)
+                .batchId(200L)
+                .businessDate(batch.businessDate())
+                .cutoffAt(NOW)
+                .actualRecordCount(null)
+                .updatedAt(NOW)
+                .build();
         assertFalse(files.saveIfAbsent(differentDigest));
         assertEquals(batch, files.findByDelivery("PAYMENT", batch.objectKey(), 0L).orElseThrow());
         assertTrue(files.updateImportStatus(100L, "CREATED", "IMPORTING", null, null));
@@ -133,8 +181,24 @@ class ReconciliationPersistenceTest {
     @Test
     void deliveryHeadersSupportMultiFileIdentityPagingAndConcurrentMetadataUpdates() {
         var day = java.time.LocalDate.of(2026, 10, 1);
-        var batch = new ReconciliationDeliveryBatch(200L, "ledger/manifest.json", "LEDGER", day,
-                START, END, NOW, 0L, 1, 30L, null, ReconciliationFileBatchStatus.CREATED, null, NOW, NOW, null);
+        var batch = ReconciliationDeliveryBatch.builder()
+                .batchId(200L)
+                .manifestObjectKey("ledger/manifest.json")
+                .sourceSystem("LEDGER")
+                .businessDate(day)
+                .windowStart(START)
+                .windowEnd(END)
+                .cutoffAt(NOW)
+                .fileVersion(0L)
+                .schemaVersion(1)
+                .expectedRecordCount(30L)
+                .actualRecordCount(null)
+                .status(ReconciliationFileBatchStatus.CREATED)
+                .failureReason(null)
+                .createdAt(NOW)
+                .updatedAt(NOW)
+                .completedAt(null)
+                .build();
         assertTrue(deliveries.saveIfAbsent(batch));
         assertFalse(deliveries.saveIfAbsent(batch));
         assertEquals(batch, deliveries.findById(200L).orElseThrow());
@@ -142,8 +206,24 @@ class ReconciliationPersistenceTest {
         assertEquals(1, deliveries.findBySourceAndBusinessDate("LEDGER", day, 0, 1).size());
         assertTrue(deliveries.findBySourceAndBusinessDate("LEDGER", day, 200, 1).isEmpty());
         assertEquals(1, deliveries.findByStatus(ReconciliationFileBatchStatus.CREATED, 0, 10).size());
-        var updated = new ReconciliationDeliveryBatch(200L, batch.manifestObjectKey(), "LEDGER", day,
-                START, END, NOW, 0L, 1, 30L, 29L, ReconciliationFileBatchStatus.QUARANTINED, "file evidence", NOW, NOW.plusSeconds(1), NOW.plusSeconds(1));
+        var updated = ReconciliationDeliveryBatch.builder()
+                .batchId(200L)
+                .manifestObjectKey(batch.manifestObjectKey())
+                .sourceSystem("LEDGER")
+                .businessDate(day)
+                .windowStart(START)
+                .windowEnd(END)
+                .cutoffAt(NOW)
+                .fileVersion(0L)
+                .schemaVersion(1)
+                .expectedRecordCount(30L)
+                .actualRecordCount(29L)
+                .status(ReconciliationFileBatchStatus.QUARANTINED)
+                .failureReason("file evidence")
+                .createdAt(NOW)
+                .updatedAt(NOW.plusSeconds(1))
+                .completedAt(NOW.plusSeconds(1))
+                .build();
         assertTrue(deliveries.updateMetadata(updated, ReconciliationFileBatchStatus.CREATED, NOW));
         assertFalse(deliveries.updateMetadata(updated, ReconciliationFileBatchStatus.CREATED, NOW));
         assertEquals(updated, deliveries.findById(200L).orElseThrow());
@@ -224,13 +304,17 @@ class ReconciliationPersistenceTest {
                 ReconciliationDifferenceType.MISSING_LEDGER).orElseThrow().getCaseId().value());
     }
 
+    /**
+     * 验证 Rule、Run、Case 的完整更新快照、数据库版本递增及过期版本拒绝行为。
+     */
     @Test
     void versionedUpdatesRejectStaleRuleRunAndCaseWithoutOverwritingState() {
         rules.save(rule());
         var firstRule = rules.findById(ReconciliationRuleId.of(1L)).orElseThrow();
         var staleRule = rules.findById(ReconciliationRuleId.of(1L)).orElseThrow();
-        firstRule.configure(false, 90L, DETAILS, NOW.plusSeconds(1));
+        firstRule.configure(false, 90L, null, NOW.plusSeconds(1));
         rules.update(firstRule);
+        assertVersionedSnapshot(firstRule, rules.findById(firstRule.getRuleId()).orElseThrow());
         staleRule.configure(true, 120L, "{}", NOW.plusSeconds(2));
         assertConcurrent(() -> rules.update(staleRule));
         assertEquals(1L, rules.findByRuleCode("PAYMENT_LEDGER_V1").orElseThrow().getVersion());
@@ -246,6 +330,7 @@ class ReconciliationPersistenceTest {
         var running = runs.findById(ReconciliationRunId.of(3L)).orElseThrow();
         running.complete(1L, 0L, 0L, 1L, 0L, 0L, NOW.plusSeconds(3));
         runs.update(running);
+        assertVersionedSnapshot(running, runs.findById(running.getRunId()).orElseThrow());
         assertEquals(ReconciliationRunStatus.COMPLETED, runs.findById(ReconciliationRunId.of(3L)).orElseThrow().getStatus());
 
         cases.save(reconciliationCase(5L));
@@ -253,6 +338,7 @@ class ReconciliationPersistenceTest {
         var staleCase = cases.findById(ReconciliationCaseId.of(5L)).orElseThrow();
         firstCase.ignore("忽略原因", NOW.plusSeconds(1));
         cases.update(firstCase);
+        assertVersionedSnapshot(firstCase, cases.findById(firstCase.getCaseId()).orElseThrow());
         staleCase.resolve("过期操作", NOW.plusSeconds(2));
         assertConcurrent(() -> cases.update(staleCase));
         assertEquals(ReconciliationCaseStatus.IGNORED, cases.findById(ReconciliationCaseId.of(5L)).orElseThrow().getStatus());
@@ -324,6 +410,205 @@ class ReconciliationPersistenceTest {
                 }
             }
         }
+    }
+
+    /**
+     * 按全部增量执行后的真实临时表逐列核对 DO，覆盖字段集合、类型、主键及可空性。
+     *
+     * @throws Exception 数据库查询或类型读取失败
+     */
+    @Test
+    void finalDdlMatchesEveryDoColumnTypeAndNullability() throws Exception {
+        Map<String, Set<String>> nullable = Map.of(
+                "Rule", Set.of("details"),
+                "Run", Set.of("started_at", "finished_at", "failure_reason"),
+                "SourceRecord", Set.of("amount", "currency", "posting_status"),
+                "MatchResult", Set.of("difference_type", "expected_amount", "expected_currency", "actual_amount", "actual_currency", "details"),
+                "Case", Set.of("assignee", "details", "resolution", "closed_at"),
+                "CaseAction", Set.of("from_status", "details"),
+                "FileBatch", Set.of("failure_reason", "completed_at", "batch_id", "business_date", "cutoff_at", "actual_record_count"),
+                "DeliveryBatch", Set.of("actual_record_count", "failure_reason", "completed_at"));
+        for (String type : TYPES) {
+            Class<?> doType = Class.forName("io.asteria.reconciliation.infrastructure.persistence.dataobject.Reconciliation" + type + "DO");
+            var table = TableInfoHelper.getTableInfo(doType);
+            Map<String, Class<?>> properties = new TreeMap<>();
+            properties.put(table.getKeyColumn(), doType.getDeclaredField(table.getKeyProperty()).getType());
+            for (var field : table.getFieldList()) properties.put(field.getColumn(), doType.getDeclaredField(field.getProperty()).getType());
+            List<String> expectedOrder = new ArrayList<>();
+            expectedOrder.add(table.getKeyColumn());
+            table.getFieldList().forEach(field -> expectedOrder.add(field.getColumn()));
+            List<String> actualOrder = new ArrayList<>();
+            Set<String> columns = new TreeSet<>();
+            Set<String> nullableColumns = new TreeSet<>();
+            try (var query = session.getConnection().prepareStatement(
+                    "SELECT a.attname, format_type(a.atttypid,a.atttypmod) AS field_type, a.attnotnull "
+                    + "FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid "
+                    + "WHERE c.relnamespace=pg_my_temp_schema() AND c.relname=? AND a.attnum>0 AND NOT a.attisdropped ORDER BY a.attnum")) {
+                query.setString(1, table.getTableName());
+                try (var rows = query.executeQuery()) {
+                    while (rows.next()) {
+                        String column = rows.getString("attname");
+                        String sqlType = rows.getString("field_type");
+                        columns.add(column);
+                        actualOrder.add(column);
+                        if (!rows.getBoolean("attnotnull")) nullableColumns.add(column);
+                        Class<?> javaType = properties.get(column);
+                        assertNotNull(javaType, table.getTableName() + "." + column);
+                        if (javaType == Long.class) assertEquals("bigint", sqlType);
+                        else if (javaType == Integer.class) assertEquals("integer", sqlType);
+                        else if (javaType == Instant.class) assertEquals("timestamp with time zone", sqlType);
+                        else if (javaType == LocalDate.class) assertEquals("date", sqlType);
+                        else if (javaType == boolean.class) assertEquals("boolean", sqlType);
+                        else if (javaType == java.math.BigDecimal.class) assertEquals("numeric(38,18)", sqlType);
+                        else if (javaType == String.class) assertTrue(sqlType.equals("text") || sqlType.startsWith("character varying("), sqlType);
+                        else fail("Unreviewed Java persistence type: " + javaType);
+                    }
+                }
+            }
+            assertEquals(properties.keySet(), columns, type + " final DDL column set");
+            assertEquals(expectedOrder, actualOrder, type + " SQL and DO declaration order");
+            assertEquals(nullable.get(type), nullableColumns, type + " nullable columns");
+        }
+    }
+
+    /**
+     * 用完整领域结构比较八条 Repository 的 INSERT 和 SELECT，而不是只验证部分字段。
+     */
+    @Test
+    void allEightRepositoriesPreserveCompleteSnapshots() {
+        var rule = rule();
+        rules.save(rule);
+        assertSnapshot(rule, rules.findById(rule.getRuleId()).orElseThrow());
+        var sourceConverter = new ReconciliationSourceRecordPersistenceConverter();
+        var sourceRow = sourceConverter.toDataObject(source(2L, 987L));
+        sourceRow.setAmount(new java.math.BigDecimal("99999999999999999999.99"));
+        var source = sourceConverter.toDomain(sourceRow);
+        sources.save(source);
+        assertSnapshot(source, sources.findById(source.getRecordId()).orElseThrow());
+        var run = run();
+        runs.save(run);
+        assertSnapshot(run, runs.findById(run.getRunId()).orElseThrow());
+        var result = result(4L, ReconciliationMatchStatus.MISMATCHED, ReconciliationDifferenceType.CURRENCY_MISMATCH);
+        results.save(result);
+        assertSnapshot(result, results.findById(result.getMatchResultId()).orElseThrow());
+        var caseRecord = reconciliationCase(5L);
+        cases.save(caseRecord);
+        assertSnapshot(caseRecord, cases.findById(caseRecord.getCaseId()).orElseThrow());
+        var action = action();
+        actions.save(action);
+        assertSnapshot(action, actions.findById(action.getCaseActionId()).orElseThrow());
+        var delivery = ReconciliationPersistenceContractTest.delivery(ReconciliationFileBatchStatus.CREATED, null, null);
+        deliveries.saveIfAbsent(delivery);
+        assertSnapshot(delivery, deliveries.findById(delivery.batchId()).orElseThrow());
+        var file = ReconciliationPersistenceContractTest.file(ReconciliationFileBatchStatus.CREATED, null, null);
+        files.saveIfAbsent(file);
+        assertSnapshot(file, files.findById(file.fileId()).orElseThrow());
+        assertEquals(file, files.findByBatchId(delivery.batchId(), 0, 1).getFirst());
+    }
+
+    /**
+     * 验证文件元数据更新覆盖实际数量与处理时间，能显式清空可空列，并保留不可变描述。
+     */
+    @Test
+    void fileMetadataUpdatesPreserveIdentityAndClearNullableColumns() {
+        var original = ReconciliationPersistenceContractTest.file(ReconciliationFileBatchStatus.CREATED, null, null);
+        files.saveIfAbsent(original);
+        var updated = ReconciliationFileBatch.builder()
+                .fileId(original.fileId())
+                .objectKey("ignored.csv")
+                .sourceSystem("ignored-source")
+                .recordType("ignored-type")
+                .windowStart(START)
+                .windowEnd(END)
+                .fileVersion(999L)
+                .schemaVersion(99)
+                .sha256("b".repeat(64))
+                .recordCount(999L)
+                .byteSize(999L)
+                .status(ReconciliationFileBatchStatus.FAILED)
+                .failureReason("失败\n\"中文\",")
+                .createdAt(original.createdAt())
+                .completedAt(NOW.plusSeconds(1))
+                .batchId(999L)
+                .businessDate(LocalDate.of(2000, 1, 1))
+                .cutoffAt(NOW.plusSeconds(10))
+                .actualRecordCount(13L)
+                .updatedAt(NOW.plusSeconds(1))
+                .build();
+        assertTrue(files.updateMetadata(updated, original.status(), original.updatedAt()));
+        var stored = files.findById(original.fileId()).orElseThrow();
+        assertEquals(original.objectKey(), stored.objectKey());
+        assertEquals(original.sourceSystem(), stored.sourceSystem());
+        assertEquals(original.fileVersion(), stored.fileVersion());
+        assertEquals(original.schemaVersion(), stored.schemaVersion());
+        assertEquals(original.sha256(), stored.sha256());
+        assertEquals(original.recordCount(), stored.recordCount());
+        assertEquals(original.byteSize(), stored.byteSize());
+        assertEquals(original.batchId(), stored.batchId());
+        assertEquals(original.businessDate(), stored.businessDate());
+        assertEquals(original.cutoffAt(), stored.cutoffAt());
+        assertEquals(updated.actualRecordCount(), stored.actualRecordCount());
+        assertEquals(updated.failureReason(), stored.failureReason());
+        assertEquals(updated.completedAt(), stored.completedAt());
+        assertEquals(updated.updatedAt(), stored.updatedAt());
+        assertFalse(files.updateMetadata(updated, original.status(), original.updatedAt()));
+        var cleared = ReconciliationFileBatch.builder()
+                .fileId(stored.fileId())
+                .objectKey(stored.objectKey())
+                .sourceSystem(stored.sourceSystem())
+                .recordType(stored.recordType())
+                .windowStart(START)
+                .windowEnd(END)
+                .fileVersion(stored.fileVersion())
+                .schemaVersion(stored.schemaVersion())
+                .sha256(stored.sha256())
+                .recordCount(stored.recordCount())
+                .byteSize(stored.byteSize())
+                .status(stored.status())
+                .failureReason(null)
+                .createdAt(stored.createdAt())
+                .completedAt(null)
+                .batchId(stored.batchId())
+                .businessDate(stored.businessDate())
+                .cutoffAt(stored.cutoffAt())
+                .actualRecordCount(null)
+                .updatedAt(NOW.plusSeconds(2))
+                .build();
+        assertTrue(files.updateMetadata(cleared, stored.status(), stored.updatedAt()));
+        assertSnapshot(cleared, files.findById(stored.fileId()).orElseThrow());
+    }
+
+    /**
+     * 验证跨 500 行分块的批量写入与来源三元组唯一约束一致。
+     */
+    @Test
+    void sourceBatchAcrossChunkBoundaryIsIdempotent() {
+        var batch = java.util.stream.LongStream.range(0, 501).mapToObj(index -> source(1000L + index, index)).toList();
+        assertEquals(501, sources.saveAllIfAbsent(batch));
+        assertEquals(0, sources.saveAllIfAbsent(batch));
+        assertSnapshot(batch.getLast(), sources.findById(batch.getLast().getRecordId()).orElseThrow());
+    }
+
+    /**
+     * 比较完整领域快照，涵盖 TEXT 的原始内容及精确数值。
+     *
+     * @param expected 写入前快照
+     * @param actual 读取后快照
+     */
+    private static void assertSnapshot(Object expected, Object actual) {
+        assertEquals(JsonUtils.mapper().valueToTree(expected), JsonUtils.mapper().valueToTree(actual));
+    }
+
+    /**
+     * 数据库条件更新递增版本，其余字段必须与调用方提交的完整快照一致。
+     *
+     * @param expected 更新时的领域快照
+     * @param actual 数据库恢复的快照
+     */
+    private static void assertVersionedSnapshot(Object expected, Object actual) {
+        var expectedJson = (com.fasterxml.jackson.databind.node.ObjectNode) JsonUtils.mapper().valueToTree(expected);
+        expectedJson.put("version", expectedJson.path("version").longValue() + 1);
+        assertEquals(expectedJson, JsonUtils.mapper().valueToTree(actual));
     }
 
     private void execute(String sql) throws SQLException {

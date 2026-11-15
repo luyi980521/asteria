@@ -78,8 +78,9 @@ CSV reader/writer 新增显式 schemaVersion 重载，不支持的版本在读�
 
 ## 数据库发布
 
-沿用 `resources/sql`，没有 Flyway/Liquibase。已部署旧文件表时只执行新增
-`reconciliation_file_ingestion_v2.sql`；全新环境先执行旧 `reconciliation_file_batch.sql`，再执行该增量。
+沿用 `resources/sql`，没有 Flyway/Liquibase。全新环境执行顶层完整建表脚本，
+`reconciliation_file_batch.sql` 已包含全部 20 列，`reconciliation_delivery_batch.sql` 只创建自己的 16 列。
+按当前完整表结构初始化；旧版表定义与历史升级脚本已移除，不再维护旧库升级路径。
 建议由已有发布流程用事务包裹。脚本不会由应用自动执行，本次验证不向正式表应用迁移。
 
 - 新表 reconciliation_delivery_batch：多文件交付头，以 batch_id 为应用主键，
@@ -113,8 +114,10 @@ T 分别为对应的元数据模型。FileBatchRepository 另提供 findByBatchI
 
 根 AGENTS.md 固化永久规范。工具 `tools/javadoc/JavadocFormatter.java` 用 JDK 21 AST 识别声明，
 词法扫描跳过字符串、字符及文本块，不采用全仓库正则替换。
-只重写现有 JavaDoc，不补造业务说明；保留普通注释、标签、链接、HTML 和代码块。
-复杂字段注释可保留多行。所有编辑均验证注释以外的原始文本完全相同，并验证正文的非空白字符不变。
+声明注释按类型处理：record 组件使用 `/* 说明 */`，类字段和枚举常量使用 `/** 说明 */`，类型与方法使用多行 JavaDoc。
+不补造业务说明，保留代码解释、标签、链接、HTML 和代码块。
+record 组件的注释和定义各占一行，组件之间空一行。复杂字段注释可保留多行。
+注释编辑验证范围外文本不变；组件排版编辑只允许语法树声明边界处的空白替换，并验证注释正文的非空白字符不变。
 
 ```powershell
 javac -encoding UTF-8 -d .cache/javadoc-tools tools/javadoc/JavadocFormatter.java
@@ -173,7 +176,7 @@ mvn -o '-Dmaven.repo.local=D:/IdeaProjects/asteria/.cache/maven' `
 - domain/valueobject：新增 ReconciliationDeliveryBatch，扩展既有 ReconciliationFileBatch。
 - domain/repository：新增 ReconciliationDeliveryBatchRepository，扩展既有 ReconciliationFileBatchRepository。
 - infrastructure/persistence：新增 DeliveryBatch 的 DO、Converter、Mapper、Repository 实现和 Mapper XML；对应扩展 FileBatch 的已有实现。
-- resources/sql：新增 reconciliation_file_ingestion_v2.sql；旧文件表创建脚本与六张核心表结构均保留。
+- resources/sql：仅保留和 DO 对齐的完整建表定义，SQL 与 DO 属性顺序一致；字段、类型和约束语义保持不变。
 - 配置：扩展根 docker-compose.yml、Bootstrap application.yml；新增 application-reconciliation-minio.yml。
 - 测试：新增 FileSchemaValidatorTest、MinioObjectStorageClientTest、MinioObjectStorageIntegrationTest；扩展文件基础设施和数据库持久化测试。
 - 永久规范与工具：根 AGENTS.md、tools/javadoc/JavadocFormatter.java、docs/verification/javadoc-format-report.json。

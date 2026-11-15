@@ -8,7 +8,12 @@ import lombok.Builder;
  */
 @Builder
 public record PostingSnapshot(
-        /** 所属凭证。 */ JournalEntryId journalEntryId,
-        /** 数据库中的凭证内序号，不根据集合下标重建。 */ Integer sequenceNo,
-        /** 分录事实。 */ Posting posting
+        /* 所属凭证。 */
+        JournalEntryId journalEntryId,
+
+        /* 数据库中的凭证内序号，不根据集合下标重建。 */
+        Integer sequenceNo,
+
+        /* 分录事实。 */
+        Posting posting
 ) { }

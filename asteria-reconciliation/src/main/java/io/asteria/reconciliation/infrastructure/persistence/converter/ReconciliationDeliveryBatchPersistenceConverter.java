@@ -18,21 +18,21 @@ public class ReconciliationDeliveryBatchPersistenceConverter {
     public ReconciliationDeliveryBatchDO toDataObject(ReconciliationDeliveryBatch value) {
         var row = new ReconciliationDeliveryBatchDO();
         row.setBatchId(value.batchId());
-        row.setManifestObjectKey(value.manifestObjectKey());
         row.setSourceSystem(value.sourceSystem());
+        row.setManifestObjectKey(value.manifestObjectKey());
+        row.setFileVersion(value.fileVersion());
+        row.setSchemaVersion(value.schemaVersion());
         row.setBusinessDate(value.businessDate());
         row.setWindowStart(value.windowStart());
         row.setWindowEnd(value.windowEnd());
         row.setCutoffAt(value.cutoffAt());
-        row.setFileVersion(value.fileVersion());
-        row.setSchemaVersion(value.schemaVersion());
         row.setExpectedRecordCount(value.expectedRecordCount());
         row.setActualRecordCount(value.actualRecordCount());
         row.setStatus(value.status().name());
         row.setFailureReason(value.failureReason());
+        row.setCompletedAt(value.completedAt());
         row.setCreatedAt(value.createdAt());
         row.setUpdatedAt(value.updatedAt());
-        row.setCompletedAt(value.completedAt());
         return row;
     }
     /**
@@ -41,22 +41,23 @@ public class ReconciliationDeliveryBatchPersistenceConverter {
      * @return 领域快照
      */
     public ReconciliationDeliveryBatch toDomain(ReconciliationDeliveryBatchDO row) {
-        return new ReconciliationDeliveryBatch(
-                row.getBatchId(),
-                row.getManifestObjectKey(),
-                row.getSourceSystem(),
-                row.getBusinessDate(),
-                row.getWindowStart(),
-                row.getWindowEnd(),
-                row.getCutoffAt(),
-                row.getFileVersion(),
-                row.getSchemaVersion(),
-                row.getExpectedRecordCount(),
-                row.getActualRecordCount(),
-                ReconciliationFileBatchStatus.valueOf(row.getStatus()),
-                row.getFailureReason(),
-                row.getCreatedAt(),
-                row.getUpdatedAt(),
-                row.getCompletedAt());
+        return ReconciliationDeliveryBatch.builder()
+                .batchId(row.getBatchId())
+                .sourceSystem(row.getSourceSystem())
+                .manifestObjectKey(row.getManifestObjectKey())
+                .fileVersion(row.getFileVersion())
+                .schemaVersion(row.getSchemaVersion())
+                .businessDate(row.getBusinessDate())
+                .windowStart(row.getWindowStart())
+                .windowEnd(row.getWindowEnd())
+                .cutoffAt(row.getCutoffAt())
+                .expectedRecordCount(row.getExpectedRecordCount())
+                .actualRecordCount(row.getActualRecordCount())
+                .status(ReconciliationFileBatchStatus.valueOf(row.getStatus()))
+                .failureReason(row.getFailureReason())
+                .completedAt(row.getCompletedAt())
+                .createdAt(row.getCreatedAt())
+                .updatedAt(row.getUpdatedAt())
+                .build();
     }
 }

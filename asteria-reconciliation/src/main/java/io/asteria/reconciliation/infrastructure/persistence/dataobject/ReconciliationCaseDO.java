@@ -23,6 +23,12 @@ public class ReconciliationCaseDO {
     @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
+    /** 首次发现差异的运行 ID，逻辑关联 reconciliation_run.id。 */
+    private Long runId;
+
+    /** 首次差异结论 ID，逻辑关联 reconciliation_match_result.id。 */
+    private Long matchResultId;
+
     /** 稳定规则编码，逻辑关联 reconciliation_rule.rule_code。 */
     private String ruleCode;
 
@@ -31,12 +37,6 @@ public class ReconciliationCaseDO {
 
     /** 工单差异类型，参与活动工单唯一性。 */
     private String differenceType;
-
-    /** 首次发现差异的运行 ID，逻辑关联 reconciliation_run.id。 */
-    private Long runId;
-
-    /** 首次差异结论 ID，逻辑关联 reconciliation_match_result.id。 */
-    private Long matchResultId;
 
     /** OPEN、INVESTIGATING、RESOLVED 或 IGNORED。 */
     private String status;

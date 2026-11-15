@@ -8,17 +8,17 @@
         <result property="sourceRecordId" column="source_record_id"/>
         <result property="sourceVersion" column="source_version"/>
         <result property="businessKey" column="business_key"/>
+        <result property="occurredAt" column="occurred_at"/>
         <result property="amount" column="amount"/>
         <result property="currency" column="currency"/>
         <result property="sourceStatus" column="source_status"/>
         <result property="postingStatus" column="posting_status"/>
-        <result property="occurredAt" column="occurred_at"/>
         <result property="payload" column="payload"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
     <sql id="BaseColumns">
-        id, source_type, source_record_id, source_version, business_key, amount, currency, source_status, posting_status, occurred_at, payload, created_at
+        id, source_type, source_record_id, source_version, business_key, occurred_at, amount, currency, source_status, posting_status, payload, created_at
     </sql>
 
     <select id="findById" resultMap="BaseResultMap">
@@ -33,8 +33,7 @@
     <insert id="insertAllIfAbsent">
         INSERT INTO reconciliation_source_record (<include refid="BaseColumns"/>) VALUES
         <foreach collection="records" item="r" separator=",">
-            (#{r.id}, #{r.sourceType}, #{r.sourceRecordId}, #{r.sourceVersion}, #{r.businessKey},
-             #{r.amount}, #{r.currency}, #{r.sourceStatus}, #{r.postingStatus}, #{r.occurredAt}, #{r.payload}, #{r.createdAt})
+            (#{r.id}, #{r.sourceType}, #{r.sourceRecordId}, #{r.sourceVersion}, #{r.businessKey}, #{r.occurredAt}, #{r.amount}, #{r.currency}, #{r.sourceStatus}, #{r.postingStatus}, #{r.payload}, #{r.createdAt})
         </foreach>
         ON CONFLICT (source_type, source_record_id, source_version) DO NOTHING
     </insert>

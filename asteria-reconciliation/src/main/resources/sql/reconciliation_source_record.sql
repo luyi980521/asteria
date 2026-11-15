@@ -6,11 +6,11 @@ CREATE TABLE reconciliation_source_record (
     source_record_id VARCHAR(128) NOT NULL,
     source_version BIGINT NOT NULL,
     business_key VARCHAR(256) NOT NULL,
+    occurred_at TIMESTAMPTZ NOT NULL,
     amount NUMERIC(38, 18),
     currency VARCHAR(16),
     source_status VARCHAR(64) NOT NULL,
     posting_status VARCHAR(64),
-    occurred_at TIMESTAMPTZ NOT NULL,
     payload TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
 
@@ -54,11 +54,11 @@ COMMENT ON COLUMN reconciliation_source_record.source_type IS '来源系统类�
 COMMENT ON COLUMN reconciliation_source_record.source_record_id IS '来源系统原始记录 ID，跨渠道时需带命名空间';
 COMMENT ON COLUMN reconciliation_source_record.source_version IS '来源记录的单调非负版本；无原生版本时采集方须提供稳定映射';
 COMMENT ON COLUMN reconciliation_source_record.business_key IS '规则约定的跨来源业务关联键；须包含必要的租户或渠道命名空间';
+COMMENT ON COLUMN reconciliation_source_record.occurred_at IS '来源业务发生时间，按此字段落入左闭右开对账窗口';
 COMMENT ON COLUMN reconciliation_source_record.amount IS '标准化金额，允许零；未知金额整体为空';
 COMMENT ON COLUMN reconciliation_source_record.currency IS '标准化金额，允许零；未知金额整体为空所对应的币种；金额为空时币种也必须为空';
 COMMENT ON COLUMN reconciliation_source_record.source_status IS '原始业务状态，保留来源语义，由规则解释';
 COMMENT ON COLUMN reconciliation_source_record.posting_status IS '可选的入账或记账状态，由规则解释';
-COMMENT ON COLUMN reconciliation_source_record.occurred_at IS '来源业务发生时间，按此字段落入左闭右开对账窗口';
 COMMENT ON COLUMN reconciliation_source_record.payload IS 'JsonUtils 序列化的原始业务快照 JSON 对象；不可修改';
 COMMENT ON COLUMN reconciliation_source_record.created_at IS '记录创建时间，UTC 时间点';
 

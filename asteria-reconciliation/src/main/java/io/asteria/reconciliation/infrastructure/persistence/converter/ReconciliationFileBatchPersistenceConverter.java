@@ -18,24 +18,24 @@ public class ReconciliationFileBatchPersistenceConverter {
     public ReconciliationFileBatchDO toDataObject(ReconciliationFileBatch value) {
         var row = new ReconciliationFileBatchDO();
         row.setFileId(value.fileId());
-        row.setObjectKey(value.objectKey());
+        row.setBatchId(value.batchId());
         row.setSourceSystem(value.sourceSystem());
+        row.setObjectKey(value.objectKey());
         row.setRecordType(value.recordType());
-        row.setWindowStart(value.windowStart());
-        row.setWindowEnd(value.windowEnd());
         row.setFileVersion(value.fileVersion());
         row.setSchemaVersion(value.schemaVersion());
+        row.setBusinessDate(value.businessDate());
+        row.setWindowStart(value.windowStart());
+        row.setWindowEnd(value.windowEnd());
+        row.setCutoffAt(value.cutoffAt());
         row.setSha256(value.sha256());
-        row.setRecordCount(value.recordCount());
         row.setByteSize(value.byteSize());
+        row.setRecordCount(value.recordCount());
+        row.setActualRecordCount(value.actualRecordCount());
         row.setStatus(value.status().name());
         row.setFailureReason(value.failureReason());
-        row.setCreatedAt(value.createdAt());
         row.setCompletedAt(value.completedAt());
-        row.setBatchId(value.batchId());
-        row.setBusinessDate(value.businessDate());
-        row.setCutoffAt(value.cutoffAt());
-        row.setActualRecordCount(value.actualRecordCount());
+        row.setCreatedAt(value.createdAt());
         row.setUpdatedAt(value.updatedAt());
         return row;
     }
@@ -45,26 +45,27 @@ public class ReconciliationFileBatchPersistenceConverter {
      * @return 领域快照
      */
     public ReconciliationFileBatch toDomain(ReconciliationFileBatchDO row) {
-        return new ReconciliationFileBatch(
-                row.getFileId(),
-                row.getObjectKey(),
-                row.getSourceSystem(),
-                row.getRecordType(),
-                row.getWindowStart(),
-                row.getWindowEnd(),
-                row.getFileVersion(),
-                row.getSchemaVersion(),
-                row.getSha256(),
-                row.getRecordCount(),
-                row.getByteSize(),
-                ReconciliationFileBatchStatus.valueOf(row.getStatus()),
-                row.getFailureReason(),
-                row.getCreatedAt(),
-                row.getCompletedAt(),
-                row.getBatchId(),
-                row.getBusinessDate(),
-                row.getCutoffAt(),
-                row.getActualRecordCount(),
-                row.getUpdatedAt());
+        return ReconciliationFileBatch.builder()
+                .fileId(row.getFileId())
+                .batchId(row.getBatchId())
+                .sourceSystem(row.getSourceSystem())
+                .objectKey(row.getObjectKey())
+                .recordType(row.getRecordType())
+                .fileVersion(row.getFileVersion())
+                .schemaVersion(row.getSchemaVersion())
+                .businessDate(row.getBusinessDate())
+                .windowStart(row.getWindowStart())
+                .windowEnd(row.getWindowEnd())
+                .cutoffAt(row.getCutoffAt())
+                .sha256(row.getSha256())
+                .byteSize(row.getByteSize())
+                .recordCount(row.getRecordCount())
+                .actualRecordCount(row.getActualRecordCount())
+                .status(ReconciliationFileBatchStatus.valueOf(row.getStatus()))
+                .failureReason(row.getFailureReason())
+                .completedAt(row.getCompletedAt())
+                .createdAt(row.getCreatedAt())
+                .updatedAt(row.getUpdatedAt())
+                .build();
     }
 }

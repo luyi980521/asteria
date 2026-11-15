@@ -21,6 +21,12 @@ public final class ReconciliationCase {
     /** 主键，由 DistributedIdGenerator 生成正数雪花 ID。 */
     private final ReconciliationCaseId caseId;
 
+    /** 首次发现差异的运行 ID，逻辑关联 reconciliation_run.id。 */
+    private final ReconciliationRunId runId;
+
+    /** 首次差异结论 ID，逻辑关联 reconciliation_match_result.id。 */
+    private final ReconciliationMatchResultId matchResultId;
+
     /** 稳定规则编码，逻辑关联 reconciliation_rule.rule_code。 */
     private final String ruleCode;
 
@@ -29,12 +35,6 @@ public final class ReconciliationCase {
 
     /** 工单差异类型，参与活动工单唯一性。 */
     private final ReconciliationDifferenceType differenceType;
-
-    /** 首次发现差异的运行 ID，逻辑关联 reconciliation_run.id。 */
-    private final ReconciliationRunId runId;
-
-    /** 首次差异结论 ID，逻辑关联 reconciliation_match_result.id。 */
-    private final ReconciliationMatchResultId matchResultId;
 
     /** OPEN、INVESTIGATING、RESOLVED 或 IGNORED。 */
     private ReconciliationCaseStatus status;

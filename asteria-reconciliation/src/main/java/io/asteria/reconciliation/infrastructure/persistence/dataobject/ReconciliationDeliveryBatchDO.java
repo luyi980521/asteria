@@ -15,11 +15,17 @@ public class ReconciliationDeliveryBatchDO {
     @TableId(value = "batch_id", type = IdType.INPUT)
     private Long batchId;
 
+    /** 来源系统 */
+    private String sourceSystem;
+
     /** 独立 Manifest 对象键 */
     private String manifestObjectKey;
 
-    /** 来源系统 */
-    private String sourceSystem;
+    /** 交付版本 */
+    private Long fileVersion;
+
+    /** 清单格式版本 */
+    private Integer schemaVersion;
 
     /** 来源系统约定的业务日期 */
     private LocalDate businessDate;
@@ -33,12 +39,6 @@ public class ReconciliationDeliveryBatchDO {
     /** 采集可见截止时间 */
     private Instant cutoffAt;
 
-    /** 交付版本 */
-    private Long fileVersion;
-
-    /** 清单格式版本 */
-    private Integer schemaVersion;
-
     /** 全部文件预期记录数之和 */
     private Long expectedRecordCount;
 
@@ -51,12 +51,12 @@ public class ReconciliationDeliveryBatchDO {
     /** 失败说明，可空 */
     private String failureReason;
 
+    /** 结束时间，可空 */
+    private Instant completedAt;
+
     /** 创建时间 */
     private Instant createdAt;
 
     /** 最近更新时间 */
     private Instant updatedAt;
-
-    /** 结束时间，可空 */
-    private Instant completedAt;
 }

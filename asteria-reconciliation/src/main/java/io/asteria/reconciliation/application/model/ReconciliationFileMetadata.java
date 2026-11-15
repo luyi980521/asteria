@@ -9,45 +9,44 @@ import java.time.LocalDate;
  */
 @Builder
 public record ReconciliationFileMetadata(
-        /* 应用分配的文件 ID。 */
-        Long fileId,
+    /* 应用分配的文件 ID。 */
+    Long fileId,
 
-        /* 对象存储相对键。 */
-        String objectKey,
+    /* 来源系统。 */
+    String sourceSystem,
 
-        /* 来源系统。 */
-        String sourceSystem,
+    /* 对象存储相对键。 */
+    String objectKey,
 
-        /* PAYMENT_CAPTURE、LEDGER_JOURNAL 或 LEDGER_POSTING。 */
-        String recordType,
+    /* PAYMENT_CAPTURE、LEDGER_JOURNAL 或 LEDGER_POSTING。 */
+    String recordType,
 
-        /* 业务窗口起点，包含。 */
-        Instant windowStart,
+    /* 文件非负版本。 */
+    Long fileVersion,
 
-        /* 业务窗口终点，不包含。 */
-        Instant windowEnd,
+    /* CSV 格式版本。 */
+    Integer schemaVersion,
 
-        /* 文件非负版本。 */
-        Long fileVersion,
+    /* 所属交付的业务日期 */
+    LocalDate businessDate,
 
-        /* CSV 格式版本。 */
-        Integer schemaVersion,
+    /* 业务窗口起点，包含。 */
+    Instant windowStart,
 
-        /* 不含表头的数据行数。 */
-        Long recordCount,
+    /* 业务窗口终点，不包含。 */
+    Instant windowEnd,
 
-        /* 文件原始字节数。 */
-        Long byteSize,
+    /* 所属交付的采集截止时间 */
+    Instant cutoffAt,
 
-        /* 原始 UTF-8 文件字节的 SHA-256，小写十六进制。 */
-        String sha256,
+    /* 原始 UTF-8 文件字节的 SHA-256，小写十六进制。 */
+    String sha256,
 
-        /* 文件生成时间。 */
-        Instant createdAt,
+    /* 文件原始字节数。 */
+    Long byteSize,
 
-        /* 所属交付的业务日期 */
-        LocalDate businessDate,
+    /* 不含表头的数据行数。 */
+    Long recordCount,
 
-        /* 所属交付的采集截止时间 */
-        Instant cutoffAt
-) { }
+    /* 文件生成时间。 */
+    Instant createdAt) { }

@@ -4,11 +4,11 @@
     <!-- 显式映射列名，JSON 文本以 String 原样存取，金额与币种分别保存。 -->
     <resultMap id="BaseResultMap" type="io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationCaseDO">
         <id property="id" column="id"/>
+        <result property="runId" column="run_id"/>
+        <result property="matchResultId" column="match_result_id"/>
         <result property="ruleCode" column="rule_code"/>
         <result property="businessKey" column="business_key"/>
         <result property="differenceType" column="difference_type"/>
-        <result property="runId" column="run_id"/>
-        <result property="matchResultId" column="match_result_id"/>
         <result property="status" column="status"/>
         <result property="assignee" column="assignee"/>
         <result property="details" column="details"/>
@@ -20,7 +20,7 @@
     </resultMap>
 
     <sql id="BaseColumns">
-        id, rule_code, business_key, difference_type, run_id, match_result_id, status, assignee, details, resolution, closed_at, version, created_at, updated_at
+        id, run_id, match_result_id, rule_code, business_key, difference_type, status, assignee, details, resolution, closed_at, version, created_at, updated_at
     </sql>
 
     <select id="findById" resultMap="BaseResultMap">

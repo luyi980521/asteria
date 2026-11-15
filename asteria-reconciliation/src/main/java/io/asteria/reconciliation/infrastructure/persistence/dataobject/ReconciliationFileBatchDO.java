@@ -15,20 +15,17 @@ public class ReconciliationFileBatchDO {
     @TableId(value = "file_id", type = IdType.INPUT)
     private Long fileId;
 
-    /** 对象存储相对路径 */
-    private String objectKey;
+    /** 所属交付批次标识，可空 */
+    private Long batchId;
 
     /** 来源系统 */
     private String sourceSystem;
 
+    /** 对象存储相对路径 */
+    private String objectKey;
+
     /** 文件记录类型 */
     private String recordType;
-
-    /** 包含的业务窗口起点 */
-    private Instant windowStart;
-
-    /** 不包含的业务窗口终点 */
-    private Instant windowEnd;
 
     /** 文件交付版本 */
     private Long fileVersion;
@@ -36,14 +33,29 @@ public class ReconciliationFileBatchDO {
     /** 数据格式版本 */
     private Integer schemaVersion;
 
+    /** 来源约定的业务日期，可空 */
+    private LocalDate businessDate;
+
+    /** 包含的业务窗口起点 */
+    private Instant windowStart;
+
+    /** 不包含的业务窗口终点 */
+    private Instant windowEnd;
+
+    /** 采集可见截止时间，可空 */
+    private Instant cutoffAt;
+
     /** 文件原始字节的 SHA-256 */
     private String sha256;
+
+    /** 文件字节数 */
+    private Long byteSize;
 
     /** 预期数据行数，不含表头 */
     private Long recordCount;
 
-    /** 文件字节数 */
-    private Long byteSize;
+    /** 实际处理行数，处理前可空 */
+    private Long actualRecordCount;
 
     /** 文件批次状态 */
     private String status;
@@ -51,23 +63,11 @@ public class ReconciliationFileBatchDO {
     /** 失败说明，可空 */
     private String failureReason;
 
-    /** 创建时间 */
-    private Instant createdAt;
-
     /** 结束时间，可空 */
     private Instant completedAt;
 
-    /** 所属交付批次标识，历史记录可空 */
-    private Long batchId;
-
-    /** 来源约定的业务日期，历史记录可空 */
-    private LocalDate businessDate;
-
-    /** 采集可见截止时间，历史记录可空 */
-    private Instant cutoffAt;
-
-    /** 实际处理行数，处理前可空 */
-    private Long actualRecordCount;
+    /** 创建时间 */
+    private Instant createdAt;
 
     /** 最近更新时间 */
     private Instant updatedAt;
