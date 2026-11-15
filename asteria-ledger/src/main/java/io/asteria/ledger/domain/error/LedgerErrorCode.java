@@ -1,57 +1,111 @@
 package io.asteria.ledger.domain.error;
 
-public enum LedgerErrorCode {
+import io.asteria.common.domain.error.ErrorCode;
+
+/**
+ * 模块业务错误码与默认消息。
+ */
+public enum LedgerErrorCode implements ErrorCode {
     /** ********************* 通用错误 ********************** */
     INVALID_PARAMS("COMMON_0001", "Invalid params"),
+    /** Argument must not be null */
     NULL_ARGUMENT("COMMON_0002", "Argument must not be null"),
 
     /** ********************* 账本模块错误 ********************** */
     INVALID_MONEY_AMOUNT("LEDGER_0001", "Money amount must be greater than zero"),
+    /** Currencies do not match */
     CURRENCY_MISMATCH("LEDGER_0002", "Currencies do not match"),
+    /** Journal entry must contain at least two postings */
     INSUFFICIENT_POSTINGS("LEDGER_0003", "Journal entry must contain at least two postings"),
+    /** Journal entry must contain postings in the same currency */
     MULTIPLE_CURRENCIES_NOT_SUPPORTED("LEDGER_0004", "Journal entry must contain postings in the same currency"),
+    /** DebitCredit direction is illegal */
     DEBIT_CREDIT_DIRECTION_ILLEGAL("LEDGER_0005", "DebitCredit direction is illegal"),
+    /** Journal entry not balanced */
     JOURNAL_ENTRY_NOT_BALANCED("LEDGER_0006", "Journal entry not balanced"),
+    /** Posting amount must be positive */
     POSTING_AMOUNT_MUST_BE_POSITIVE("LEDGER_0007", "Posting amount must be positive"),
+    /** Journal entry cannot be posted */
     JOURNAL_ENTRY_CANNOT_BE_POSTED("LEDGER_0008", "Journal entry cannot be posted"),
+    /** Only posted entry can be reversed */
     ONLY_POSTED_ENTRY_CAN_BE_REVERSED("LEDGER_0009", "Only posted entry can be reversed"),
+    /** Journal entry already reversed */
     JOURNAL_ENTRY_ALREADY_REVERSED("LEDGER_0010", "Journal entry already reversed"),
+    /** Reversed at before posted at */
     REVERSED_AT_BEFORE_POSTED_AT("LEDGER_0011", "Reversed at before posted at"),
+    /** Source type required */
     SOURCE_TYPE_REQUIRED("LEDGER_0012", "Source type required"),
+    /** Source id required */
     SOURCE_ID_REQUIRED("LEDGER_0013", "Source id required"),
+    /** Event type required */
     EVENT_TYPE_REQUIRED("LEDGER_0014", "Event type required"),
+    /** Event id required */
     EVENT_ID_REQUIRED("LEDGER_0015", "Event id required"),
+    /** Duplicate ledger event */
     DUPLICATE_LEDGER_EVENT("LEDGER_0016", "Duplicate ledger event"),
+    /** Ledger account id required */
     LEDGER_ACCOUNT_ID_REQUIRED("LEDGER_0017", "Ledger account id required"),
+    /** Ledger account code required */
     LEDGER_ACCOUNT_CODE_REQUIRED("LEDGER_0018", "Ledger account code required"),
+    /** Ledger account owner type required */
     LEDGER_ACCOUNT_OWNER_TYPE_REQUIRED("LEDGER_0019", "Ledger account owner type required"),
+    /** Ledger account owner id must be greater than zero */
     LEDGER_ACCOUNT_OWNER_ID_ILLEGAL("LEDGER_0020", "Ledger account owner id must be greater than zero"),
+    /** Ledger account category required */
     LEDGER_ACCOUNT_CATEGORY_REQUIRED("LEDGER_0021", "Ledger account category required"),
+    /** Ledger account currency required */
     LEDGER_ACCOUNT_CURRENCY_REQUIRED("LEDGER_0022", "Ledger account currency required"),
+    /** Ledger account status required */
     LEDGER_ACCOUNT_STATUS_REQUIRED("LEDGER_0023", "Ledger account status required"),
+    /** Ledger account is not active */
     LEDGER_ACCOUNT_NOT_ACTIVE("LEDGER_0024", "Ledger account is not active"),
+    /** Ledger account currency does not match posting currency */
     LEDGER_ACCOUNT_CURRENCY_MISMATCH("LEDGER_0025", "Ledger account currency does not match posting currency"),
+    /** Posting money required */
     POSTING_MONEY_REQUIRED("LEDGER_0026", "Posting money required"),
+    /** Closed ledger account cannot be frozen */
     CLOSED_LEDGER_ACCOUNT_CANNOT_BE_FROZEN("LEDGER_0027", "Closed ledger account cannot be frozen"),
+    /** Closed ledger account cannot be activated */
     CLOSED_LEDGER_ACCOUNT_CANNOT_BE_ACTIVATED("LEDGER_0028", "Closed ledger account cannot be activated"),
+    /** Ledger account is already closed */
     LEDGER_ACCOUNT_ALREADY_CLOSED("LEDGER_0029", "Ledger account is already closed"),
+    /** Ledger account is already exists */
     LEDGER_ACCOUNT_ALREADY_EXISTS("LEDGER_0030", "Ledger account is already exists"),
+    /** Ledger account doesn't exist */
     LEDGER_ACCOUNT_NOT_EXIST("LEDGER_0031", "Ledger account doesn't exist"),
 
     ;
 
+    /** 业务错误码 */
     private final String code;
+    /** 默认错误消息 */
     private final String defaultMessage;
 
+    /**
+     * 保存业务错误码与默认消息。
+     *
+     * @param code 业务错误码
+     * @param defaultMessage 默认错误消息
+     */
     LedgerErrorCode(String code, String defaultMessage) {
         this.code = code;
         this.defaultMessage = defaultMessage;
     }
 
+    /**
+     * 返回稳定的业务错误码。
+     *
+     * @return 业务错误码
+     */
     public String code() {
         return code;
     }
 
+    /**
+     * 返回默认错误消息。
+     *
+     * @return 默认错误消息
+     */
     public String defaultMessage() {
         return defaultMessage;
     }

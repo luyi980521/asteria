@@ -2,6 +2,7 @@ package io.asteria.bootstrap.web.exception;
 
 import io.asteria.balance.domain.exception.BalanceDomainException;
 import io.asteria.common.domain.exception.CommonDomainException;
+import io.asteria.common.domain.exception.BusinessException;
 import io.asteria.common.application.exception.RemoteServiceException;
 import io.asteria.currency.domain.exception.CurrencyDomainException;
 import io.asteria.ledger.domain.exception.LedgerDomainException;
@@ -21,6 +22,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * 保留余额模块异常的响应与日志契约。
+     *
+     * @param exception 余额业务异常
+     * @return 原有错误响应
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BalanceDomainException.class)
     public ApiResponse<Void> handleBalanceDomainException(BalanceDomainException exception) {
@@ -93,6 +100,19 @@ public class GlobalExceptionHandler {
         log.warn("Settlement domain exception, code: {}, message: {}",
                 exception.getErrorCode().getCode(), exception.getMessage(), exception);
         return ApiResponse.failure(exception.getErrorCode().getCode(), exception.getMessage());
+    }
+
+    /**
+     * 识别公共业务异常，保留原先未配置模块处理器时的 HTTP 500 与 ERROR 日志行为。
+     * 具体模块处理器由 Spring 按异常类型距离优先匹配。
+     *
+     * @param exception 尚无模块专用处理器的业务异常
+     * @return 原有系统错误响应，不暴露内部诊断信息
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(BusinessException.class)
+    public ApiResponse<Void> handleBusinessException(BusinessException exception) {
+        return handleException(exception);
     }
 
     /**

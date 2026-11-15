@@ -1,9 +1,11 @@
 package io.asteria.reconciliation.domain.error;
 
+import io.asteria.common.domain.error.ErrorCode;
+
 /**
  * 对账领域错误码；数据库唯一性冲突仍由持久化层报告。
  */
-public enum ReconciliationErrorCode {
+public enum ReconciliationErrorCode implements ErrorCode {
     /** 参数、时间或持久化数据违反领域约束。 */
     INVALID_PARAMS("RECONCILIATION_0001", "Reconciliation parameters violate domain constraints"),
     /** 当前状态不允许请求的转换。 */
@@ -18,6 +20,12 @@ public enum ReconciliationErrorCode {
     /** 默认诊断信息。 */
     private final String defaultMessage;
 
+    /**
+     * 保存业务错误码与默认消息。
+     *
+     * @param code 业务错误码
+     * @param defaultMessage 默认错误消息
+     */
     ReconciliationErrorCode(String code, String defaultMessage) {
         this.code = code;
         this.defaultMessage = defaultMessage;

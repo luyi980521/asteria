@@ -1,11 +1,12 @@
 package io.asteria.reconciliation.domain.exception;
 
+import io.asteria.common.domain.exception.BusinessException;
 import io.asteria.reconciliation.domain.error.ReconciliationErrorCode;
 
 /**
  * 对账领域异常，携带稳定错误码及可选的校验失败原因。
  */
-public class ReconciliationDomainException extends RuntimeException {
+public class ReconciliationDomainException extends BusinessException {
     /** 本次失败所属的领域错误。 */
     private final ReconciliationErrorCode errorCode;
 
@@ -20,7 +21,8 @@ public class ReconciliationDomainException extends RuntimeException {
      * 保留序列化等底层失败原因。
      */
     public ReconciliationDomainException(ReconciliationErrorCode errorCode, Throwable cause) {
-        super((errorCode == null ? ReconciliationErrorCode.INVALID_PARAMS : errorCode).defaultMessage(), cause);
+        super(errorCode == null ? ReconciliationErrorCode.INVALID_PARAMS : errorCode,
+                (errorCode == null ? ReconciliationErrorCode.INVALID_PARAMS : errorCode).defaultMessage(), cause);
         this.errorCode = errorCode == null ? ReconciliationErrorCode.INVALID_PARAMS : errorCode;
     }
 
