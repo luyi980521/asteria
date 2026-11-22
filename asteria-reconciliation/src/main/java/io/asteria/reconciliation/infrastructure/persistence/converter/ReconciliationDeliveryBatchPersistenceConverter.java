@@ -1,8 +1,9 @@
 package io.asteria.reconciliation.infrastructure.persistence.converter;
 
 import io.asteria.reconciliation.domain.enums.ReconciliationFileBatchStatus;
-import io.asteria.reconciliation.domain.valueobject.ReconciliationDeliveryBatch;
+import io.asteria.reconciliation.domain.entity.ReconciliationDeliveryBatch;
 import io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationDeliveryBatchDO;
+import io.asteria.reconciliation.domain.valueobject.ReconciliationDeliveryBatchId;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,22 +18,22 @@ public class ReconciliationDeliveryBatchPersistenceConverter {
      */
     public ReconciliationDeliveryBatchDO toDataObject(ReconciliationDeliveryBatch value) {
         var row = new ReconciliationDeliveryBatchDO();
-        row.setId(value.batchId());
-        row.setSourceSystem(value.sourceSystem());
-        row.setManifestObjectKey(value.manifestObjectKey());
-        row.setDeliveryVersion(value.fileVersion());
-        row.setSchemaVersion(value.schemaVersion());
-        row.setBusinessDate(value.businessDate());
-        row.setWindowStart(value.windowStart());
-        row.setWindowEnd(value.windowEnd());
-        row.setCutoffAt(value.cutoffAt());
-        row.setExpectedRecordCount(value.expectedRecordCount());
-        row.setActualRecordCount(value.actualRecordCount());
-        row.setStatus(value.status().name());
-        row.setFailureReason(value.failureReason());
-        row.setCompletedAt(value.completedAt());
-        row.setCreatedAt(value.createdAt());
-        row.setUpdatedAt(value.updatedAt());
+        row.setId(value.getBatchId().value());
+        row.setSourceSystem(value.getSourceSystem());
+        row.setManifestObjectKey(value.getManifestObjectKey());
+        row.setDeliveryVersion(value.getFileVersion());
+        row.setSchemaVersion(value.getSchemaVersion());
+        row.setBusinessDate(value.getBusinessDate());
+        row.setWindowStart(value.getWindowStart());
+        row.setWindowEnd(value.getWindowEnd());
+        row.setCutoffAt(value.getCutoffAt());
+        row.setExpectedRecordCount(value.getExpectedRecordCount());
+        row.setActualRecordCount(value.getActualRecordCount());
+        row.setStatus(value.getStatus().name());
+        row.setFailureReason(value.getFailureReason());
+        row.setCompletedAt(value.getCompletedAt());
+        row.setCreatedAt(value.getCreatedAt());
+        row.setUpdatedAt(value.getUpdatedAt());
         return row;
     }
     /**
@@ -42,7 +43,7 @@ public class ReconciliationDeliveryBatchPersistenceConverter {
      */
     public ReconciliationDeliveryBatch toDomain(ReconciliationDeliveryBatchDO row) {
         return ReconciliationDeliveryBatch.builder()
-                .batchId(row.getId())
+                .batchId(ReconciliationDeliveryBatchId.of(row.getId()))
                 .sourceSystem(row.getSourceSystem())
                 .manifestObjectKey(row.getManifestObjectKey())
                 .fileVersion(row.getDeliveryVersion())

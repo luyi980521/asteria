@@ -1,12 +1,14 @@
 package io.asteria.reconciliation.infrastructure.persistence.repository;
 
 import io.asteria.reconciliation.domain.repository.ReconciliationFileBatchRepository;
-import io.asteria.reconciliation.domain.valueobject.ReconciliationFileBatch;
+import io.asteria.reconciliation.domain.entity.ReconciliationFileBatch;
 import io.asteria.reconciliation.domain.enums.ReconciliationFileBatchStatus;
 import io.asteria.reconciliation.infrastructure.persistence.converter.ReconciliationFileBatchPersistenceConverter;
 import io.asteria.reconciliation.infrastructure.persistence.mapper.ReconciliationFileBatchMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import io.asteria.reconciliation.domain.valueobject.ReconciliationFileBatchId;
+import io.asteria.reconciliation.domain.valueobject.ReconciliationDeliveryBatchId;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,8 +26,8 @@ public class ReconciliationFileBatchRepositoryImpl implements ReconciliationFile
     private final ReconciliationFileBatchPersistenceConverter converter;
 
     @Override
-    public Optional<ReconciliationFileBatch> findById(Long id) {
-        return Optional.ofNullable(mapper.findById(id)).map(converter::toDomain);
+    public Optional<ReconciliationFileBatch> findById(ReconciliationFileBatchId id) {
+        return Optional.ofNullable(mapper.findById(id.value())).map(converter::toDomain);
     }
     @Override
     public Optional<ReconciliationFileBatch> findByDelivery(String sourceSystem, String objectKey, Long fileVersion) {
@@ -50,13 +52,13 @@ public class ReconciliationFileBatchRepositoryImpl implements ReconciliationFile
         return mapper.updateMetadata(converter.toDataObject(batch), expectedStatus.name(), expectedUpdatedAt) == 1;
     }
     @Override
-    public List<ReconciliationFileBatch> findByBatchId(Long batchId, long afterId, int limit) {
+    public List<ReconciliationFileBatch> findByBatchId(ReconciliationDeliveryBatchId batchId, long afterId, int limit) {
         checkPage(afterId, limit);
-        return mapper.findByBatchId(batchId, afterId, limit).stream().map(converter::toDomain).toList();
+        return mapper.findByBatchId(batchId.value(), afterId, limit).stream().map(converter::toDomain).toList();
     }
     @Override
-    public boolean updateImportStatus(Long fileId, String expectedStatus, String status, Instant completedAt, String failureReason) {
-        return mapper.updateImportStatus(fileId, expectedStatus, status, completedAt, failureReason) == 1;
+    public boolean updateImportStatus(ReconciliationFileBatchId fileId, String expectedStatus, String status, Instant completedAt, String failureReason) {
+        return mapper.updateImportStatus(fileId.value(), expectedStatus, status, completedAt, failureReason) == 1;
     }
     private void checkPage(long afterId, int limit) {
         if (afterId < 0 || limit < 1 || limit > 1000) throw new IllegalArgumentException("Invalid batch page");

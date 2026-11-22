@@ -43,6 +43,16 @@
         ON CONFLICT (source_system, manifest_object_key, delivery_version) DO NOTHING
     </insert>
     <!-- 不实现状态机，以状态与更新时间作为条件，保护并发元数据更新。 -->
+    <update id="updateStatus">
+        UPDATE reconciliation_delivery_batch SET status = #{targetStatus}
+        WHERE id = #{id} AND status = #{originalStatus}
+    </update>
+    <update id="updateEntity">
+        UPDATE reconciliation_delivery_batch SET status = #{status}, actual_record_count = #{actualRecordCount},
+            failure_reason = #{failureReason}, completed_at = #{completedAt},
+            updated_at = GREATEST(clock_timestamp(), updated_at + INTERVAL '1 microsecond')
+        WHERE id = #{id} AND updated_at = #{updatedAt}
+    </update>
     <update id="updateMetadata">
         UPDATE reconciliation_delivery_batch SET status = #{row.status}, actual_record_count = #{row.actualRecordCount},
             failure_reason = #{row.failureReason}, updated_at = #{row.updatedAt}, completed_at = #{row.completedAt}

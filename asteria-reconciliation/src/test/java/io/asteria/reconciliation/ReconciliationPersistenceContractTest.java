@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import io.asteria.common.util.JsonUtils;
 import io.asteria.reconciliation.domain.enums.*;
 import io.asteria.reconciliation.domain.valueobject.*;
+import io.asteria.reconciliation.domain.entity.ReconciliationDeliveryBatch;
+import io.asteria.reconciliation.domain.entity.ReconciliationFileBatch;
 import io.asteria.reconciliation.infrastructure.persistence.converter.*;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.session.AutoMappingBehavior;
@@ -131,13 +133,13 @@ class ReconciliationPersistenceContractTest {
         row.setBusinessDate(null);
         row.setCutoffAt(null);
         var restored = converter.toDomain(row);
-        assertNull(restored.batchId());
-        assertNull(restored.businessDate());
-        assertNull(restored.cutoffAt());
-        assertNull(restored.actualRecordCount());
-        assertEquals(45L, restored.fileVersion());
-        assertEquals(1, restored.schemaVersion());
-        assertEquals(ReconciliationFileBatchStatus.COMPLETED, restored.status());
+        assertNull(restored.getBatchId());
+        assertNull(restored.getBusinessDate());
+        assertNull(restored.getCutoffAt());
+        assertNull(restored.getActualRecordCount());
+        assertEquals(45L, restored.getFileVersion());
+        assertEquals(1, restored.getSchemaVersion());
+        assertEquals(ReconciliationFileBatchStatus.COMPLETED, restored.getStatus());
         assertEquals(JsonUtils.mapper().valueToTree(row), JsonUtils.mapper().valueToTree(converter.toDataObject(restored)));
     }
 
@@ -152,7 +154,7 @@ class ReconciliationPersistenceContractTest {
     static ReconciliationFileBatch file(ReconciliationFileBatchStatus status, String reason, Long actual) {
         var time = NOW.plusNanos(123456000);
         return ReconciliationFileBatch.builder()
-                .fileId(101L)
+                .fileId(ReconciliationFileBatchId.of(101L))
                 .objectKey("ledger/中文-journal.csv")
                 .sourceSystem("LEDGER")
                 .recordType("LEDGER_JOURNAL")
@@ -167,7 +169,7 @@ class ReconciliationPersistenceContractTest {
                 .failureReason(reason)
                 .createdAt(time)
                 .completedAt(null)
-                .batchId(201L)
+                .batchId(ReconciliationDeliveryBatchId.of(201L))
                 .businessDate(LocalDate.of(2026, 10, 1))
                 .cutoffAt(NOW)
                 .actualRecordCount(actual)
@@ -186,7 +188,7 @@ class ReconciliationPersistenceContractTest {
     static ReconciliationDeliveryBatch delivery(ReconciliationFileBatchStatus status, String reason, Long actual) {
         var time = NOW.plusNanos(123456000);
         return ReconciliationDeliveryBatch.builder()
-                .batchId(201L)
+                .batchId(ReconciliationDeliveryBatchId.of(201L))
                 .manifestObjectKey("ledger/manifest.json")
                 .sourceSystem("LEDGER")
                 .businessDate(LocalDate.of(2026, 10, 1))

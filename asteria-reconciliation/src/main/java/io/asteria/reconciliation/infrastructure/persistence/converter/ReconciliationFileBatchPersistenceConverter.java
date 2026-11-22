@@ -1,8 +1,10 @@
 package io.asteria.reconciliation.infrastructure.persistence.converter;
 
 import io.asteria.reconciliation.domain.enums.ReconciliationFileBatchStatus;
-import io.asteria.reconciliation.domain.valueobject.ReconciliationFileBatch;
+import io.asteria.reconciliation.domain.entity.ReconciliationFileBatch;
 import io.asteria.reconciliation.infrastructure.persistence.dataobject.ReconciliationFileBatchDO;
+import io.asteria.reconciliation.domain.valueobject.ReconciliationDeliveryBatchId;
+import io.asteria.reconciliation.domain.valueobject.ReconciliationFileBatchId;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,26 +19,26 @@ public class ReconciliationFileBatchPersistenceConverter {
      */
     public ReconciliationFileBatchDO toDataObject(ReconciliationFileBatch value) {
         var row = new ReconciliationFileBatchDO();
-        row.setId(value.fileId());
-        row.setBatchId(value.batchId());
-        row.setSourceSystem(value.sourceSystem());
-        row.setObjectKey(value.objectKey());
-        row.setRecordType(value.recordType());
-        row.setFileVersion(value.fileVersion());
-        row.setSchemaVersion(value.schemaVersion());
-        row.setBusinessDate(value.businessDate());
-        row.setWindowStart(value.windowStart());
-        row.setWindowEnd(value.windowEnd());
-        row.setCutoffAt(value.cutoffAt());
-        row.setSha256(value.sha256());
-        row.setByteSize(value.byteSize());
-        row.setRecordCount(value.recordCount());
-        row.setActualRecordCount(value.actualRecordCount());
-        row.setStatus(value.status().name());
-        row.setFailureReason(value.failureReason());
-        row.setCompletedAt(value.completedAt());
-        row.setCreatedAt(value.createdAt());
-        row.setUpdatedAt(value.updatedAt());
+        row.setId(value.getFileId().value());
+        row.setBatchId(value.getBatchId() == null ? null : value.getBatchId().value());
+        row.setSourceSystem(value.getSourceSystem());
+        row.setObjectKey(value.getObjectKey());
+        row.setRecordType(value.getRecordType());
+        row.setFileVersion(value.getFileVersion());
+        row.setSchemaVersion(value.getSchemaVersion());
+        row.setBusinessDate(value.getBusinessDate());
+        row.setWindowStart(value.getWindowStart());
+        row.setWindowEnd(value.getWindowEnd());
+        row.setCutoffAt(value.getCutoffAt());
+        row.setSha256(value.getSha256());
+        row.setByteSize(value.getByteSize());
+        row.setRecordCount(value.getRecordCount());
+        row.setActualRecordCount(value.getActualRecordCount());
+        row.setStatus(value.getStatus().name());
+        row.setFailureReason(value.getFailureReason());
+        row.setCompletedAt(value.getCompletedAt());
+        row.setCreatedAt(value.getCreatedAt());
+        row.setUpdatedAt(value.getUpdatedAt());
         return row;
     }
     /**
@@ -46,8 +48,8 @@ public class ReconciliationFileBatchPersistenceConverter {
      */
     public ReconciliationFileBatch toDomain(ReconciliationFileBatchDO row) {
         return ReconciliationFileBatch.builder()
-                .fileId(row.getId())
-                .batchId(row.getBatchId())
+                .fileId(ReconciliationFileBatchId.of(row.getId()))
+                .batchId(row.getBatchId() == null ? null : ReconciliationDeliveryBatchId.of(row.getBatchId()))
                 .sourceSystem(row.getSourceSystem())
                 .objectKey(row.getObjectKey())
                 .recordType(row.getRecordType())

@@ -24,4 +24,19 @@ public class ManifestSerializer {
         new FileSchemaValidator().validate(manifest);
         return manifest;
     }
+
+    /**
+     * 仅解析清单 JSON，不校验 Manifest 业务字段或文件完整性。
+     *
+     * @param bytes UTF-8 JSON 内容
+     * @return 反序列化后的清单
+     * @throws IllegalArgumentException 内容无法解析为清单对象，保留原始解析原因
+     */
+    public ReconciliationFileManifest deserializeContent(byte[] bytes) {
+        var manifest = JsonUtils.fromJson(bytes, ReconciliationFileManifest.class);
+        if (manifest == null) {
+            throw new IllegalArgumentException("Manifest JSON must contain an object");
+        }
+        return manifest;
+    }
 }

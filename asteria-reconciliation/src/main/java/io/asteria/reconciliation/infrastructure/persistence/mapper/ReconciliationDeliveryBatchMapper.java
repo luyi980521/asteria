@@ -14,6 +14,24 @@ import java.util.List;
 @Mapper
 public interface ReconciliationDeliveryBatchMapper extends BaseMapper<ReconciliationDeliveryBatchDO> {
     /**
+     * 按实体原更新时间保存处理元数据，并刷新数据库更新时间。
+     *
+     * @param row 实体对应的数据行
+     * @return 更新行数
+     */
+    int updateEntity(ReconciliationDeliveryBatchDO row);
+
+    /**
+     * 按预期状态和时间原子更新状态，不修改交付描述及处理结果。
+     *
+     * @param id 批次主键
+     * @param originalStatus 原状态
+     * @param targetStatus 目标状态
+     * @return 更新行数
+     */
+    int updateStatus(@Param("id") Long id, @Param("expectedStatus") String originalStatus, @Param("status") String targetStatus);
+
+    /**
      * 读取主键对应的元数据。
      */
     ReconciliationDeliveryBatchDO findById(@Param("id") Long id);

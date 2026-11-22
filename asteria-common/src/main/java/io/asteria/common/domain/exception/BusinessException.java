@@ -9,6 +9,10 @@ public class BusinessException extends RuntimeException {
     /** 业务错误码 */
     private final ErrorCode errorCode;
 
+    public BusinessException(ErrorCode errorCode) {
+        this(errorCode, errorCode.defaultMessage());
+    }
+
     /**
      * 按模块指定的消息构造异常，允许调用方随后通过 initCause 设置原因。
      *

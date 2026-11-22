@@ -1,7 +1,9 @@
 package io.asteria.reconciliation.domain.repository;
 
-import io.asteria.reconciliation.domain.valueobject.ReconciliationFileBatch;
+import io.asteria.reconciliation.domain.entity.ReconciliationFileBatch;
 import io.asteria.reconciliation.domain.enums.ReconciliationFileBatchStatus;
+import io.asteria.reconciliation.domain.valueobject.ReconciliationFileBatchId;
+import io.asteria.reconciliation.domain.valueobject.ReconciliationDeliveryBatchId;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +16,7 @@ public interface ReconciliationFileBatchRepository {
     /**
      * 按主键读取。
      */
-    Optional<ReconciliationFileBatch> findById(Long id);
+    Optional<ReconciliationFileBatch> findById(ReconciliationFileBatchId id);
     /**
      * 按来源、对象键及版本读取已登记描述；冲突后的内容比较由调用方负责。
      */
@@ -38,9 +40,9 @@ public interface ReconciliationFileBatchRepository {
     /**
      * 按交付批次读取文件页，首屏 afterId 为 0。
      */
-    List<ReconciliationFileBatch> findByBatchId(Long batchId, long afterId, int limit);
+    List<ReconciliationFileBatch> findByBatchId(ReconciliationDeliveryBatchId batchId, long afterId, int limit);
     /**
      * 兼容旧调用方的状态条件更新；新增处理代码优先使用带更新时间条件的 updateMetadata。
      */
-    boolean updateImportStatus(Long fileId, String expectedStatus, String status, Instant completedAt, String failureReason);
+    boolean updateImportStatus(ReconciliationFileBatchId fileId, String expectedStatus, String status, Instant completedAt, String failureReason);
 }

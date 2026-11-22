@@ -118,8 +118,12 @@ class ReconciliationPersistenceTest {
 
     @Test
     void fileRegistrationIsIdempotentAndImportStatusUsesCompareAndSet() throws Exception {
+        deliveries.insert(ReconciliationDeliveryBatch.builder().batchId(ReconciliationDeliveryBatchId.of(200L))
+                .sourceSystem("PAYMENT").manifestObjectKey("payment/manifest.json").fileVersion(0L).schemaVersion(1)
+                .businessDate(LocalDate.of(2026, 10, 1)).windowStart(START).windowEnd(END).cutoffAt(NOW)
+                .expectedRecordCount(2L).status(ReconciliationFileBatchStatus.DELIVERED).createdAt(NOW).updatedAt(NOW).build());
         var batch = ReconciliationFileBatch.builder()
-                .fileId(100L)
+                .fileId(ReconciliationFileBatchId.of(100L))
                 .objectKey("payment/captures.csv")
                 .sourceSystem("PAYMENT")
                 .recordType("PAYMENT_CAPTURE")
@@ -134,7 +138,7 @@ class ReconciliationPersistenceTest {
                 .failureReason(null)
                 .createdAt(NOW)
                 .completedAt(null)
-                .batchId(200L)
+                .batchId(ReconciliationDeliveryBatchId.of(200L))
                 .businessDate(java.time.LocalDate.of(2026, 10, 1))
                 .cutoffAt(NOW)
                 .actualRecordCount(null)
@@ -143,10 +147,10 @@ class ReconciliationPersistenceTest {
         assertTrue(files.saveIfAbsent(batch));
         assertFalse(files.saveIfAbsent(batch));
         var differentDigest = ReconciliationFileBatch.builder()
-                .fileId(101L)
-                .objectKey(batch.objectKey())
-                .sourceSystem(batch.sourceSystem())
-                .recordType(batch.recordType())
+                .fileId(ReconciliationFileBatchId.of(101L))
+                .objectKey(batch.getObjectKey())
+                .sourceSystem(batch.getSourceSystem())
+                .recordType(batch.getRecordType())
                 .windowStart(START)
                 .windowEnd(END)
                 .fileVersion(0L)
@@ -158,23 +162,23 @@ class ReconciliationPersistenceTest {
                 .failureReason(null)
                 .createdAt(NOW)
                 .completedAt(null)
-                .batchId(200L)
-                .businessDate(batch.businessDate())
+                .batchId(ReconciliationDeliveryBatchId.of(200L))
+                .businessDate(batch.getBusinessDate())
                 .cutoffAt(NOW)
                 .actualRecordCount(null)
                 .updatedAt(NOW)
                 .build();
         assertFalse(files.saveIfAbsent(differentDigest));
-        assertEquals(batch, files.findByDelivery("PAYMENT", batch.objectKey(), 0L).orElseThrow());
-        assertTrue(files.updateImportStatus(100L, "CREATED", "IMPORTING", null, null));
-        assertFalse(files.updateImportStatus(100L, "CREATED", "IMPORTING", null, null));
-        assertTrue(files.updateImportStatus(100L, "IMPORTING", "COMPLETED", NOW.plusSeconds(1), null));
-        var completed = files.findById(100L).orElseThrow();
-        assertEquals(ReconciliationFileBatchStatus.COMPLETED, completed.status());
-        assertEquals(NOW.plusSeconds(1), completed.completedAt());
-        assertSqlState("23514", () -> files.updateImportStatus(100L, "COMPLETED", "UNKNOWN", NOW.plusSeconds(2), null));
-        assertEquals(1, files.findByBatchId(200L, 0, 10).size());
-        assertEquals(1, files.findBySourceAndBusinessDate("PAYMENT", batch.businessDate(), 0, 10).size());
+        assertSnapshot(batch, files.findByDelivery("PAYMENT", batch.getObjectKey(), 0L).orElseThrow());
+        assertTrue(files.updateImportStatus(ReconciliationFileBatchId.of(100L), "CREATED", "IMPORTING", null, null));
+        assertFalse(files.updateImportStatus(ReconciliationFileBatchId.of(100L), "CREATED", "IMPORTING", null, null));
+        assertTrue(files.updateImportStatus(ReconciliationFileBatchId.of(100L), "IMPORTING", "COMPLETED", NOW.plusSeconds(1), null));
+        var completed = files.findById(ReconciliationFileBatchId.of(100L)).orElseThrow();
+        assertEquals(ReconciliationFileBatchStatus.COMPLETED, completed.getStatus());
+        assertEquals(NOW.plusSeconds(1), completed.getCompletedAt());
+        assertSqlState("23514", () -> files.updateImportStatus(ReconciliationFileBatchId.of(100L), "COMPLETED", "UNKNOWN", NOW.plusSeconds(2), null));
+        assertEquals(1, files.findByBatchId(ReconciliationDeliveryBatchId.of(200L), 0, 10).size());
+        assertEquals(1, files.findBySourceAndBusinessDate("PAYMENT", batch.getBusinessDate(), 0, 10).size());
         assertEquals(1, files.findByStatus(ReconciliationFileBatchStatus.COMPLETED, 0, 10).size());
     }
 
@@ -182,7 +186,7 @@ class ReconciliationPersistenceTest {
     void deliveryHeadersSupportMultiFileIdentityPagingAndConcurrentMetadataUpdates() {
         var day = java.time.LocalDate.of(2026, 10, 1);
         var batch = ReconciliationDeliveryBatch.builder()
-                .batchId(200L)
+                .batchId(ReconciliationDeliveryBatchId.of(200L))
                 .manifestObjectKey("ledger/manifest.json")
                 .sourceSystem("LEDGER")
                 .businessDate(day)
@@ -201,14 +205,14 @@ class ReconciliationPersistenceTest {
                 .build();
         assertTrue(deliveries.saveIfAbsent(batch));
         assertFalse(deliveries.saveIfAbsent(batch));
-        assertEquals(batch, deliveries.findById(200L).orElseThrow());
-        assertEquals(batch, deliveries.findByDelivery("LEDGER", batch.manifestObjectKey(), 0L).orElseThrow());
+        assertSnapshot(batch, deliveries.findById(ReconciliationDeliveryBatchId.of(200L)).orElseThrow());
+        assertSnapshot(batch, deliveries.findByDelivery("LEDGER", batch.getManifestObjectKey(), 0L).orElseThrow());
         assertEquals(1, deliveries.findBySourceAndBusinessDate("LEDGER", day, 0, 1).size());
         assertTrue(deliveries.findBySourceAndBusinessDate("LEDGER", day, 200, 1).isEmpty());
         assertEquals(1, deliveries.findByStatus(ReconciliationFileBatchStatus.CREATED, 0, 10).size());
         var updated = ReconciliationDeliveryBatch.builder()
-                .batchId(200L)
-                .manifestObjectKey(batch.manifestObjectKey())
+                .batchId(ReconciliationDeliveryBatchId.of(200L))
+                .manifestObjectKey(batch.getManifestObjectKey())
                 .sourceSystem("LEDGER")
                 .businessDate(day)
                 .windowStart(START)
@@ -226,7 +230,7 @@ class ReconciliationPersistenceTest {
                 .build();
         assertTrue(deliveries.updateMetadata(updated, ReconciliationFileBatchStatus.CREATED, NOW));
         assertFalse(deliveries.updateMetadata(updated, ReconciliationFileBatchStatus.CREATED, NOW));
-        assertEquals(updated, deliveries.findById(200L).orElseThrow());
+        assertSnapshot(updated, deliveries.findById(ReconciliationDeliveryBatchId.of(200L)).orElseThrow());
         assertThrows(IllegalArgumentException.class, () -> deliveries.findByStatus(ReconciliationFileBatchStatus.CREATED, -1, 10));
     }
 
@@ -499,11 +503,11 @@ class ReconciliationPersistenceTest {
         assertSnapshot(action, actions.findById(action.getCaseActionId()).orElseThrow());
         var delivery = ReconciliationPersistenceContractTest.delivery(ReconciliationFileBatchStatus.CREATED, null, null);
         deliveries.saveIfAbsent(delivery);
-        assertSnapshot(delivery, deliveries.findById(delivery.batchId()).orElseThrow());
+        assertSnapshot(delivery, deliveries.findById(delivery.getBatchId()).orElseThrow());
         var file = ReconciliationPersistenceContractTest.file(ReconciliationFileBatchStatus.CREATED, null, null);
         files.saveIfAbsent(file);
-        assertSnapshot(file, files.findById(file.fileId()).orElseThrow());
-        assertEquals(file, files.findByBatchId(delivery.batchId(), 0, 1).getFirst());
+        assertSnapshot(file, files.findById(file.getFileId()).orElseThrow());
+        assertSnapshot(file, files.findByBatchId(delivery.getBatchId(), 0, 1).getFirst());
     }
 
     /**
@@ -514,7 +518,7 @@ class ReconciliationPersistenceTest {
         var original = ReconciliationPersistenceContractTest.file(ReconciliationFileBatchStatus.CREATED, null, null);
         files.saveIfAbsent(original);
         var updated = ReconciliationFileBatch.builder()
-                .fileId(original.fileId())
+                .fileId(original.getFileId())
                 .objectKey("ignored.csv")
                 .sourceSystem("ignored-source")
                 .recordType("ignored-type")
@@ -527,55 +531,55 @@ class ReconciliationPersistenceTest {
                 .byteSize(999L)
                 .status(ReconciliationFileBatchStatus.FAILED)
                 .failureReason("失败\n\"中文\",")
-                .createdAt(original.createdAt())
+                .createdAt(original.getCreatedAt())
                 .completedAt(NOW.plusSeconds(1))
-                .batchId(999L)
+                .batchId(ReconciliationDeliveryBatchId.of(999L))
                 .businessDate(LocalDate.of(2000, 1, 1))
                 .cutoffAt(NOW.plusSeconds(10))
                 .actualRecordCount(13L)
                 .updatedAt(NOW.plusSeconds(1))
                 .build();
-        assertTrue(files.updateMetadata(updated, original.status(), original.updatedAt()));
-        var stored = files.findById(original.fileId()).orElseThrow();
-        assertEquals(original.objectKey(), stored.objectKey());
-        assertEquals(original.sourceSystem(), stored.sourceSystem());
-        assertEquals(original.fileVersion(), stored.fileVersion());
-        assertEquals(original.schemaVersion(), stored.schemaVersion());
-        assertEquals(original.sha256(), stored.sha256());
-        assertEquals(original.recordCount(), stored.recordCount());
-        assertEquals(original.byteSize(), stored.byteSize());
-        assertEquals(original.batchId(), stored.batchId());
-        assertEquals(original.businessDate(), stored.businessDate());
-        assertEquals(original.cutoffAt(), stored.cutoffAt());
-        assertEquals(updated.actualRecordCount(), stored.actualRecordCount());
-        assertEquals(updated.failureReason(), stored.failureReason());
-        assertEquals(updated.completedAt(), stored.completedAt());
-        assertEquals(updated.updatedAt(), stored.updatedAt());
-        assertFalse(files.updateMetadata(updated, original.status(), original.updatedAt()));
+        assertTrue(files.updateMetadata(updated, original.getStatus(), original.getUpdatedAt()));
+        var stored = files.findById(original.getFileId()).orElseThrow();
+        assertEquals(original.getObjectKey(), stored.getObjectKey());
+        assertEquals(original.getSourceSystem(), stored.getSourceSystem());
+        assertEquals(original.getFileVersion(), stored.getFileVersion());
+        assertEquals(original.getSchemaVersion(), stored.getSchemaVersion());
+        assertEquals(original.getSha256(), stored.getSha256());
+        assertEquals(original.getRecordCount(), stored.getRecordCount());
+        assertEquals(original.getByteSize(), stored.getByteSize());
+        assertEquals(original.getBatchId(), stored.getBatchId());
+        assertEquals(original.getBusinessDate(), stored.getBusinessDate());
+        assertEquals(original.getCutoffAt(), stored.getCutoffAt());
+        assertEquals(updated.getActualRecordCount(), stored.getActualRecordCount());
+        assertEquals(updated.getFailureReason(), stored.getFailureReason());
+        assertEquals(updated.getCompletedAt(), stored.getCompletedAt());
+        assertEquals(updated.getUpdatedAt(), stored.getUpdatedAt());
+        assertFalse(files.updateMetadata(updated, original.getStatus(), original.getUpdatedAt()));
         var cleared = ReconciliationFileBatch.builder()
-                .fileId(stored.fileId())
-                .objectKey(stored.objectKey())
-                .sourceSystem(stored.sourceSystem())
-                .recordType(stored.recordType())
+                .fileId(stored.getFileId())
+                .objectKey(stored.getObjectKey())
+                .sourceSystem(stored.getSourceSystem())
+                .recordType(stored.getRecordType())
                 .windowStart(START)
                 .windowEnd(END)
-                .fileVersion(stored.fileVersion())
-                .schemaVersion(stored.schemaVersion())
-                .sha256(stored.sha256())
-                .recordCount(stored.recordCount())
-                .byteSize(stored.byteSize())
-                .status(stored.status())
+                .fileVersion(stored.getFileVersion())
+                .schemaVersion(stored.getSchemaVersion())
+                .sha256(stored.getSha256())
+                .recordCount(stored.getRecordCount())
+                .byteSize(stored.getByteSize())
+                .status(stored.getStatus())
                 .failureReason(null)
-                .createdAt(stored.createdAt())
+                .createdAt(stored.getCreatedAt())
                 .completedAt(null)
-                .batchId(stored.batchId())
-                .businessDate(stored.businessDate())
-                .cutoffAt(stored.cutoffAt())
+                .batchId(stored.getBatchId())
+                .businessDate(stored.getBusinessDate())
+                .cutoffAt(stored.getCutoffAt())
                 .actualRecordCount(null)
                 .updatedAt(NOW.plusSeconds(2))
                 .build();
-        assertTrue(files.updateMetadata(cleared, stored.status(), stored.updatedAt()));
-        assertSnapshot(cleared, files.findById(stored.fileId()).orElseThrow());
+        assertTrue(files.updateMetadata(cleared, stored.getStatus(), stored.getUpdatedAt()));
+        assertSnapshot(cleared, files.findById(stored.getFileId()).orElseThrow());
     }
 
     /**
